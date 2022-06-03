@@ -1,0 +1,52 @@
+<template>
+	<view class="bg-white">
+		<hoprxi-navigation title="商品类目" :backgroundColor="[1, ['#6B73FF', '#000DFF', 135]]" :titleFont="['#FFF']"
+			:surplusHeight=43>
+			<view slot="extendSlot" class="cu-bar search">
+				<view class="search-form radius">
+					<text class="cuIcon-search"></text>
+					<input v-model="scanResult" :adjust-position="false" type="text" placeholder="请输入类目名称、拼音助记码"
+						confirm-type="search">
+					<text class="cuIcon-scan text-blue text-bold" @tap="scan"></text>
+				</view>
+				<view class="action text-white">
+					<text class="cuIcon-close "></text>
+					<text @click="computedScrollViewHeight">取消</text>
+				</view>
+			</view>
+		</hoprxi-navigation>
+		<hop-tree ref="hop-tree" :trees="categories" checkType="checkbox" :disabledIds="disabledIds"
+			:expandedIds="expandedIds" :expendAll="false" :checkedIds="checkedIds" class="margin-left-sm"
+			@check="check">
+		</hop-tree>
+	</view>
+</template>
+
+<script>
+	import catalog from '@/data/catalog_test_data.js'; //用例数据库
+	export default {
+		data() {
+			return {
+				categories: [],
+				disabledIds: ["-99"],
+				expandedIds: ["1", "1532", "3446", "24325", "24326", "24327", "24325"],
+				checkedIds: ["754", "1234", "98874", "1532", "24323465345", "b25423", "24325", "24326"],
+				defaultProps: {
+					children: 'sub',
+					label: 'name'
+				},
+			}
+		},
+		created() {
+			this.categories = catalog.category;
+		},
+		methods: {
+			check(object) {
+				console.log(object);
+			}
+		}
+	}
+</script>
+
+<style lang='scss'>
+</style>

@@ -1,0 +1,185 @@
+{
+	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "首页"
+			}
+		}, {
+			"path": "pages/index/workflow",
+			"style": {
+				"navigationBarTitleText": "业务",
+				"navigationStyle": "custom"
+			}
+		}, {
+			"path": "pages/member/member",
+			"style": {
+				"navigationBarTitleText": "会员",
+				"navigationStyle": "custom"
+			}
+		}, {
+			"path": "pages/oa/oa",
+			"style": {
+				"navigationBarTitleText": "OA",
+				"navigationStyle": "custom"
+			}
+		}, {
+			"path": "pages/index/user",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "我的"
+			}
+		}, {
+			"path": "pages/public/not_implemented",
+			"style": {
+				"navigationBarTitleText": "未实现",
+				"navigationStyle": "custom"
+			}
+		}
+	],
+	"subPackages": [{
+		"root": "pages/workflow",
+		"pages": [{
+			"path": "store_selection",
+			"style": {
+				"navigationStyle": "custom"
+			},
+			"permission": {
+				"scope.userLocation": {
+					"desc": "你的位置信息将用于定位你所处的门店"
+				}
+			}
+		}, {
+			"path": "price/price_adjustment_sheet",
+			"style": {
+				"navigationBarTitleText": "调价单",
+				"navigationStyle": "custom"
+			}
+		}, {
+			"path": "price/price_adjustment_details",
+			"style": {
+				"navigationBarTitleText": "调价单明细",
+				"navigationStyle": "custom"
+			}
+		}, {
+			"path": "price/price_adjustment_add",
+			"style": {
+				"navigationBarTitleText": "新增调价单",
+				"navigationStyle": "custom"
+			}
+		}, {
+			"path": "price/promotion",
+			"style": {
+				"navigationBarTitleText": "促销",
+				"navigationStyle": "custom"
+			}
+		}, {
+			"path": "label/label",
+			"style": {
+				"navigationBarTitleText": "标签",
+				"navigationStyle": "custom"
+			}
+		}, {
+			"path": "label/printSetting",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "标签打印设置"
+			}
+		}, {
+			"path": "catalog/catalog",
+			"style": {
+				"navigationBarTitleText": "商品目录",
+				"navigationStyle": "custom"
+			}
+		}, {
+			"path": "catalog/good",
+			"style": {
+				"navigationBarTitleText": "商品",
+				"navigationStyle": "custom"
+			}
+		}, {
+			"path": "catalog/category",
+			"style": {
+				"navigationBarTitleText": "商品类目",
+				"navigationStyle": "custom"
+			}
+		}, {
+			"path": "purchase/order",
+			"style": {
+				"navigationBarTitleText": "订单",
+				"navigationStyle": "custom"
+			}
+		}]
+	}, {
+		"root": "pages/user",
+		"pages": [{
+			"path": "login",
+			"style": {
+				"navigationBarTitleText": "登录",
+				"navigationStyle": "custom"
+			}
+		}, {
+			"path": "register",
+			"style": {
+				"navigationBarTitleText": "注册",
+				"navigationStyle": "custom"
+			}
+		}, {
+			"path": "password",
+			"style": {
+				"navigationBarTitleText": "找回密码",
+				"navigationStyle": "custom"
+			}
+		}, {
+			"path": "userInfo",
+			"style": {
+				"navigationBarTitleText": "用户信息",
+				"navigationStyle": "custom"
+			}
+		}, {
+			"path": "bindMobile",
+			"style": {
+				"navigationBarTitleText": "用户绑定",
+				"navigationStyle": "custom"
+			}
+		}]
+	} ],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "HOPRXI协助工具",
+		"navigationBarBackgroundColor": "#e7ebed",
+		"backgroundColor": "#F8F8F8"
+	},
+	"tabBar": {
+		"color": "#909399",
+		"selectedColor": "#303133",
+		"borderStyle": "black",
+		"backgroundColor": "#ffffff",
+		"list": [{
+			"text": "首页",
+			"pagePath": "pages/index/index",
+			"iconPath": "static/tab_icon/index.png",
+			"selectedIconPath": "static/tab_icon/index_selected.png"
+		}, {
+			"text": "业务",
+			"pagePath": "pages/index/workflow",
+			"iconPath": "static/tab_icon/workflow.png",
+			"selectedIconPath": "static/tab_icon/workflow_selected.png"
+		}, {
+			"text": "会员",
+			"pagePath": "pages/member/member",
+			"iconPath": "static/tab_icon/member.png",
+			"selectedIconPath": "static/tab_icon/member_selected.png"
+		}, {
+			"text": "OA",
+			"pagePath": "pages/oa/oa",
+			"iconPath": "static/tab_icon/oa.png",
+			"selectedIconPath": "static/tab_icon/oa_selected.png"
+		}, {
+			"text": "我的",
+			"pagePath": "pages/index/user",
+			"iconPath": "static/tab_icon/user.png",
+			"selectedIconPath": "static/tab_icon/user_selected.png"
+		}]
+	}
+}
