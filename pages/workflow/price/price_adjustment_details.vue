@@ -1,6 +1,6 @@
 <template>
 	<view class="price_adjustment_datails">
-		<hop-nav-bar title="调价明细" :backgroundColor="[1, ['#AC32E4', '#7918F2', -225]]" tabPage="/pages/index/index"
+		<hoprxi-navigation title="调价明细" :backgroundColor="[1, ['#AC32E4', '#7918F2', -225]]" tabPage="/pages/index/index"
 			:titleFont="['#FFF']" :surplusHeight="fold?'80':'15'">
 			<view slot="extendSlot">
 				<view v-show="fold">
@@ -22,7 +22,7 @@
 				<text class="flex justify-center text-white text-bold" :class="fold?'cuIcon-fold':'cuIcon-unfold'"
 					@click="foldClick"></text>
 			</view>
-		</hop-nav-bar>
+		</hoprxi-navigation>
 		<scroll-view scroll-y :scroll-with-animation="true" :enable-back-to-top="true"
 			:style="{height: fold?'calc(100vh - 140px)':'calc(100vh - 125px)'}">
 			<block v-for="(item,index) in price_adjustment.items" :key="index">

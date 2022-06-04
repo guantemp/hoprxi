@@ -1,20 +1,20 @@
 <template>
-	<view class="bg-white">
-		<hop-nav-bar id="navBar" :title="good?'商品编辑':'商品新增'" :backgroundColor="[1, ['#6B73FF', '#000DFF', 135]]"
-			:titleFont="['#FFF']">
-		</hop-nav-bar>
+	<view>
+		<hoprxi-navigation :title="good?'商品编辑':'商品新增'" :backgroundColor="[1, ['#6B73FF', '#000DFF', 135]]"
+			:titleFont="['#FFF']" id="navBar">
+		</hoprxi-navigation>
 		<view :style="[scrollContentStyle]" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
 			<view class="flex flex-direction justify-center align-center padding-tb-sm" v-if="pullingDown">
 				<view class="loading-animation"></view>
-				<text class="pull-down-text">释放刷新~</text>
+				<text class="pull-down-text">释放刷新~~</text>
 			</view>
 			<view class="cu-form-group">
 				<view class="title">
-					<text v-if='good.plu'>PLU码</text>
+					<text v-if="good && good.plu">PLU码</text>
 					<text v-else>商品条码</text>
 					<text class="text-red margin-left-xs">*</text>
 				</view>
-				<input v-model="scanResult" :placeholder="good.plu||good.barcode||''" @blur="scanResultBlur">
+				<input v-model="scanResult" :placeholder="good?good.plu||good.barcode:''" @blur="scanResultBlur">
 				<view class="cu-capsule radius align-center">
 					<view class='cu-tag bg-blue text-lg' @tap.stop="scan">
 						<text class='cuIcon-scan text-white'></text>
@@ -26,27 +26,27 @@
 			</view>
 			<view class="cu-form-group">
 				<view class="title">商品名称<text class="text-red margin-left-xs">*</text></view>
-				<input v-model="name" :placeholder="good.name||''">
+				<input v-model="name" :placeholder="good?good.name:''">
 				<text class="cuIcon-more" @tap.stop="showAliasModalDialog" :class="alias?'text-red':''"></text>
 			</view>
 			<view class="cu-form-group">
 				<view class="title">商品规格<text class="text-red margin-left-xs">*</text></view>
-				<input v-model="specs" :placeholder="good.specs||'未定义'">
+				<input v-model="specs" :placeholder="good&&good.specs||'未定义'">
 			</view>
 			<view class="cu-form-group">
 				<view class="title">商品等级<text class="text-red margin-left-xs">*</text></view>
-				<input v-model="grade" :placeholder="grade||good.grade||'合格品'" disabled>
+				<input v-model="grade" :placeholder="grade||good&&good.grade||'合格品'" disabled>
 				<text class="cuIcon-more" @tap.stop="showGradeRadioDialog"></text>
 			</view>
 			<view class="cu-form-group">
 				<view class="title" @tap.stop="this.$util.toast('直辖定位到区级，其余定位到市！')">
 					商品产地<text class="text-red margin-left-xs">*</text></view>
-				<input v-model="placeOfOrigin" :placeholder="good.placeOfOrigin||''">
+				<input v-model="placeOfOrigin" :placeholder="good&&good.placeOfOrigin||''">
 				<text class="cuIcon-right" @tap.stop="showOriginDialog"></text>
 			</view>
 			<view class="cu-form-group">
 				<view class="title">商品类别<text class="text-red margin-left-xs">*</text></view>
-				<input :placeholder="good.category.name||'未定义'" v-model="category">
+				<input :placeholder="good&&good.category.name||'未定义'" v-model="category">
 				<text class="cuIcon-more" @tap.stop="navToCategory(good.category.id)"></text>
 			</view>
 			<view class="cu-form-group">
@@ -54,8 +54,8 @@
 					参考进价<text class="cuIcon-info"></text>
 				</view>
 				<text class="text-price"></text>
-				<input :placeholder="good.storage.lastPurchasePrice||'0.00/PCS'" :value="purchasePrice" type="digit"
-					@blur="purchasePriceBlur">
+				<input :placeholder="good&&good.storage.lastPurchasePrice||'0.00/PCS'" :value="purchasePrice"
+					type="digit" @blur="purchasePriceBlur">
 			</view>
 			<view class="cu-form-group">
 				<view class="title" @tap.stop="this.$util.toast('0.00元为灵活定价商品，POS系统每次销售时会询问售价！')">
@@ -63,11 +63,10 @@
 				<text class="text-price"></text>
 				<view class="flex flex-sub">
 					<badge v-if="retailGrossProfitRate" :count="'毛利率：'+ retailGrossProfitRate" class="basis-df">
-						<input :placeholder="good.retailPrice||'0.00/PCS'" :value="retailPrice" type="digit"
+						<input :placeholder="good&&good.retailPrice||'0.00/PCS'" :value="retailPrice" type="digit"
 							@blur="retailPriceBlur">
 					</badge>
-					<input v-else placeholder="0.00/PCS" :value="retailPrice" type="digit"
-						@blur="retailPriceBlur">
+					<input v-else placeholder="0.00/PCS" :value="retailPrice" type="digit" @blur="retailPriceBlur">
 				</view>
 				<text class="icon-unit text-blue" @tap.stop="showUnitDrawerModal"></text>
 			</view>
@@ -76,11 +75,10 @@
 				<text class="text-price"></text>
 				<view class="flex flex-sub">
 					<badge v-if="retailGrossProfitRate" :count="'毛利率：'+ retailGrossProfitRate" class="basis-df">
-						<input :placeholder="good.memberPrice||'0.00/PCS'" :value="memberPrice" type="digit"
+						<input :placeholder="good&&good.memberPrice||'0.00/PCS'" :value="memberPrice" type="digit"
 							@blur="memberPriceBlur">
 					</badge>
-					<input v-else placeholder="0.00/PCS" :value="memberPrice" type="digit"
-						@blur="memberPriceBlur">
+					<input v-else placeholder="0.00/PCS" :value="memberPrice" type="digit" @blur="memberPriceBlur">
 				</view>
 				<text class="icon-unit text-blue" @tap.stop="showUnitDrawerModal"></text>
 			</view>
@@ -89,18 +87,16 @@
 				<text class="text-price"></text>
 				<view class="flex flex-sub">
 					<badge v-if="retailGrossProfitRate" :count="'毛利率：'+ retailGrossProfitRate" class="basis-df">
-						<input :placeholder="good.memberPrice||'0.00/PCS'" :value="memberPrice" type="digit"
+						<input :placeholder="good&&good.memberPrice||'0.00/PCS'" :value="memberPrice" type="digit"
 							@blur="memberPriceBlur">
 					</badge>
-					<input v-else placeholder="0.00/PCS" :value="memberPrice" type="digit"
-						@blur="memberPriceBlur">
+					<input v-else placeholder="0.00/PCS" :value="memberPrice" type="digit" @blur="memberPriceBlur">
 				</view>
 				<text class="icon-unit text-blue" @tap.stop="showUnitDrawerModal"></text>
 			</view>
 			<view class="cu-form-group solid-bottom">
 				<view class="title">保&nbsp;&nbsp;质&nbsp;&nbsp;期</view>
-				<input :placeholder="good.shelfLife||'0天'" :value="shelfLife" type="number"
-					@blur="shelfLifeBlur">
+				<input :placeholder="good&&good.shelfLife||'0天'" :value="shelfLife" type="number" @blur="shelfLifeBlur">
 			</view>
 			<view class="cu-bar bg-white">
 				<view class="action title">商品图片</view>
@@ -147,7 +143,7 @@
 			<view class="cu-dialog">
 				<view class="flex align-center solid-bottom padding text-left">
 					<view class="margin-right-sm">商品别名：</view>
-					<input type="text" :placeholder="good.name.alias||'请输入商品的另外一个名称'" v-model="alias"
+					<input type="text" :placeholder="good&&good.name.alias||'请输入商品的另外一个名称'" v-model="alias"
 						class="flex-sub">
 				</view>
 				<view class="cu-bar bg-white">
@@ -264,12 +260,12 @@
 			//let pattern = new RegExp(/(^\d+)天$/i);
 			//let result = pattern.exec("35") //"内蒙古.呼和浩特"
 			//console.log(this.computedGrossProfitRate(null, 65));
-		},
-		mounted() {
-			const query = uni.createSelectorQuery().in(this);
-			query.select('#navBar').boundingClientRect(res => {
-				this.navBarHeight = res.height;
-			}).exec();
+			//console.log(this.good)
+			let query = uni.createSelectorQuery().in(this);
+			query.select('#navBar').boundingClientRect().exec(res => {
+				this.navBarHeight=res[0].height;
+				console.log(this.navBarHeight);
+			});
 		},
 		watch: {
 			unit() {
@@ -323,9 +319,7 @@
 					},
 				});
 			},
-			generate(sign) {
-				console.log(sign);
-			},
+			generate(sign) {},
 			scanResultBlur(sign) {},
 			showAliasModalDialog() {
 				this.aliasModalDialog = true;
@@ -347,42 +341,40 @@
 				this.originDialog = false;
 			},
 			showOriginDialog() {
-	
-					let pattern = new RegExp(/^([\u4e00-\u9fa5]{1,}[省|市|自治区]?)\.([\u4e00-\u9fa5]{1,}[市|区|县|州|盟|地区]?)$/i);
-					let result = pattern.exec(this.good.placeOfOrigin);
-					if (this.placeOfOrigin)  result = pattern.exec(this.placeOfOrigin);
-					if (result) {
-						let province = ["北京市", "天津市", "上海市"];
-						if (province.includes(result[1])) {
-							this.initPlaceOfOrigin = [result[1], result[1], result[2]];
-						} else if (result[1] === '重庆市') {
-							let area = ["城口县", "丰都县", "垫江县", "忠县", "云阳县", "奉节县", "巫山县", "巫溪县", "石柱土家族自治县", "秀山土家族苗族自治县",
-								"酉阳土家族苗族自治县", "彭水苗族土家族自治县"
-							];
-							if (area.includes(result[2])) //直辖县
-								this.initPlaceOfOrigin = [result[1], '直辖县', result[2]];
-							else this.initPlaceOfOrigin = [result[1], result[1], result[2]];
-						} else if (result[1] === '新疆维吾尔自治区') {
-							let area = ["石河子市", "阿拉尔市", "图木舒克市", "五家渠市", "北屯市", "铁门关市", "双河市", "可克达拉市", "昆玉市", "胡杨河市"];
-							if (area.includes(result[2])) //直辖县
-								this.initPlaceOfOrigin = [result[1], '直辖县', result[2]];
-						} else if (result[1] === '海南省') {
-							let area = ["五指山市", "琼海市", "文昌市", "万宁市", "东方市", "定安县", "屯昌县", "澄迈县", "临高县", "白沙黎族自治县",
-								"昌江黎族自治县", "乐东黎族自治县", "陵水黎族自治县", "保亭黎族苗族自治县", "琼中黎族苗族自治县"
-							];
-							if (area.includes(result[2])) //直辖县
-								this.initPlaceOfOrigin = [result[1], '直辖县', result[2]];
-						} else if (result[1] === '湖北省') {
-							let area = ["仙桃市", "潜江市", "天门市", "神农架林区"];
-							if (area.includes(result[2])) //直辖县
-								this.initPlaceOfOrigin = [result[1], '直辖县', result[2]];
-						}
-						if (this.initPlaceOfOrigin.length === 0) {
-							this.initPlaceOfOrigin = [result[1], result[2]];
-						}
-					} else {
-						this.initPlaceOfOrigin = [];
-
+				let pattern = new RegExp(/^([\u4e00-\u9fa5]{1,}[省|市|自治区]?)\.([\u4e00-\u9fa5]{1,}[市|区|县|州|盟|地区]?)$/i);
+				let result = pattern.exec(this.good.placeOfOrigin);
+				if (this.placeOfOrigin) result = pattern.exec(this.placeOfOrigin);
+				if (result) {
+					let province = ["北京市", "天津市", "上海市"];
+					if (province.includes(result[1])) {
+						this.initPlaceOfOrigin = [result[1], result[1], result[2]];
+					} else if (result[1] === '重庆市') {
+						let area = ["城口县", "丰都县", "垫江县", "忠县", "云阳县", "奉节县", "巫山县", "巫溪县", "石柱土家族自治县", "秀山土家族苗族自治县",
+							"酉阳土家族苗族自治县", "彭水苗族土家族自治县"
+						];
+						if (area.includes(result[2])) //直辖县
+							this.initPlaceOfOrigin = [result[1], '直辖县', result[2]];
+						else this.initPlaceOfOrigin = [result[1], result[1], result[2]];
+					} else if (result[1] === '新疆维吾尔自治区') {
+						let area = ["石河子市", "阿拉尔市", "图木舒克市", "五家渠市", "北屯市", "铁门关市", "双河市", "可克达拉市", "昆玉市", "胡杨河市"];
+						if (area.includes(result[2])) //直辖县
+							this.initPlaceOfOrigin = [result[1], '直辖县', result[2]];
+					} else if (result[1] === '海南省') {
+						let area = ["五指山市", "琼海市", "文昌市", "万宁市", "东方市", "定安县", "屯昌县", "澄迈县", "临高县", "白沙黎族自治县", "昌江黎族自治县",
+							"乐东黎族自治县", "陵水黎族自治县", "保亭黎族苗族自治县", "琼中黎族苗族自治县"
+						];
+						if (area.includes(result[2])) //直辖县
+							this.initPlaceOfOrigin = [result[1], '直辖县', result[2]];
+					} else if (result[1] === '湖北省') {
+						let area = ["仙桃市", "潜江市", "天门市", "神农架林区"];
+						if (area.includes(result[2])) //直辖县
+							this.initPlaceOfOrigin = [result[1], '直辖县', result[2]];
+					}
+					if (this.initPlaceOfOrigin.length === 0) {
+						this.initPlaceOfOrigin = [result[1], result[2]];
+					}
+				} else {
+					this.initPlaceOfOrigin = [];
 				}
 				//console.log(this.initPlaceOfOrigin);
 				this.originDialog = true;
@@ -530,7 +522,7 @@
 	}
 </script>
 
-<style scoped lang='scss'>
+<style lang='scss'>
 	.bottom {
 		display: flex;
 		justify-content: center;

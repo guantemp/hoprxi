@@ -1,8 +1,8 @@
 <template>
 	<view class="price_adjustment_sheet">
-		<hop-nav-bar title="调价单" :backgroundColor="[1, ['#AC32E4', '#7918F2', 90]]" :titleFont="['#FFF','left',700]"
-			surplusHeight=43 id="navBar">
-			<view slot="extendSlot" class="cu-bar search">
+		<hoprxi-navigation title="调价单" :backgroundColor="[1, ['#AC32E4', '#7918F2', 90]]"
+			:titleFont="['#FFF','left',700]" :surplusHeight="43" id="navBar">
+			<template slot="extendSlot" class="cu-bar search">
 				<view class="search-form radius">
 					<text class="cuIcon-search"></text>
 					<input v-model="scanResult" :adjust-position="false" type="text" placeholder="请输入单据号、商品条码"
@@ -14,18 +14,18 @@
 					<text @click="computedScrollViewHeight">取消</text>
 					<text class="cuIcon-filter margin-left-xs" @click="query"></text>
 				</view>
-			</view>
-		</hop-nav-bar>
+			</template>
+		</hoprxi-navigation>
 		<view class="flex justify-around align-center bg-white solid padding-tb-sm padding-lr-lg" v-if="dateShow">
 			<text @click.stop="selectDate(true)">{{formattedStartDate}}</text>
 			<text>至</text>
 			<text @click.stop="selectDate(false)">{{formattedEndDate}}</text>
 		</view>
 		<scroll-view scroll-y :scroll-with-animation="true" :enable-back-to-top="true"
-			:style="{height:dateShow?'calc(98.5vh - '+(fixedHeight+dateShowHeight)+'px - 12rpx)':'calc(98.5vh - '+ fixedHeight +'px - 12rpx)'}">
-			<view class="bg-white nav margin-top-xs">
+			:style="{height:dateShow?'calc(98.5vh - '+(fixedHeight+dateShowHeight)+'px - 10rpx)':'calc(98.5vh - '+ fixedHeight +'px - 10rpx)'}">
+			<view class="bg-white margin-top-xs nav">
 				<view class="flex text-center">
-					<view class="cu-item flex-sub" :class="index===tabCur?'text-orange cur':''"
+					<view class="cu-item flex-sub" :class="{'text-orange cur':index===tabCur}"
 						v-for="(item,index) in tabList" :key="index" @tap="tabSelect" :data-id="index">
 						{{item}}
 					</view>
@@ -33,23 +33,23 @@
 			</view>
 			<block v-for="(sheet,index) in priceAdjustmentSheet" :key="index">
 				<view class="sheet">
-					<hop-list-cell :title="'单据号: ' + sheet.sheetNumber" :titleFont="['#8799a3',28,700]"
+					<hoprxi-cell :title="'单据号: ' + sheet.sheetNumber" :titleFont="['#8799a3',28,700]"
 						:line="['dashed','#e4e7ed']" decorateIconClass="cuIcon-comment">
-						<view slot="executableSlot">
+						<template #executableSlot>
 							<text v-if="sheet.approval==='normal' || sheet.approval==='denied'"
 								class="cuIcon-delete text-blue"
 								@click.stop="showDeleteModalDialog(sheet.sheetNumber,$event)"
 								data-target="DialogModalDelete"></text>
-						</view>
-					</hop-list-cell>
+						</template>
+					</hoprxi-cell>
 					<view class="sheetDetailed margin-top-xs padding-lr-xs" @tap.stop="navToSheet(sheet.sheetNumber)">
 						<text class="iconfont icon-price-adjustment left" :style="[{color:selectColor(sheet)}]"></text>
 						<view class="flex flex-direction midlle text-cut">
 							<text>申请日期：{{sheet.applyDate}}</text>
 							<text class="text-cut">适配门店：{{sheet.store}}</text>
 							<text class="margin-bottom-xs">生效日期：{{sheet.effectDate}}</text>
-							<hop-list-cell :title="'申请人：' + sheet.proposer" :line="['dashed','#e4e7ed','top']">
-							</hop-list-cell>
+							<hoprxi-cell :title="'申请人：' + sheet.proposer" :line="['dashed','#e4e7ed','top']">
+							</hoprxi-cell>
 						</view>
 						<text class="cuIcon-right text-grey margin-left-sm right"></text>
 					</view>
@@ -63,14 +63,14 @@
 				<text class="cuIcon-add margin-right-xl"></text>新增调价单</button>
 		</view>
 		<!-- 删除对话框 -->
-		<view class="cu-modal" :class="deleteModalDialog?'show':''">
+		<view class="cu-modal" :class="{'show':deleteModalDialog}">
 			<view class="cu-dialog">
 				<view class="cu-bar bg-white">
-					<view class="content">删除提示</view>
+					<view class="content text-bold text-orange">警 告</view>
 				</view>
-				<view class="padding-xl bg-white text-bold">
-					<text>删除调价单据：</text>
-					<text class="text-blue">{{selectedSheetNumber}}</text>
+				<view class="padding-xs bg-white">
+					<text class="text-bold">将删除调价单据</text><br /><br />
+					<text class="text-blue">单据号：{{selectedSheetNumber}}</text>
 				</view>
 				<view class="cu-bar bg-white">
 					<view class="action margin-0 flex-sub text-green" @tap="hideDeleteModalDialog">取消</view>
@@ -86,9 +86,9 @@
 					<text @tap.stop.prevent="hideDateModal">取消</text>
 					<text class="text-orange" @tap.stop.prevent="pickerConfirm">确定</text>
 				</view>
-				<hop-date-picker :startYear="startYear" fields="day" :current="current" :value="initDate"
+				<hoprxi-date-picker :startYear="startYear" fields="day" :current="true" :value="initDate"
 					@change="handlerChange" @touchstart="touchStart" @touchend="touchEnd">
-				</hop-date-picker>
+				</hoprxi-date-picker>
 			</view>
 		</view>
 	</view>
@@ -121,7 +121,7 @@
 				result: {},
 			}
 		},
-		onLoad: function() {
+		onLoad() {
 			this.priceAdjustmentSheet = priceAdjustmentSheetTestData;
 			let currentDate = new Date();
 			this.formattedStartDate = formatDate(currentDate, "yyyy-MM-dd 00:00:00");
@@ -129,7 +129,7 @@
 			currentDate.setDate(currentDate.getDate() - 31);
 			this.startYear = currentDate.getFullYear();
 			//定时器请求数据
-			setTimeout(() => {
+			this.$nextTick(() => {
 				let query = uni.createSelectorQuery().in(this);
 				query.select('#navBar').boundingClientRect().exec(res => {
 					this.setFixedHeight(res[0].height);
@@ -138,7 +138,7 @@
 				query.select('.add').boundingClientRect().exec(res => {
 					this.setFixedHeight(res[0].height);
 				});
-			}, 10);
+			})
 		},
 		methods: {
 			scan() {

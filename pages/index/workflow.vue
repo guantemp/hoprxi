@@ -1,6 +1,6 @@
 <template>
 	<view class="workflow">
-		<hoprxi-navigation title="工作台" :backgroundColor="[1, ['#65FDF0', '#1D6FA3',45]]" :surplusHeight=26
+		<hoprxi-navigation title="工作台" :backgroundColor="[1, ['#65FDF0', '#1D6FA3',45]]" :surplusHeight="26"
 			:titleFont="['#FFF','center',700]">
 			<view slot="extendSlot" class="store" @click="this.$util.navTo('/pages/workflow/store_selection')">
 				<text class="cuIcon-location txt"></text>

@@ -194,7 +194,7 @@
 	}
 </script>
 
-<style scoped lang='scss'>
+<style lang='scss'>
 	.store {
 		width: 100vw;
 		background-color: #F8F8F8;

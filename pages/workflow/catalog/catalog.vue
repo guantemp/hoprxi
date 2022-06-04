@@ -1,8 +1,8 @@
 <template>
 	<view>
-		<hoprxi-navigation title="商品目录" :backgroundColor="[1, ['#6B73FF', '#000DFF', 135]]" :titleFont="['#FFF']" id="navBar"
-			:surplusHeight=43>
-			<view slot="extendSlot" class="cu-bar search">
+		<hoprxi-navigation title="商品目录" :backgroundColor="[1, ['#6B73FF', '#000DFF', 135]]" :titleFont="['#FFF']"
+			id="navBar" :surplusHeight="43">
+			<template slot="extendSlot" class="cu-bar search">
 				<view class="search-form radius">
 					<text class="cuIcon-search"></text>
 					<input v-model="scanResult" :adjust-position="false" type="text" placeholder="请输入商品条码、名称、拼音助记码"
@@ -10,15 +10,14 @@
 					<text class="cuIcon-scan text-blue text-bold" @tap="scan"></text>
 				</view>
 				<view class="action text-white">
-					<text class="cuIcon-close "></text>
-					<text @click="computedScrollViewHeight">取消</text>
+					<text class="cuIcon-close text-xs" @click="computedScrollViewHeight">取消</text>
 				</view>
-			</view>
+			</template>
 		</hoprxi-navigation>
-		<hop-filterDropdown :menus="categories"></hop-filterDropdown>
+		<hoprxi-dropdown :menus="categories"></hoprxi-dropdown>
 		<scroll-view scroll-y :scroll-with-animation="true" :enable-back-to-top="true"
 			:style="{height: 'calc(100vh - 150px)'}">
-			<hop-slider :btnArr="btnArr" :items="catalog" @del="del" @click="nav">
+			<hop-slider :btnArr="btnArr" :items="catalog" @del="del" @click="navigationToDetail">
 				<template v-slot="{item}">
 					<view class="flex padding-lr-sm padding-tb-xs align-center solid-top" @longpress="onLongPress"
 						:data-id="item.id||item.plu" :data-sign="item.id?'id':'plu'">
@@ -129,7 +128,7 @@
 			category(data) {
 				this.$util.navTo('/pages/workflow/catalog/category');
 			},
-			nav(data) {
+			navigationToDetail(data) {
 				if (data.id) this.$util.navTo('/pages/workflow/catalog/good?id=' + data.id);
 				if (data.plu) this.$util.navTo('/pages/workflow/catalog/good?plu=' + data.plu);
 			},
@@ -145,7 +144,7 @@
 	}
 </script>
 
-<style  lang='scss'>
+<style lang='scss'>
 	.catalog {
 		position: relative;
 		width: 100vw;
