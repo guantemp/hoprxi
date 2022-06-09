@@ -88,7 +88,7 @@ export default {
 	}, {
 		id: "9832546898",
 		name: "粮油",
-		filter: "singleSelect",
+		selector: "single",
 		sub: [{
 			id: "3446",
 			name: "食用油",
@@ -198,7 +198,7 @@ export default {
 	}, {
 		id: "4",
 		name: "日化",
-		filter: "multiSelect",
+		selector: "multi",
 		sub: [{
 			id: "234",
 			name: "纸品",

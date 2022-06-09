@@ -1,14 +1,12 @@
 <template>
 	<view>
 		<scroll-view scroll-x class="navigation bg-white" scroll-with-animation :scroll-left="scrollLeft">
-			<view class="tab" :class="index === selected?'text-orange cur text-bold':''" v-for="(tab,index) in tabs"
-				:key="tab.id" :data-id="tab.id" @tap="tabSelect">
+			<view class="tab" :ref="tab" :class="{'text-orange cur text-bold':index === selected}"
+				v-for="(tab,index) in tabs" :key="tab.id" :data-id="tab.id" @tap="tabSelect">
 				<text>{{tab.name}}</text>
-				<text v-if="tab.sub" class="cuIcon-triangledownfill subIcon" :class="[
-				{
-					'selected':tab.id === select[0] && popupShow,
-				}
-				]" @tap.stop="triangledown" :data-id="tab.id"></text>
+				<text v-if="tab.sub" class="cuIcon-triangledownfill subIcon"
+					:class="{'selected':index === selected && popupShow}" @tap.stop="triangledown"
+					:data-id="tab.id"></text>
 			</view>
 		</scroll-view>
 		<!-- 遮罩层-->
@@ -16,23 +14,23 @@
 		<!--4个层级-->
 		<view class="popup" :class="{'hide':!popupShow}" v-if="tabs[selected].depth >= 4">
 			<scroll-view class="left" :scroll-y="true" :scroll-into-view="'left_'+ leftScrollInto">
-				<block v-for="(one,index) in childrenOf(selected).sub" :key="one.id">
-					<view class="leftMenu" :id="'left_'+ one.id" :class="{'bg-white text-bold':select[1] === one.id}"
-						@tap.stop="menuSelect(selected,one.id)">
+				<block v-for="(one,index) in tabs[selected].sub" :key="one.id">
+					<view class="leftMenu" :id="'left_'+ one.id" :class="{'bg-white text-bold':select[selected]&&select[selected].level2_id === one.id}"
+						@tap.stop="menuSelect(one.id)">
 						<text>{{one.name}}</text>
 					</view>
 				</block>
 			</scroll-view>
 			<scroll-view class="right" :scroll-y="true" :scroll-into-view="'label_'+rightScrollInto">
-				<block v-for="(two,index) in childrenOf(selected,select[1]).sub" :key="two.id">
+				<block v-for="(two,index) in childrenOf(select[selected])" :key="two.id">
 					<view class="label" :class="{'text-red text-bold':select[2] === two.id}" :id="'label_'+ two.id"
-						@tap.top="menuSelect(selected,select[1],two.id)">
+						@tap.top="menuSelect(select[1],two.id)">
 						<text>{{two.name}}</text>
 						<text class="cuIcon-check text-lg text-bold" v-if="!two.sub&&select[2] === two.id"></text>
 					</view>
 					<view class="items" v-if="two.sub">
 						<block v-for="(three,three_index) in two.sub" :key="three.id">
-							<view class="item" @tap.top="menuSelect(selected,select[1],select[2],three.id)"
+							<view class="item" @tap.top="menuSelect(select[1],select[2],three.id)"
 								:class="{'selected':select[3]===three.id}" :id="'label_'+ three.id">
 								<text>{{three.name}}</text>
 							</view>
@@ -46,15 +44,15 @@
 		<view class="popup" :class="{'hide':!popupShow}" v-else-if="tabs[selected].depth <= 3">
 			<scroll-view class="filter" scroll-y="true" :scroll-into-view="'s_'+ scrollInto"
 				:scroll-with-animation="true" :enable-back-to-top="true"
-				:style="childrenOf(selected).selector === 'multiSelect'?'padding-bottom:108rpx':''">
-				<block v-for="(two,index) in childrenOf(selected).sub" :key="two.id">
+				:style="{'padding-bottom:108rpx':tabs[selected].selector === 'multiSelect'}">
+				<block v-for="(two,index) in tabs[selected].sub" :key="two.id">
 					<view class="label" :class="select[1] === index? 'text-red':'text-gray'" :id="'label_'+index"
-						@tap="menuSelect(selected,index,null,null)">
+						@tap="menuSelect(index,null,null)">
 						<text>{{two.name}}</text>
 					</view>
 					<view class="items items-extend" v-if="two.sub">
 						<block v-for="(three,three_index) in two.sub" :key="three.id">
-							<view class="item item-extend" @tap.top="menuSelect(selected,select[1],three_index,null)"
+							<view class="item item-extend" @tap.top="menuSelect(select[1],three_index,null)"
 								:class="{'selected':select[2]===three_index}">
 								<text>{{three.name}}</text>
 							</view>
@@ -77,6 +75,9 @@
 	import {
 		getPropertyFromData,
 	} from '@/common/js/util.js';
+	import {
+		ref
+	} from "vue";
 	export default {
 		name: 'hoprxi-dropdown',
 		props: {
@@ -94,7 +95,7 @@
 					id: 'id', // 指定id为节点对象的某个属性值
 					sub: 'sub', // 指定子树为节点对象的某个属性值
 					name: 'name', // 指定标签为节点对象的某个属性值
-					selector: 'filter' //选择类型 singleSelect,multiSelect
+					selector: 'selector' //选择类型 singleSelect,multiSelect
 				}
 			},
 		},
@@ -113,6 +114,78 @@
 		},
 		watch: {},
 		methods: {
+			tabSelect(event) {
+				const id = event.currentTarget.dataset.id;
+				const index = this.indexOf(id, this.tabs);
+				this.selected = index;
+				//css tab中 (margin:10+padding:20)*2=60
+				this.scrollLeft = (index - 1) * 60;
+				if (this.popupShow && !this.tabs[index].sub) this.popupShow = false
+				this.$nextTick(() => {
+					console.log("tab:" + this.tabs[index].id)
+				})
+			},
+			triangledown(event) {
+				this.tabSelect(event);
+				this.popupShow = !this.popupShow;
+			},
+			closePopup() {
+				this.popupShow = false;
+			},
+			childrenOf(level2_id) {
+				let first_select = this.select[this.selected]; //第一次点击tab_select
+				console.log(this.select[this.selected]);
+				if (typeof(first_select) === "undefined") {
+					if (this.tabs[this.selected].sub[0].sub) {
+						return this.tabs[this.selected].sub[0].sub;
+					}
+					return this.tabs[this.selected].sub[0];
+				}
+				let sub = this.tabs[this.selected].sub;
+				let index = this.indexOf(this.select[this.selected].level2_id, sub);
+				//console.log(sub[index].sub);
+				return sub[index].sub;
+				return sub[this.indexOf(level2_id, sub)].sub;
+			},
+			menuSelect(level2_id, level3_id, level4_id) {
+				console.log("menu：" + (level2_id !== null && typeof(level3_id) == "undefined" && typeof(level4_id) ==
+					"undefined"))
+				if (level2_id === null || typeof(level2_id) == "undefined") return;
+				if (level2_id !== null && typeof(level3_id) == "undefined" && typeof(level4_id) == "undefined") {
+					this.$set(this.select, this.selected, {
+						level2_id: level2_id
+					});
+					if (this.select[1] !== level2_id) {
+						this.$set(this.select, 1, level2_id);
+					}
+					console.log("level2_id：" + this.select[this.selected].level2_id)
+				} else if (level2_id !== null && level3_id !== null && level4_id == null) {
+					if (this.select[3]) this.select[3] = null;
+					if (this.select[2] !== level3_id) {
+						this.$set(this.select, 2, level3_id);
+					}
+				} else if (level2_id != null && level4_id != null) {
+					if (this.select[3] !== level4_id) {
+						this.$set(this.select, 3, level4_id);
+					}
+				}
+				//console.log(this.select[3]);
+				this.$emit('selected', {
+					index: 0,
+					value: 0
+				});
+			},
+			indexOf(id, menus = []) {
+				if (!id || !menus || !Array.isArray(menus) || menus.length === 0) return 0;
+				let index = 0;
+				for (const menu of menus) {
+					if (id === menu.id) {
+						break;
+					}
+					index++;
+				}
+				return index;
+			},
 			depth(treeData) {
 				let floor = 0
 				let max = 0
@@ -129,29 +202,6 @@
 				}
 				_each(treeData, 1)
 				return max + 1;
-			},
-			indexOf(id, menus = []) {
-				if (!id || !menus || !Array.isArray(menus) || menus.length === 0) return 0;
-				let index = 0;
-				for (const menu of menus) {
-					if (id === menu.id) {
-						break;
-					}
-					index++;
-				}
-				return index;
-			},
-			childrenOf(level1_id, level2_id = null, level3_id = null, level4_id = null) {
-				if (level1_id == null && level2_id == null && level3_id == null && level4_id == null) {
-					return this.tabs[this.selected].sub;
-				}
-				if (level1_id != null && level2_id == null && level3_id == null && level4_id == null) {
-					return this.tabs[level1_id];
-				}
-				if (level1_id != null && level2_id != null && level3_id == null && level4_id == null) {
-					let temp = this.tabs[this.indexOf(level1_id, this.tabs)].sub;
-					return temp[this.indexOf(level2_id, temp)];
-				}
 			},
 			decorate() {
 				const _translate = (parent, children = []) => {
@@ -185,7 +235,7 @@
 						id: id,
 						name: name,
 					}
-					const selector = getPropertyFromData(menu, this.props, 'filter');
+					const selector = getPropertyFromData(menu, this.props, 'selector');
 					if (selector) {
 						parent = {
 							...parent,
@@ -199,50 +249,9 @@
 					}
 					i += 1;
 				}
-				this.select[0] = this.tabs[0].id;
-				console.log(this.tabs);
+				//this.select[0] = this.tabs[0].id;
+				//console.log(this.tabs);
 			},
-			tabSelect(event) {
-				const id = event.currentTarget.dataset.id;
-				const index = this.indexOf(id, this.tabs);
-				this.selected = index;
-				//css tab中 (margin:10+padding:20)*2=60
-				this.scrollLeft = (index - 1) * 60;
-				if (this.popupShow && !this.tabs[index].sub) this.popupShow = false;
-				console.log(this.tabs[this.selected]);
-			},
-			triangledown(event) {
-				this.tabSelect(event);
-				this.popupShow = !this.popupShow;
-			},
-			closePopup() {
-				this.popupShow = false;
-			},
-			menuSelect(level1_id, level2_id, level3_id, level4_id) {
-				if (level1_id == null) return;
-				if (level1_id != null && level2_id == null && level3_id == null && level4_id == null) {}
-				if (level1_id != null && level2_id != null && level3_id == null && level4_id == null) {
-					if (this.select[1] !== level2_id) {
-						this.$set(this.select, 1, level2_id);
-					}
-				}
-				if (level1_id != null && level2_id != null && level3_id != null && level4_id == null) {
-					if (this.select[3]) this.select[3] = null;
-					if (this.select[2] !== level3_id) {
-						this.$set(this.select, 2, level3_id);
-					}
-				}
-				if (level1_id != null && level2_id != null && level4_id != null) {
-					if (this.select[3] !== level4_id) {
-						this.$set(this.select, 3, level4_id);
-					}
-				}
-				//console.log(this.select[3]);
-				this.$emit('selected', {
-					index: 0,
-					value: 0
-				});
-			}
 		}
 	}
 </script>
@@ -311,11 +320,11 @@
 		background-color: #fff;
 		z-index: 9;
 		box-shadow: 0 5px 5px rgba(0, 0, 0, .1);
-		transition: all 0.5s ease 0s;
+		transition: display 0.5s linear 0s;
 
 		&.hide {
 			display: none;
-			transition: all 0.5s linear 0s;
+			transition: display 0.5s linear 0s;
 		}
 
 		.left {
