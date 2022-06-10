@@ -15,18 +15,21 @@
 		<view class="popup" :class="{'hide':!popupShow}" v-if="tabs[selected].depth >= 4">
 			<scroll-view class="left" :scroll-y="true" :scroll-into-view="'left_'+ leftScrollInto">
 				<block v-for="(one,index) in tabs[selected].sub" :key="one.id">
-					<view class="leftMenu" :id="'left_'+ one.id" :class="{'bg-white text-bold':select[selected]&&select[selected].level2_id === one.id}"
-						@tap.stop="menuSelect(one.id)">
+					<view class="leftMenu" :id="'left_'+ one.id"
+						:class="{'bg-white text-bold':select[selected]&&select[selected].level2_id === one.id&&!select[selected].cancel}"
+						@tap.stop="menu_selected(one.id)">
 						<text>{{one.name}}</text>
 					</view>
 				</block>
 			</scroll-view>
 			<scroll-view class="right" :scroll-y="true" :scroll-into-view="'label_'+rightScrollInto">
-				<block v-for="(two,index) in childrenOf(select[selected])" :key="two.id">
-					<view class="label" :class="{'text-red text-bold':select[2] === two.id}" :id="'label_'+ two.id"
-						@tap.top="menuSelect(select[1],two.id)">
+				<block v-for="(two,index) in children()" :key="two.id">
+					<view class="label"
+						:class="{'text-red text-bold':select[selected]&&select[selected].level3_id === two.id}"
+						:id="'label_'+ two.id" @tap.top="menu_selected(two.id,'three')">
 						<text>{{two.name}}</text>
-						<text class="cuIcon-check text-lg text-bold" v-if="!two.sub&&select[2] === two.id"></text>
+						<text class="cuIcon-check text-lg text-bold"
+							v-if="select[selected]&&select[selected].level3_id === two.id"></text>
 					</view>
 					<view class="items" v-if="two.sub">
 						<block v-for="(three,three_index) in two.sub" :key="three.id">
@@ -121,9 +124,6 @@
 				//css tab中 (margin:10+padding:20)*2=60
 				this.scrollLeft = (index - 1) * 60;
 				if (this.popupShow && !this.tabs[index].sub) this.popupShow = false
-				this.$nextTick(() => {
-					console.log("tab:" + this.tabs[index].id)
-				})
 			},
 			triangledown(event) {
 				this.tabSelect(event);
@@ -132,9 +132,10 @@
 			closePopup() {
 				this.popupShow = false;
 			},
-			childrenOf(level2_id) {
+			children() {
 				let first_select = this.select[this.selected]; //第一次点击tab_select
-				console.log(this.select[this.selected]);
+				console.log("chilren:");
+				console.log(typeof(first_select) === "undefined");
 				if (typeof(first_select) === "undefined") {
 					if (this.tabs[this.selected].sub[0].sub) {
 						return this.tabs[this.selected].sub[0].sub;
@@ -143,13 +144,46 @@
 				}
 				let sub = this.tabs[this.selected].sub;
 				let index = this.indexOf(this.select[this.selected].level2_id, sub);
-				//console.log(sub[index].sub);
 				return sub[index].sub;
-				return sub[this.indexOf(level2_id, sub)].sub;
+			},
+			menu_selected(id, level = "second") {
+				switch (level) {
+					case "second":
+						let second = this.select[this.selected];
+						if (typeof(second) !== "undefined" && !second.cancel && second.level2_id && second.level2_id ===
+							id) {
+							this.$set(this.select, this.selected, {
+								level2_id: id,
+								cancel: true
+							});
+						} else {
+							this.$set(this.select, this.selected, {
+								level2_id: id
+							});
+						}
+						break;
+					case "three":
+						let three = this.select[this.selected];
+						if (typeof(three) === "undefined") {
+							this.$set(this.select, this.selected, {
+								level2_id: this.tabs[this.selected].sub[0].id,
+								level3_id: id
+							});
+						} else {
+							let three_object = {
+								...this.select[this.selected],
+								level3_id: id
+							}
+							this.$set(this.select, this.selected, three_object);
+						}
+						console.log("menu_selected:");
+						console.log(this.select[this.selected])
+						break;
+					case "four":
+						break;
+				}
 			},
 			menuSelect(level2_id, level3_id, level4_id) {
-				console.log("menu：" + (level2_id !== null && typeof(level3_id) == "undefined" && typeof(level4_id) ==
-					"undefined"))
 				if (level2_id === null || typeof(level2_id) == "undefined") return;
 				if (level2_id !== null && typeof(level3_id) == "undefined" && typeof(level4_id) == "undefined") {
 					this.$set(this.select, this.selected, {
@@ -158,7 +192,7 @@
 					if (this.select[1] !== level2_id) {
 						this.$set(this.select, 1, level2_id);
 					}
-					console.log("level2_id：" + this.select[this.selected].level2_id)
+					//console.log("level2_id：" + this.select[this.selected].level2_id)
 				} else if (level2_id !== null && level3_id !== null && level4_id == null) {
 					if (this.select[3]) this.select[3] = null;
 					if (this.select[2] !== level3_id) {
