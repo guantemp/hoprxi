@@ -9,11 +9,11 @@
 				<view class="bg-gray light content">
 					<view class="cu-capsule radius">
 						<view class="cu-tag bg-green">version 0.1</view>
-						<view class="cu-tag line-green">2021-11-15</view>
+						<view class="cu-tag line-green">2022-06-10</view>
 					</view>
 					<view class="margin-top flex flex-direction">
-						<text>好吧，感觉有点good</text>
-						<text>一个进展可以的下拉过滤菜单，一个居中搞了一周</text>
+						<text>1、使用vue3改写</text>
+						<text>2、一个勉强的下拉菜单，后面逻辑复杂了要改</text>
 					</view>
 				</view>
 			</view>

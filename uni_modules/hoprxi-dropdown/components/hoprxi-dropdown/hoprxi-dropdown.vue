@@ -17,7 +17,7 @@
 				<block v-for="(one,index) in tabs[selected].sub" :key="one.id">
 					<view class="leftMenu" :id="'left_'+ one.id"
 						:class="{'bg-white text-bold':select[selected]&&select[selected].level2_id === one.id&&!select[selected].cancel}"
-						@tap.stop="menu_selected(one.id)">
+						@tap.stop="second_menu_selected(one.id)">
 						<text>{{one.name}}</text>
 					</view>
 				</block>
@@ -26,15 +26,16 @@
 				<block v-for="(two,index) in children()" :key="two.id">
 					<view class="label"
 						:class="{'text-red text-bold':select[selected]&&select[selected].level3_id === two.id}"
-						:id="'label_'+ two.id" @tap.top="menu_selected(two.id,'three')">
+						:id="'label_'+ two.id" @tap.top="three_menu_selected(two.id)">
 						<text>{{two.name}}</text>
 						<text class="cuIcon-check text-lg text-bold"
 							v-if="select[selected]&&select[selected].level3_id === two.id"></text>
 					</view>
 					<view class="items" v-if="two.sub">
 						<block v-for="(three,three_index) in two.sub" :key="three.id">
-							<view class="item" @tap.top="menuSelect(select[1],select[2],three.id)"
-								:class="{'selected':select[3]===three.id}" :id="'label_'+ three.id">
+							<view class="item" @tap.top="four_menu_selected(three.id)"
+								:class="{'selected':select[selected]&&select[selected].level4_id === three.id}"
+								:id="'label_'+ three.id">
 								<text>{{three.name}}</text>
 							</view>
 						</block>
@@ -47,25 +48,28 @@
 		<view class="popup" :class="{'hide':!popupShow}" v-else-if="tabs[selected].depth <= 3">
 			<scroll-view class="filter" scroll-y="true" :scroll-into-view="'s_'+ scrollInto"
 				:scroll-with-animation="true" :enable-back-to-top="true"
-				:style="{'padding-bottom:108rpx':tabs[selected].selector === 'multiSelect'}">
-				<block v-for="(two,index) in tabs[selected].sub" :key="two.id">
-					<view class="label" :class="select[1] === index? 'text-red':'text-gray'" :id="'label_'+index"
-						@tap="menuSelect(index,null,null)">
-						<text>{{two.name}}</text>
+				:style="{'padding-bottom:108rpx':tabs[selected].selector === 'multi'}">
+				<block v-for="(one,index) in tabs[selected].sub" :key="one.id">
+					<view class="label"
+						:class="{'text-red text-bold':select[selected]&&select[selected].level2_id === one.id}"
+						:id="'label_'+ one.id" @tap="second_menu_selected(one.id)">
+						<text>{{one.name}}</text>
+						<text class="cuIcon-check text-lg text-bold"
+							v-if="select[selected]&&select[selected].level2_id === one.id"></text>
 					</view>
-					<view class="items items-extend" v-if="two.sub">
-						<block v-for="(three,three_index) in two.sub" :key="three.id">
-							<view class="item item-extend" @tap.top="menuSelect(select[1],three_index,null)"
-								:class="{'selected':select[2]===three_index}">
-								<text>{{three.name}}</text>
+					<view class="items items-extend" v-if="one.sub">
+						<block v-for="(two,three_index) in one.sub" :key="two.id">
+							<view class="item item-extend" @tap.top="three_three_menu_selected(two.id)"
+								:class="{'selected':select[selected]&&select[selected].level3_id === two.id}">
+								<text>{{two.name}}</text>
 							</view>
 						</block>
 					</view>
 					<view class="bott"></view>
 				</block>
 			</scroll-view>
-			<view class="filterBtn" v-if="tabs[selected].selector === 'multiSelect'">
-				<button class="cu-btn radius shadow bg-orange basis-sm margin-right-sm text-lg" @tap.stop="">
+			<view class="filterBtn" v-if="tabs[selected].selector === 'multi'">
+				<button class="cu-btn radius shadow bg-orange basis-sm margin-right-sm text-lg" @tap.stop="rest_multi">
 					<text>重置</text></button>
 				<button class="cu-btn radius shadow bg-orange basis-sm text-lg" @tap.stop="">
 					<text>确定</text></button>
@@ -119,11 +123,10 @@
 		methods: {
 			tabSelect(event) {
 				const id = event.currentTarget.dataset.id;
-				const index = this.indexOf(id, this.tabs);
-				this.selected = index;
+				this.selected = this.indexOf(id, this.tabs);
 				//css tab中 (margin:10+padding:20)*2=60
-				this.scrollLeft = (index - 1) * 60;
-				if (this.popupShow && !this.tabs[index].sub) this.popupShow = false
+				this.scrollLeft = (this.selected - 1) * 60;
+				if (this.popupShow && !this.tabs[this.selected].sub) this.popupShow = false
 			},
 			triangledown(event) {
 				this.tabSelect(event);
@@ -134,8 +137,6 @@
 			},
 			children() {
 				let first_select = this.select[this.selected]; //第一次点击tab_select
-				console.log("chilren:");
-				console.log(typeof(first_select) === "undefined");
 				if (typeof(first_select) === "undefined") {
 					if (this.tabs[this.selected].sub[0].sub) {
 						return this.tabs[this.selected].sub[0].sub;
@@ -146,69 +147,80 @@
 				let index = this.indexOf(this.select[this.selected].level2_id, sub);
 				return sub[index].sub;
 			},
-			menu_selected(id, level = "second") {
-				switch (level) {
-					case "second":
-						let second = this.select[this.selected];
-						if (typeof(second) !== "undefined" && !second.cancel && second.level2_id && second.level2_id ===
-							id) {
-							this.$set(this.select, this.selected, {
-								level2_id: id,
-								cancel: true
-							});
-						} else {
-							this.$set(this.select, this.selected, {
-								level2_id: id
-							});
-						}
-						break;
-					case "three":
-						let three = this.select[this.selected];
-						if (typeof(three) === "undefined") {
-							this.$set(this.select, this.selected, {
-								level2_id: this.tabs[this.selected].sub[0].id,
-								level3_id: id
-							});
-						} else {
-							let three_object = {
-								...this.select[this.selected],
-								level3_id: id
-							}
-							this.$set(this.select, this.selected, three_object);
-						}
-						console.log("menu_selected:");
-						console.log(this.select[this.selected])
-						break;
-					case "four":
-						break;
+			second_menu_selected(id) {
+				let second = this.select[this.selected];
+				if (typeof(second) !== "undefined" && !second.cancel && second.level2_id && second.level2_id === id) {
+					this.$set(this.select, this.selected, {
+						level2_id: id,
+						cancel: true
+					});
+				} else {
+					this.$set(this.select, this.selected, {
+						level2_id: id
+					});
 				}
 			},
-			menuSelect(level2_id, level3_id, level4_id) {
-				if (level2_id === null || typeof(level2_id) == "undefined") return;
-				if (level2_id !== null && typeof(level3_id) == "undefined" && typeof(level4_id) == "undefined") {
+			three_menu_selected(id) {
+				let three = this.select[this.selected];
+				if (typeof(three) === "undefined") {
 					this.$set(this.select, this.selected, {
-						level2_id: level2_id
+						level2_id: this.tabs[this.selected].sub[0].id,
+						level3_id: id
 					});
-					if (this.select[1] !== level2_id) {
-						this.$set(this.select, 1, level2_id);
+				} else {
+					let three_object = {
+						level2_id: this.select[this.selected].level2_id,
+						level3_id: id
 					}
-					//console.log("level2_id：" + this.select[this.selected].level2_id)
-				} else if (level2_id !== null && level3_id !== null && level4_id == null) {
-					if (this.select[3]) this.select[3] = null;
-					if (this.select[2] !== level3_id) {
-						this.$set(this.select, 2, level3_id);
+					this.$set(this.select, this.selected, three_object);
+				}
+			},
+			four_menu_selected(id) {
+				const _find_level3 = (sub, id) => {
+					for (const v of sub) {
+						if (v.sub) {
+							for (const v1 of v.sub) {
+								if (v1.id === id) return v.id
+							}
+						}
 					}
-				} else if (level2_id != null && level4_id != null) {
-					if (this.select[3] !== level4_id) {
-						this.$set(this.select, 3, level4_id);
+				};
+				if (typeof(this.select[this.selected]) === "undefined") {
+					this.select[this.selected] = {
+						level2_id: this.tabs[this.selected].sub[0].id
 					}
 				}
-				//console.log(this.select[3]);
+				let sub = this.tabs[this.selected].sub;
+				let index = this.indexOf(this.select[this.selected].level2_id, sub);
+				let four_object = {
+					...this.select[this.selected],
+					level3_id: _find_level3(sub[index].sub, id),
+					level4_id: id
+				}
+				this.$set(this.select, this.selected, four_object);
+			},
+			three_three_menu_selected(id) {
+				const _find_level2 = (sub, id) => {
+					for (const v of sub) {
+						if (v.sub) {
+							for (const v1 of v.sub) {
+								if (v1.id === id) return v.id
+							}
+						}
+					}
+				};
+				let sub = this.tabs[this.selected].sub;
+				let four_object = {
+					level2_id: _find_level2(sub, id),
+					level3_id: id
+				};
+				this.$set(this.select, this.selected, four_object);
 				this.$emit('selected', {
 					index: 0,
 					value: 0
 				});
 			},
+			rest_multi() {},
 			indexOf(id, menus = []) {
 				if (!id || !menus || !Array.isArray(menus) || menus.length === 0) return 0;
 				let index = 0;
@@ -283,8 +295,6 @@
 					}
 					i += 1;
 				}
-				//this.select[0] = this.tabs[0].id;
-				//console.log(this.tabs);
 			},
 		}
 	}
@@ -365,11 +375,10 @@
 			display: flex;
 			white-space: nowrap;
 			text-overflow: ellipsis;
-			width: 218rpx;
+			width: 28vw;
 			background-color: #f0f0f0;
 
 			.leftMenu {
-				font-size: 28rpx;
 				padding-left: 24rpx;
 
 				>text {
@@ -398,7 +407,7 @@
 			}
 
 			.bott {
-				border-bottom: solid 1rpx #e5e5e5;
+				border-bottom: dashed 1rpx #e5e5e5;
 				margin: 0rpx 6rpx 0 0;
 			}
 		}
@@ -467,7 +476,7 @@
 			position: absolute;
 			bottom: 0;
 			display: flex;
-			min-height: $select-padding;
+			min-height: $select-padding; //预置固定值
 			width: 100%;
 			justify-content: center;
 			align-items: center;
