@@ -25,7 +25,7 @@
 		</view>
 		<!--个人服务-->
 		<view class="service">
-			<hoprxi-cell decorateIcon="/static/user_icon/service.png" title="我的服务" arrow='true'/>
+			<hoprxi-cell decorateIcon="/static/user_icon/service.png" title="我的服务" :arrow='true'/>
 			<view class="cu-list grid col-3 no-border">
 				<view class="cu-item " @tap.stop="this.$util.navTo('/pages/public/not_implemented')">
 					<view class="text-red">

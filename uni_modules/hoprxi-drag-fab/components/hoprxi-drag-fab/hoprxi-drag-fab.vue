@@ -6,7 +6,7 @@
 				<view @click="_onMenuClick(menu.event, menu)" :class="['menu',{'menu-pop':isPopMenu}]"
 					:style="{width: size + 'rpx',height: size + 'rpx'}">
 					<slot :menu="menu">
-						<image :src="menu.iconPath" mode="scaleToFill" class="menu-image"
+						<image :src="menu.iconPath" mode="aspectFit" class="menu-image"
 							:style="{width:size/2 + 'rpx',height:size/2 + 'rpx'}" />
 						<text class="text">{{ menu.text }}</text>
 					</slot>
@@ -239,7 +239,7 @@
 <style lang="scss">
 	.ball {
 		position: fixed;
-		z-index: 9;
+		z-index: 7;
 		justify-content: center;
 		align-items: center;
 		box-shadow: 0 0 5rpx 2rpx rgba(0, 0, 0, 0.2);
@@ -279,7 +279,7 @@
 	.menus {
 		position: fixed;
 		display: flex;
-		z-index: 9;
+		z-index: 7;
 		flex-direction: row;
 		overflow: hidden;
 		transition-property: width, height, background-color;

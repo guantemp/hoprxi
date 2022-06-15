@@ -91,7 +91,7 @@ export default {
 		selector: "single",
 		sub: [{
 			id: "3446",
-			name: "食用油",
+			name: "食用油啊啊啊",
 			sub: [{
 				id: "231532",
 				name: "菜籽油",
@@ -151,7 +151,14 @@ export default {
 			name: "调味品",
 			sub: [{
 				id: "t436534",
-				name: "酱油"
+				name: "酱油",
+				sub: [{
+					id: "t436535",
+					name: "老抽",
+				}, {
+					id: "t436536",
+					name: "生抽",
+				}]
 			}, {
 				id: "t46534",
 				name: "醋"
@@ -218,6 +225,9 @@ export default {
 			}, {
 				id: "24327",
 				name: "香皂",
+			}, {
+				id: "24328",
+				name: "沐浴露",
 			}]
 		}, {
 			id: "224",

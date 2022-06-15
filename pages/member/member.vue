@@ -1,7 +1,7 @@
 <template>
-	<view class="bg-white">
-		<hoprxi-navigation title="商品类目" :backgroundColor="[1, ['#6B73FF', '#000DFF', 135]]" :titleFont="['#FFF']"
-			:surplusHeight=43>
+	<view>
+		<hoprxi-navigation title="会员管理" :backgroundColor="[1, ['#6B73FF', '#000DFF', 135]]"
+			:titleFont="['#FFF','center',700]" :surplusHeight=43>
 			<view slot="extendSlot" class="cu-bar search">
 				<view class="search-form radius">
 					<text class="cuIcon-search"></text>
@@ -15,10 +15,10 @@
 				</view>
 			</view>
 		</hoprxi-navigation>
-		<hop-tree ref="hop-tree" :trees="categories" checkType="checkbox" :disabledIds="disabledIds"
+		<hopxi-tree :trees="categories" checkType="checkbox" :disabledIds="disabledIds"
 			:expandedIds="expandedIds" :expendAll="false" :checkedIds="checkedIds" class="margin-left-sm"
 			@check="check">
-		</hop-tree>
+		</hopxi-tree>
 	</view>
 </template>
 

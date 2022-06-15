@@ -10,14 +10,14 @@
 					<text class="cuIcon-scan text-blue text-bold" @tap="scan"></text>
 				</view>
 				<view class="action text-white">
-					<text class="cuIcon-close text-xs" @click="computedScrollViewHeight">取消</text>
+					<text class="cuIcon-close" @click="computedScrollViewHeight">取消</text>
 				</view>
 			</template>
 		</hoprxi-navigation>
 		<hoprxi-dropdown :menus="categories"></hoprxi-dropdown>
 		<scroll-view scroll-y :scroll-with-animation="true" :enable-back-to-top="true"
 			:style="{height: 'calc(100vh - 150px)'}">
-			<hop-slider :btnArr="btnArr" :items="catalog" @del="del" @click="navigationToDetail">
+			<hoprxi-slider :btnArr="btnArr" :items="catalog" @del="del" @click="navigationToDetail">
 				<template v-slot="{item}">
 					<view class="flex padding-lr-sm padding-tb-xs align-center solid-top" @longpress="onLongPress"
 						:data-id="item.id||item.plu" :data-sign="item.id?'id':'plu'">
@@ -43,7 +43,7 @@
 						</view>
 					</view>
 				</template>
-			</hop-slider>
+			</hoprxi-slider>
 		</scroll-view>
 		<hoprxi-drag-fab :menus="menus" @addGood="addGood" @addScale="addScale" @category="category"></hoprxi-drag-fab>
 	</view>

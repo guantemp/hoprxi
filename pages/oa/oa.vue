@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<hoprxi-navigation title="商品目录" :backgroundColor="[1, ['#6B73FF', '#000DFF', 135]]" :titleFont="['#FFF']"
+		<hoprxi-navigation title="OA" :backgroundColor="[1, ['#6B73FF', '#000DFF', 135]]" :titleFont="['#FFF']"
 			id="navBar" :surplusHeight="43">
 			<view slot="extendSlot" class="cu-bar search">
 				<view class="search-form radius">

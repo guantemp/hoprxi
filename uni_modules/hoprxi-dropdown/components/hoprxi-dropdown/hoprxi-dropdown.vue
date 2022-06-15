@@ -12,11 +12,11 @@
 		<!-- 遮罩层-->
 		<view class="mask" :class="{'show':popupShow}" @tap="closePopup"></view>
 		<!--4个层级-->
-		<view class="popup" :class="{'hide':!popupShow}" v-if="tabs[selected].depth >= 4">
+		<view :class="['popup',{'hide':!popupShow}]" v-if="tabs[selected].depth >= 4">
 			<scroll-view class="left" :scroll-y="true" :scroll-into-view="'left_'+ leftScrollInto">
 				<block v-for="(one,index) in tabs[selected].sub" :key="one.id">
-					<view class="leftMenu" :id="'left_'+ one.id"
-						:class="{'bg-white text-bold':select[selected]&&select[selected].level2_id === one.id&&!select[selected].cancel}"
+					<view class="left_menu" :id="'left_'+ one.id"
+						:class="{'bg-white text-red':select[selected]&&select[selected].level2_id === one.id&&!select[selected].level2_cancel}"
 						@tap.stop="second_menu_selected(one.id)">
 						<text>{{one.name}}</text>
 					</view>
@@ -24,8 +24,7 @@
 			</scroll-view>
 			<scroll-view class="right" :scroll-y="true" :scroll-into-view="'label_'+rightScrollInto">
 				<block v-for="(two,index) in children()" :key="two.id">
-					<view class="label"
-						:class="{'text-red text-bold':select[selected]&&select[selected].level3_id === two.id}"
+					<view class="label" :class="{'text-orange':select[selected]&&select[selected].level3_id === two.id}"
 						:id="'label_'+ two.id" @tap.top="three_menu_selected(two.id)">
 						<text>{{two.name}}</text>
 						<text class="cuIcon-check text-lg text-bold"
@@ -51,15 +50,15 @@
 				:style="{'padding-bottom:108rpx':tabs[selected].selector === 'multi'}">
 				<block v-for="(one,index) in tabs[selected].sub" :key="one.id">
 					<view class="label"
-						:class="{'text-red text-bold':select[selected]&&select[selected].level2_id === one.id}"
+						:class="{'text-red text-bold':select[selected]&&select[selected].level2_id === one.id&&!select[selected].level2_cancel}"
 						:id="'label_'+ one.id" @tap="second_menu_selected(one.id)">
 						<text>{{one.name}}</text>
 						<text class="cuIcon-check text-lg text-bold"
-							v-if="select[selected]&&select[selected].level2_id === one.id"></text>
+							v-if="select[selected]&&select[selected].level2_id === one.id&&!select[selected].level2_cancel"></text>
 					</view>
 					<view class="items items-extend" v-if="one.sub">
 						<block v-for="(two,three_index) in one.sub" :key="two.id">
-							<view class="item item-extend" @tap.top="three_three_menu_selected(two.id)"
+							<view class="item item-extend" @tap.top="three_menu_selected(two.id)"
 								:class="{'selected':select[selected]&&select[selected].level3_id === two.id}">
 								<text>{{two.name}}</text>
 							</view>
@@ -149,78 +148,74 @@
 			},
 			second_menu_selected(id) {
 				let second = this.select[this.selected];
-				if (typeof(second) !== "undefined" && !second.cancel && second.level2_id && second.level2_id === id) {
+				if (typeof(second) !== "undefined" && !second.level2_cancel && second.level2_id && second.level2_id ===
+					id) {
 					this.$set(this.select, this.selected, {
 						level2_id: id,
-						cancel: true
+						level2_cancel: true
 					});
 				} else {
 					this.$set(this.select, this.selected, {
-						level2_id: id
+						level2_id: id,
 					});
 				}
 			},
 			three_menu_selected(id) {
 				let three = this.select[this.selected];
-				if (typeof(three) === "undefined") {
+				if (typeof(three) !== "undefined" && three.level3_id && three.level3_id === id) {
 					this.$set(this.select, this.selected, {
-						level2_id: this.tabs[this.selected].sub[0].id,
-						level3_id: id
+						level2_id: three.level2_id
 					});
 				} else {
-					let three_object = {
-						level2_id: this.select[this.selected].level2_id,
+					let sub = this.tabs[this.selected].sub;
+					this.$set(this.select, this.selected, {
+						level2_id: this.findParent(sub, id),
 						level3_id: id
-					}
-					this.$set(this.select, this.selected, three_object);
+					});
 				}
 			},
 			four_menu_selected(id) {
-				const _find_level3 = (sub, id) => {
-					for (const v of sub) {
-						if (v.sub) {
-							for (const v1 of v.sub) {
-								if (v1.id === id) return v.id
-							}
-						}
+				let four = this.select[this.selected];
+				if (typeof(four) !== "undefined" && four.level4_id && four.level4_id === id) {
+					this.$set(this.select, this.selected, {
+						level2_id: this.select[this.selected].level2_id,
+						level3_id: this.select[this.selected].level3_id
+					});
+				} else {
+					let level2_id = (typeof(four) !== "undefined" && four.level2_id !== undefined) ? four.level2_id : this
+						.tabs[this.selected].sub[0].id;
+					let sub1 = this.tabs[this.selected].sub;
+					let index = this.indexOf(level2_id, sub1);
+					let sub2 = sub1[index].sub;
+					let level3_id = this.findParent(sub2, id);
+					level2_id = this.findParent(sub1, level3_id);
+					let four_object = {
+						level2_id: level2_id,
+						level3_id: level3_id,
+						level4_id: id
 					}
-				};
-				if (typeof(this.select[this.selected]) === "undefined") {
-					this.select[this.selected] = {
-						level2_id: this.tabs[this.selected].sub[0].id
-					}
+					this.$set(this.select, this.selected, four_object);
 				}
-				let sub = this.tabs[this.selected].sub;
-				let index = this.indexOf(this.select[this.selected].level2_id, sub);
-				let four_object = {
-					...this.select[this.selected],
-					level3_id: _find_level3(sub[index].sub, id),
-					level4_id: id
-				}
-				this.$set(this.select, this.selected, four_object);
 			},
 			three_three_menu_selected(id) {
-				const _find_level2 = (sub, id) => {
-					for (const v of sub) {
-						if (v.sub) {
-							for (const v1 of v.sub) {
-								if (v1.id === id) return v.id
-							}
-						}
-					}
-				};
-				let sub = this.tabs[this.selected].sub;
-				let four_object = {
-					level2_id: _find_level2(sub, id),
-					level3_id: id
-				};
-				this.$set(this.select, this.selected, four_object);
+
 				this.$emit('selected', {
 					index: 0,
 					value: 0
 				});
 			},
-			rest_multi() {},
+			rest_multi() {
+				this.$set(this.select, this.selected, {});
+			},
+			findParent(sub, id) {
+				for (const v of sub) {
+					if (v.sub) {
+						for (const v1 of v.sub) {
+							if (v1.id === id) return v.id
+						}
+					}
+				}
+			},
 			indexOf(id, menus = []) {
 				if (!id || !menus || !Array.isArray(menus) || menus.length === 0) return 0;
 				let index = 0;
@@ -323,9 +318,9 @@
 		}
 
 		.subIcon {
-			font-size: 150%;
+			font-size: 120%;
 			position: absolute;
-			top: 4rpx;
+			top: 6rpx;
 			vertical-align: bottom;
 			transition: transform .5s ease-in-out, -webkit-transform .5s ease-in-out;
 
@@ -338,7 +333,7 @@
 	.mask {
 		display: flex;
 		position: fixed;
-		z-index: 2;
+		z-index: 8;
 		top: 0;
 		left: 0;
 		right: 0;
@@ -364,35 +359,37 @@
 		background-color: #fff;
 		z-index: 9;
 		box-shadow: 0 5px 5px rgba(0, 0, 0, .1);
-		transition: display 0.5s linear 0s;
+		opacity: 1;
+		transition: opacity .5s;
 
 		&.hide {
-			display: none;
-			transition: display 0.5s linear 0s;
+			opacity: 0;
+			transition-duration: 0.5s;
 		}
 
 		.left {
 			display: flex;
-			white-space: nowrap;
-			text-overflow: ellipsis;
 			width: 28vw;
 			background-color: #f0f0f0;
 
-			.leftMenu {
-				padding-left: 24rpx;
+			.left_menu {
+				padding-left: 20rpx;
+				white-space: nowrap;
+				/*overflow: hidden;*/
+				/*text-overflow: ellipsis;*/
 
 				>text {
 					/*以下垂直居中，仅对一列有效*/
 					display: inline-block;
+					vertical-align: middle;
 					height: 96rpx;
 					line-height: 96rpx;
-					vertical-align: middle;
 				}
 			}
 		}
 
 		.right {
-			padding: 0 0rpx 0 24rpx;
+			padding: 0 6rpx 0 20rpx;
 
 			.label {
 				display: flex;
@@ -413,11 +410,10 @@
 		}
 
 		.filter {
-
 			.label {
 				display: flex;
 				justify-content: space-between;
-				padding: 0 24rpx;
+				padding: 0 26rpx;
 
 				>text {
 					height: 78rpx;
@@ -426,10 +422,10 @@
 			}
 
 			.items-extend {
-				padding: 0 24rpx;
+				padding: 0 2rpx 0 24rpx;
 
 				.item-extend {
-					flex: 0 0 29%;
+					flex: 0 0 30%;
 					min-height: 74rpx;
 					margin-right: calc(16rpx*3 / 2);
 				}
@@ -443,6 +439,8 @@
 			.item {
 				display: flex;
 				justify-content: center;
+				font-size: 28rpx;
+				/*重要设置上下左右居中*/
 				text-align: center;
 				flex: 0 0 32%;
 				min-height: 68rpx;
@@ -452,7 +450,6 @@
 				margin-bottom: 16rpx;
 				border: solid #f5f5f5 1rpx;
 				padding: 4rpx 8rpx;
-
 
 				&.selected {
 					border-color: #ec652b;
@@ -476,7 +473,8 @@
 			position: absolute;
 			bottom: 0;
 			display: flex;
-			min-height: $select-padding; //预置固定值
+			min-height: $select-padding;
+			/*预置固定值*/
 			width: 100%;
 			justify-content: center;
 			align-items: center;

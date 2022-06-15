@@ -1,5 +1,5 @@
 <template>
-	<view class="navBar">
+	<view class="navBar text-lg">
 		<view class="navBarContent"
 			:style="{width:barWidth,height:barHeight,'background-color': navBarBackgroudColor,'background-image':navBarBackgroudColor,navShadow:navShadow}">
 			<!--全局背景 -->
@@ -298,7 +298,6 @@
 			.surplus {
 				width: 100%;
 				padding-left: 16rpx;
-				font-size: 32rpx;
 
 				.title {
 					white-space: nowrap;
