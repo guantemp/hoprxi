@@ -19,8 +19,8 @@
 			:style="{height:'calc(100vh - ' + (navigatorHeight) + 'px)'}">
 			<hoprxi-slider :btnArr="btnArr" :items="catalog" @del="del" @click="navigationToDetail">
 				<template v-slot="{item}">
-					<view class="flex padding-lr-sm padding-tb-xs align-center solid-top text-df" @longpress="onLongPress"
-						:data-id="item.id||item.plu" :data-sign="item.id?'id':'plu'">
+					<view class="flex padding-lr-sm padding-tb-xs align-center solid-top" @longpress="onLongPress"
+						:data-id="item.id||item.plu" :data-sign="item.id?'id':'plu'" style="font-size: 29rpx;">
 						<view class="imageWrapper">
 							<image class="good-img"
 								:src="item.goodImg||(item.barcode?'/static/workflow_icon/archives.png':'/static/workflow_icon/plu.png')"
@@ -108,11 +108,13 @@
 		mounted() {
 			let query = uni.createSelectorQuery().in(this);
 			query.select('#navBar').boundingClientRect().exec(res => {
-				this.setHeight(res[0].height);
+				this.navigatorHeight=res[0].height;
+				//this.setHeight(res[0].height);
 			});
 			query = uni.createSelectorQuery().in(this);
 			query.select('#dropdown').boundingClientRect().exec(res => {
-				this.setHeight(res[0].height);
+				this.navigatorHeight=this.navigatorHeight+res[0].height;
+				//this.setHeight(res[0].height);
 			});
 		},
 		onReady() {

@@ -4,13 +4,12 @@
 			<view class="tab" :ref="tab" :class="{'text-orange cur text-bold':index === selected}"
 				v-for="(tab,index) in tabs" :key="tab.id" :data-id="tab.id" @tap="tabSelect">
 				<text>{{tab.name}}</text>
-				<text v-if="tab.sub" class="cuIcon-triangledownfill subIcon"
-					:class="{'selected':index === selected && popupShow}" @tap.stop="triangledown"
-					:data-id="tab.id"></text>
+				<text v-if="tab.sub" class="cuIcon-triangledownfill subIcon" :data-id="tab.id"
+					:class="{'selected':index === selected && popupShow}" @tap="triangledown"></text>
 			</view>
 		</scroll-view>
 		<!-- 遮罩层-->
-		<view class="mask" :class="{'show':popupShow}" @tap="closePopup"></view>
+		<view :class="['mask',{'show':popupShow}]" @tap="closePopup"></view>
 		<!--4个层级-->
 		<view :class="['popup',{'hide':!popupShow}]" v-if="tabs[selected].depth >= 4">
 			<scroll-view class="left" :scroll-y="true" :scroll-into-view="'left_'+ leftScrollInto">
@@ -44,7 +43,7 @@
 			</scroll-view>
 		</view>
 		<!--3个层级-->
-		<view class="popup" :class="{'hide':!popupShow}" v-else-if="tabs[selected].depth <= 3">
+		<view :class="['popup',{'hide':!popupShow}]" v-else-if="tabs[selected].depth <= 3">
 			<scroll-view class="filter" scroll-y="true" :scroll-into-view="'s_'+ scrollInto"
 				:scroll-with-animation="true" :enable-back-to-top="true"
 				:style="{'padding-bottom:108rpx':tabs[selected].selector === 'multi'}">
@@ -354,17 +353,17 @@
 		display: flex;
 		position: absolute;
 		width: 100%;
-		height: 55vh;
+		height: 52vh;
 		background-color: #fff;
 		z-index: 9;
 		box-shadow: 0 5px 5px rgba(0, 0, 0, .1);
 		opacity: 1;
-		transition: opacity height .5s;
+		transition: opacity .5s;
 
 		&.hide {
 			opacity: 0;
-			height: 0;
-			transition: opacity height .5s;
+			display: none;
+			transition: opacity .5s;
 		}
 
 		.left {
