@@ -17,9 +17,9 @@
 		</hop-nav-bar>
 		<scroll-view scroll-y :scroll-with-animation="true" :enable-back-to-top="true"
 			:style="{height: 'calc(100vh - 10px)'}" class="padding-left-sm bg-white">
-			<hop-tree :trees="categories" checkType="radio" :disabledIds="disabledIds" :expandedIds="expandedIds"
+			<hoprxi-tree :trees="categories" checkType="radio" :disabledIds="disabledIds" :expandedIds="expandedIds"
 				:expendAll="false" :checkedIds="checkedIds" checkOnlyLeaf>
-			</hop-tree>
+			</hoprxi-tree>
 		</scroll-view>
 	</view>
 </template>

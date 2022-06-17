@@ -1,4 +1,4 @@
-import HashMap from './HashMap.js';
+import HashMap from '@/common/js/HashMap.js';
 //节点
 export class Node {
 	constructor(id, label, icon) {

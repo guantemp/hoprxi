@@ -143,12 +143,17 @@
 				"navigationStyle": "custom"
 			}
 		}]
-	} ],
+	}],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
 		"navigationBarTitleText": "HOPRXI协助工具",
 		"navigationBarBackgroundColor": "#e7ebed",
 		"backgroundColor": "#F8F8F8"
+		/*
+		"usingComponents": {
+			"hoprxi-tree-item": "/uni_modules/hoprxi-tree/components/hoprxi-tree/hoprxi-tree-item"
+		}
+		*/
 	},
 	"tabBar": {
 		"color": "#909399",

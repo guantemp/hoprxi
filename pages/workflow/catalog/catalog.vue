@@ -14,12 +14,12 @@
 				</view>
 			</template>
 		</hoprxi-navigation>
-		<hoprxi-dropdown :menus="categories"></hoprxi-dropdown>
+		<hoprxi-dropdown :menus="categories" id="dropdown"></hoprxi-dropdown>
 		<scroll-view scroll-y :scroll-with-animation="true" :enable-back-to-top="true"
-			:style="{height: 'calc(100vh - 150px)'}">
+			:style="{height:'calc(100vh - ' + (navigatorHeight) + 'px)'}">
 			<hoprxi-slider :btnArr="btnArr" :items="catalog" @del="del" @click="navigationToDetail">
 				<template v-slot="{item}">
-					<view class="flex padding-lr-sm padding-tb-xs align-center solid-top" @longpress="onLongPress"
+					<view class="flex padding-lr-sm padding-tb-xs align-center solid-top text-df" @longpress="onLongPress"
 						:data-id="item.id||item.plu" :data-sign="item.id?'id':'plu'">
 						<view class="imageWrapper">
 							<image class="good-img"
@@ -36,7 +36,7 @@
 							<view>
 								产地：<text>{{item.placeOfOrigin}}</text>
 							</view>
-							<view>
+							<view class="flex justify-between">
 								零售价：<text class="text-price text-red margin-right-sm">{{item.retailPrice}}</text>
 								会员价：<text class="text-price text-red">{{item.memberPrice}}</text>
 							</view>
@@ -59,18 +59,20 @@
 				categories: [],
 				tabCur: 0,
 				scrollLeft: 0,
+				navigatorHeight: 0,
 				btnArr: [{
 					name: '删除',
 					width: 200,
 					background: '#ff5500',
 					color: '#fff',
 					event: 'del'
-				}],
-				fabPattern: {
-					color: '#7A7E83',
-					backgroundColor: '#fff',
+				},{
+					name: '相似',
+					width: 200,
+					color: '#fff',
+					background: '#007AFF',
 					selectedColor: '#007AFF',
-				},
+				}],
 				menus: [{
 					iconPath: '/static/workflow_icon/new.png',
 					selectedIconPath: '/static/workflow_icon/new.png',
@@ -103,8 +105,18 @@
 			});
 			this.catalog = catalog_test.catalog;
 		},
+		mounted() {
+			let query = uni.createSelectorQuery().in(this);
+			query.select('#navBar').boundingClientRect().exec(res => {
+				this.setHeight(res[0].height);
+			});
+			query = uni.createSelectorQuery().in(this);
+			query.select('#dropdown').boundingClientRect().exec(res => {
+				this.setHeight(res[0].height);
+			});
+		},
 		onReady() {
-			uni.hideLoading()
+			uni.hideLoading();
 		},
 		methods: {
 			scan() {
@@ -118,6 +130,10 @@
 						console.log(JSON.stringify(res));
 					},
 				});
+			},
+			setHeight(height) {
+				this.navigatorHeight = this.navigatorHeight + height;
+				console.log(this.navigatorHeight)
 			},
 			addGood(data) {
 				this.$util.navTo('/pages/workflow/catalog/good');

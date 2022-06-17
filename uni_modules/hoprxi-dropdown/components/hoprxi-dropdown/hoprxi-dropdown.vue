@@ -198,7 +198,6 @@
 				}
 			},
 			three_three_menu_selected(id) {
-
 				this.$emit('selected', {
 					index: 0,
 					value: 0
@@ -360,11 +359,12 @@
 		z-index: 9;
 		box-shadow: 0 5px 5px rgba(0, 0, 0, .1);
 		opacity: 1;
-		transition: opacity .5s;
+		transition: opacity height .5s;
 
 		&.hide {
 			opacity: 0;
-			transition-duration: 0.5s;
+			height: 0;
+			transition: opacity height .5s;
 		}
 
 		.left {

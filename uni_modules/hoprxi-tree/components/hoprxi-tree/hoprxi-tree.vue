@@ -1,7 +1,7 @@
 <template>
-	<view class="tree">
+	<view>
 		<block v-for="(tree,index) in treesList" :key="index">
-			<hoprxi-tree-item :position='index' :nodeId="tree.root.id" :checkType="checkType"
+			<hoprxi-tree-item :position='index' :node="tree.root" :checkType="checkType"
 				:checkOnlyLeaf="checkOnlyLeaf" :indent="indent"></hoprxi-tree-item>
 		</block>
 	</view>
@@ -12,16 +12,18 @@
 	 * @property {Array} trees 层级数组，id项目的列不能有重复的值
 	 * @property {Number} indent,每层级间的缩进
 	 */
+	import {
+		getPropertyFromData,
+	} from '@/common/js/util.js';
 	import HoprxiTreeItem from './hoprxi-tree-item.vue';
 	import {
 		Node,
 		Tree
-	} from '@/common/js/tree/Tree.js';
-	import HashMap from '@/common/js/tree/HashMap.js';
+	} from './Tree.js';
 	export default {
 		name: 'hoprxi-tree',
 		components: {
-			HoprxiTreeItem,
+			HoprxiTreeItem
 		},
 		props: {
 			trees: {
@@ -31,7 +33,7 @@
 			},
 			indent: {
 				type: Number,
-				default: 38
+				default: 48
 			},
 			checkedIds: {
 				type: Array,
@@ -55,7 +57,7 @@
 			},
 			checkType: {
 				type: String,
-				default: '',
+				default: 'checkbox',
 				validator(value) {
 					return value === 'radio' || value === 'checkbox' || '' === value
 				}
@@ -97,9 +99,8 @@
 			for (const tree of this.treesList) {
 				if (!this.expendAll) tree.presetExpanded(this.expandedIds);
 				this.selected = tree.presetChecked(this.checkedIds);
-				console.log(tree.depth("4"))	
+				//console.log(tree.depth("4"))
 			}
-		
 			//let hm = new HashMap();
 			//for (let i = 0; i < 16; i++) hm.put(i+'哈哈', i + '是我');
 			//for (let i = 0; i < 16; i++) console.log(hm.get('0哈哈'));
@@ -108,7 +109,7 @@
 			return {
 				treesList: this.treesList,
 				selected: this.selected,
-				trees:this
+				trees: this
 			}
 		},
 		watch: {
@@ -140,19 +141,19 @@
 					tree.presetExpanded(this.expandedIds);
 				}
 			},
-			trees(){
+			trees() {
 				this.toTreeList(this.trees);
 			}
 		},
 		methods: {
 			toTreeList(trees) {
 				for (const tree of trees) {
-					const id = this.getPropertyFromData(tree, 'id');
-					const label = this.getPropertyFromData(tree, 'label');
-					const icon = this.getPropertyFromData(tree, 'icon');
-					let root = new Tree(new Node(id, label, icon),this.checkOnlyLeaf);
+					const id = getPropertyFromData(tree, this.props, 'id');
+					const label = getPropertyFromData(tree, this.props, 'label');
+					const icon = getPropertyFromData(tree, this.props, 'icon');
+					let root = new Tree(new Node(id, label, icon), this.checkOnlyLeaf);
 					if (this.disabledIds.includes(root.root.id)) root.root.disabled = true;
-					const sub = this.getPropertyFromData(tree, 'sub');
+					const sub = getPropertyFromData(tree, this.props, 'sub');
 					if (Array.isArray(sub) && sub.length > 0) {
 						this.toTree(root, root.root, sub);
 					}
@@ -162,31 +163,20 @@
 			toTree(tree = undefined, parent, sub = []) {
 				if (this.expendAll) parent.expanded = true;
 				for (const node of sub) {
-					const id = this.getPropertyFromData(node, 'id');
-					const label = this.getPropertyFromData(node, 'label');
-					const icon = this.getPropertyFromData(node, 'icon');
+					const id = getPropertyFromData(node, this.props, 'id');
+					const label = getPropertyFromData(node, this.props, 'label');
+					const icon = getPropertyFromData(node, this.props, 'icon');
 					let child = new Node(id, label, icon);
 					if (parent.expanded) child.visible = true;
 					if (this.checkedIds.includes(child.id)) child.checked = true;
 					if (this.disabledIds.includes(child.id)) child.disabled = true;
 					tree.addChild(parent, child);
-					let sub = this.getPropertyFromData(node, 'sub');
+					let sub = getPropertyFromData(node, this.props, 'sub');
 					if (Array.isArray(sub) && sub.length > 0) {
 						this.toTree(tree, child, sub);
 					}
 				}
 				return tree;
-			},
-			getPropertyFromData(data, prop) {
-				const config = this.props[prop];
-				if (typeof config === 'function') {
-					return config(data);
-				} else if (typeof config === 'string') {
-					return data[config];
-				} else if (typeof config === 'undefined') {
-					const dataProp = data[prop];
-					return dataProp === undefined ? '' : dataProp;
-				}
 			},
 			getSelectedNodes(includeHalfChecked) {
 				//this.checkedIds=this.checkedIds;
@@ -202,7 +192,7 @@
 			getNodePath(key) {
 				return [];
 			},
-			check(object){
+			check(object) {
 				//console.log(object);
 			},
 			checkAll() {},

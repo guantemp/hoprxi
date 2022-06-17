@@ -156,9 +156,6 @@
 			setFixedHeight(height) {
 				this.fixedHeight = this.fixedHeight + height;
 			},
-			setDateShowHeight(height) {
-				this.dateShowHeight = height;
-			},
 			query() {
 				this.dateShow = !this.dateShow;
 				if (this.dateShow && this.dateShowHeight === 0) {
