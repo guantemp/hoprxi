@@ -1,5 +1,5 @@
 <template>
-	<view>
+	<view class="catalog">
 		<hoprxi-navigation title="商品目录" :backgroundColor="[1, ['#6B73FF', '#000DFF', 135]]" :titleFont="['#FFF']"
 			id="navBar" :surplusHeight="43">
 			<template slot="extendSlot" class="cu-bar search">
@@ -16,11 +16,11 @@
 		</hoprxi-navigation>
 		<hoprxi-dropdown :menus="categories" id="dropdown"></hoprxi-dropdown>
 		<scroll-view scroll-y :scroll-with-animation="true" :enable-back-to-top="true"
-			:style="{height:'calc(100vh - ' + (navigatorHeight) + 'px)'}">
-			<hoprxi-slider :btnArr="btnArr" :items="catalog" @del="del" @click="navigationToDetail">
+			:style="{height:'calc(100vh - ' + navigatorHeight + 'px)'}">
+			<hoprxi-slider :buttons="btnArr" :items="catalog" @del="del" @click="navigationToDetail">
 				<template v-slot="{item}">
 					<view class="flex padding-lr-sm padding-tb-xs align-center solid-top" @longpress="onLongPress"
-						:data-id="item.id||item.plu" :data-sign="item.id?'id':'plu'" style="font-size: 29rpx;">
+						:data-id="item.id||item.plu" :data-sign="item.id?'id':'plu'">
 						<view class="imageWrapper">
 							<image class="good-img"
 								:src="item.goodImg||(item.barcode?'/static/workflow_icon/archives.png':'/static/workflow_icon/plu.png')"
@@ -66,8 +66,8 @@
 					background: '#ff5500',
 					color: '#fff',
 					event: 'del'
-				},{
-					name: '相似',
+				}, {
+					name: '历史',
 					width: 200,
 					color: '#fff',
 					background: '#007AFF',
@@ -105,19 +105,16 @@
 			});
 			this.catalog = catalog_test.catalog;
 		},
-		mounted() {
-			let query = uni.createSelectorQuery().in(this);
-			query.select('#navBar').boundingClientRect().exec(res => {
-				this.navigatorHeight=res[0].height;
-				//this.setHeight(res[0].height);
-			});
-			query = uni.createSelectorQuery().in(this);
-			query.select('#dropdown').boundingClientRect().exec(res => {
-				this.navigatorHeight=this.navigatorHeight+res[0].height;
-				//this.setHeight(res[0].height);
-			});
-		},
 		onReady() {
+			let query = uni.createSelectorQuery().in(this);
+			query.select('#navBar').boundingClientRect().exec(rect => {
+				this.navigatorHeight = rect[0].height;
+			});
+			//复用query得到单位是rpx,似乎不太准确
+			query = uni.createSelectorQuery().in(this); //再一次单位是px,
+			query.select('#dropdown').boundingClientRect().exec(rect => {
+				this.navigatorHeight = this.navigatorHeight + rect[0].height;
+			});
 			uni.hideLoading();
 		},
 		methods: {
@@ -132,10 +129,6 @@
 						console.log(JSON.stringify(res));
 					},
 				});
-			},
-			setHeight(height) {
-				this.navigatorHeight = this.navigatorHeight + height;
-				console.log(this.navigatorHeight)
 			},
 			addGood(data) {
 				this.$util.navTo('/pages/workflow/catalog/good');

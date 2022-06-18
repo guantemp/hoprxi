@@ -264,7 +264,6 @@
 			let query = uni.createSelectorQuery().in(this);
 			query.select('#navBar').boundingClientRect().exec(res => {
 				this.navBarHeight=res[0].height;
-				console.log(this.navBarHeight);
 			});
 		},
 		watch: {

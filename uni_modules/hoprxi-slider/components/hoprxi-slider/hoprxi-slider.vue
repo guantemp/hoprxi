@@ -1,31 +1,31 @@
 <template>
-	<view>
-		<view class="slider"  v-for="(item,index) in items" :key="index">
+	<block v-for="(item,index) in items" :key="item.id||item.plu||index">
+		<view class="slider" :class="intervalClass">
 			<view class="item" :style="{transform:item.isTouchMove?'translateX(0)':`translateX(${offset}rpx)`,
 			                              marginLeft:`-${offset}rpx`}" @touchstart="touchstart" @touchmove="touchmove"
 				:data-index="index">
 				<view class="flex-sub" @tap.stop="itemClick(item)">
 					<slot :item="item"></slot>
 				</view>
-				<view class="btn" v-for="(btn,num) in btnArr" :key="num" @tap.stop="btnClick(btn.event,item)"
-					:style="[btnStyle(num)]">
-					<text class="text-df" :style="{color:btn.color}">{{btn.name}}</text>
+				<view class="button" v-for="(button,num) in buttons" :key="num"
+					@tap.stop="buttonClick(button.event,item)" :style="[buttonStyle(num)]">
+					<text class="text-df" :style="{color:button.color}">{{button.name}}</text>
 				</view>
 			</view>
 		</view>
-	</view>
+	</block>
 </template>
 
 <script>
 	/*
 	 * items：{Array}，使用者需要在mounted中赋值，created中则使用Vue.$nextTick(() => {}赋值
-	 * @property {String} hierarchyClass,用于slot中item之间的css3风格，比如item之间的间隔
-	 * @property {Array} btnArr 按钮格式为：[{name: 'xxx', background:'xxx',width:'xxx',color:'xxx',event:'xxx'}]
+	 * @property {String} intervalClass,用于item之间的css3风格，比如item之间的间隔
+	 * @property {Array} buttons 按钮格式为：[{name: 'xxx', background:'xxx',width:'xxx',color:'xxx',event:'xxx'}]
 	 */
 	export default {
 		name: 'hoprxi-slider',
 		props: {
-			hierarchyClass: {
+			intervalClass: {
 				type: String,
 				default: ''
 			},
@@ -38,17 +38,17 @@
 				default: 0
 			},
 			//按钮数组
-			btnArr: {
+			buttons: {
 				type: Array,
 				default: [{
 					name: '编辑',
-					width: 150,
+					width: 180,
 					background: '#00aaff',
 					color: '#fff',
 					event: 'edit'
 				}, {
 					name: '删除',
-					width: 200,
+					width: 180,
 					background: '#ff5500',
 					color: '#fff',
 					event: 'del'
@@ -63,8 +63,8 @@
 			}
 		},
 		created() {
-			if (Array.isArray(this.btnArr)) {
-				for (const btn of this.btnArr) {
+			if (Array.isArray(this.buttons)) {
+				for (const btn of this.buttons) {
 					this.offset += btn.width;
 				}
 			}
@@ -74,12 +74,12 @@
 			}
 		},
 		methods: {
-			btnStyle(index) {
+			buttonStyle(index) {
 				let style = {};
-				style.backgroundColor = this.btnArr[index].background;
+				style.backgroundColor = this.buttons[index].background;
 				//style.boxShadow = "5px 5px 5px " + this.btnArr[index].background;
-				style.width = this.btnArr[index].width + 'rpx';
-				if (index === this.btnArr.length - 1) {
+				style.width = this.buttons[index].width + 'rpx';
+				if (index === this.buttons.length - 1) {
 					style.borderTopRightRadius = this.radius + 'rpx';
 					style.borderBottomRightRadius = this.radius + 'rpx';
 				}
@@ -90,7 +90,7 @@
 				this.$emit('click', item);
 			},
 			//单击按钮
-			btnClick(name, item) {
+			buttonClick(name, item) {
 				this.$emit(name, item)
 			},
 			touchstart(event) {
@@ -167,7 +167,7 @@
 		transition: transform .5s ease-out;
 	}
 
-	.btn {
+	.button {
 		/*  #ifdef APP-PLUS||H5||MP  */
 		display: flex;
 		/*  #endif  */

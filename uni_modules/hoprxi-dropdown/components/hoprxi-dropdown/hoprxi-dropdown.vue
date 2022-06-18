@@ -38,15 +38,14 @@
 							</view>
 						</block>
 					</view>
-					<view class="bott"></view>
+					<view class="division"></view>
 				</block>
 			</scroll-view>
 		</view>
 		<!--3个层级-->
 		<view :class="['popup',{'hide':!popupShow}]" v-else-if="tabs[selected].depth <= 3">
-			<scroll-view class="filter" scroll-y="true" :scroll-into-view="'s_'+ scrollInto"
-				:scroll-with-animation="true" :enable-back-to-top="true"
-				:style="{'padding-bottom:108rpx':tabs[selected].selector === 'multi'}">
+			<scroll-view class="filter" scroll-y :scroll-with-animation="true" :enable-back-to-top="true"
+				:style="{'height:calc(52vh - 108rpx);' : tabs[selected].selector === 'multi'}">
 				<block v-for="(one,index) in tabs[selected].sub" :key="one.id">
 					<view class="label"
 						:class="{'text-red text-bold':select[selected]&&select[selected].level2_id === one.id&&!select[selected].level2_cancel}"
@@ -63,7 +62,7 @@
 							</view>
 						</block>
 					</view>
-					<view class="bott"></view>
+					<view class="division"></view>
 				</block>
 			</scroll-view>
 			<view class="filterBtn" v-if="tabs[selected].selector === 'multi'">
@@ -463,7 +462,7 @@
 			}
 		}
 
-		.bott {
+		.division {
 			border-bottom: dashed 1rpx #e5e5e5;
 			margin: 0 12rpx;
 		}

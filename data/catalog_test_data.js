@@ -122,7 +122,14 @@ export default {
 				name: "玉米油"
 			}, {
 				id: "2332",
-				name: "橄榄油"
+				name: "橄榄油",
+				sub: [{
+					id: "23321",
+					name: "希腊的"
+				}, {
+					id: "23322",
+					name: "不清楚产地"
+				}]
 			}, {
 				id: "312",
 				name: "葵花籽油"
@@ -287,7 +294,11 @@ export default {
 	}],
 	catalog: [{
 		id: "201451060435585024",
-		name: '彩虹柠檬香电热灭蚊香液',
+		name: {
+			"name": "彩虹柠檬香电热灭蚊香液",
+			"mnemonic": "chlmxdrmwxy",
+			"alias": "彩虹电热灭蚊香液"
+		},
 		barcode: 6907861191394,
 		specs: '150ml',
 		placeOfOrigin: '四川省.成都市',

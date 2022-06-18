@@ -1,7 +1,7 @@
 <template>
 	<view>
-		<hop-nav-bar title="商品类目" :backgroundColor="[1, ['#6B73FF', '#000DFF', 135]]" :titleFont="['#FFF']"
-			surplusHeight=43>
+		<hoprxi-navigation title="商品类目" :backgroundColor="[1, ['#6B73FF', '#000DFF', 135]]" :titleFont="['#FFF']"
+			:surplusHeight=43>
 			<view slot="extendSlot" class="cu-bar search">
 				<view class="search-form radius">
 					<text class="cuIcon-search"></text>
@@ -14,7 +14,7 @@
 					<text @click="computedScrollViewHeight">取消</text>
 				</view>
 			</view>
-		</hop-nav-bar>
+		</hoprxi-navigation>
 		<scroll-view scroll-y :scroll-with-animation="true" :enable-back-to-top="true"
 			:style="{height: 'calc(100vh - 10px)'}" class="padding-left-sm bg-white">
 			<hoprxi-tree :trees="categories" checkType="radio" :disabledIds="disabledIds" :expandedIds="expandedIds"
