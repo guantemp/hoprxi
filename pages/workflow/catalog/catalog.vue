@@ -5,7 +5,7 @@
 			<template slot="extendSlot" class="cu-bar search">
 				<view class="search-form radius">
 					<text class="cuIcon-search"></text>
-					<input v-model="scanResult" :adjust-position="false" type="text" placeholder="请输入商品条码、名称、拼音助记码"
+					<input v-model="scanResult" :adjust-position="false" type="text" placeholder="请输入商品条码、名称、助记码"
 						confirm-type="search">
 					<text class="cuIcon-scan text-blue text-bold" @tap="scan"></text>
 				</view>
@@ -17,7 +17,7 @@
 		<hoprxi-dropdown :menus="categories" id="dropdown"></hoprxi-dropdown>
 		<scroll-view scroll-y :scroll-with-animation="true" :enable-back-to-top="true"
 			:style="{height:'calc(100vh - ' + navigatorHeight + 'px)'}">
-			<hoprxi-slider :buttons="btnArr" :items="catalog" @del="del" @click="navigationToDetail">
+			<hoprxi-slider :buttons="buttons" :items="catalog" @del="del" @click="navigationToDetail">
 				<template v-slot="{item}">
 					<view class="flex padding-lr-sm padding-tb-xs align-center solid-top" @longpress="onLongPress"
 						:data-id="item.id||item.plu" :data-sign="item.id?'id':'plu'">
@@ -27,7 +27,7 @@
 								mode="aspectFill" />
 						</view>
 						<view class="flex flex-direction flex-sub">
-							<view class="text-cut">{{item.name}}</view>
+							<view class="text-cut">{{item.name.name}}</view>
 							<view class="flex justify-between">
 								<text v-if="item.barcode">条码：{{item.barcode}}</text>
 								<text v-else>PLU号：{{item.plu}}</text>
@@ -50,7 +50,7 @@
 </template>
 
 <script>
-	import catalog_test from '@/data/catalog_test_data.js'; //用例数据库
+	import catalog_test from '@/data/catalog_test_data.js'; //用例
 	export default {
 		data() {
 			return {
@@ -60,7 +60,7 @@
 				tabCur: 0,
 				scrollLeft: 0,
 				navigatorHeight: 0,
-				btnArr: [{
+				buttons: [{
 					name: '删除',
 					width: 200,
 					background: '#ff5500',

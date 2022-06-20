@@ -165,7 +165,7 @@
 						res => {
 							this.setDateShowHeight(res[0].height);
 						});
-					}, 10);
+					}, 1);
 				}
 			},
 			tabSelect(e) {

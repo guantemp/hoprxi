@@ -8,13 +8,13 @@
 				<view class="loading-animation"></view>
 				<text class="pull-down-text">释放刷新~~</text>
 			</view>
-			<view class="cu-form-group">
+			<view class="cu-form-group" >
 				<view class="title">
 					<text v-if="good && good.plu">PLU码</text>
 					<text v-else>商品条码</text>
 					<text class="text-red margin-left-xs">*</text>
 				</view>
-				<input v-model="scanResult" :placeholder="good?good.plu||good.barcode:''" @blur="scanResultBlur">
+				<input v-model="scanResult" :placeholder="good&&(good.plu||good.barcode)" @blur="scanResultBlur">
 				<view class="cu-capsule radius align-center">
 					<view class='cu-tag bg-blue text-lg' @tap.stop="scan">
 						<text class='cuIcon-scan text-white'></text>
@@ -26,8 +26,9 @@
 			</view>
 			<view class="cu-form-group">
 				<view class="title">商品名称<text class="text-red margin-left-xs">*</text></view>
-				<input v-model="name" :placeholder="good?good.name:''">
-				<text class="cuIcon-more" @tap.stop="showAliasModalDialog" :class="alias?'text-red':''"></text>
+				<input v-model="name" :placeholder="good?good.name.name:''" type="text">
+				<text class="cuIcon-more" @tap.stop="showAliasModalDialog"
+					:class="{'text-red':(good&&good.name.alias)||alias}"></text>
 			</view>
 			<view class="cu-form-group">
 				<view class="title">商品规格<text class="text-red margin-left-xs">*</text></view>
@@ -35,8 +36,8 @@
 			</view>
 			<view class="cu-form-group">
 				<view class="title">商品等级<text class="text-red margin-left-xs">*</text></view>
-				<input v-model="grade" :placeholder="grade||good&&good.grade||'合格品'" disabled>
-				<text class="cuIcon-more" @tap.stop="showGradeRadioDialog"></text>
+				<input v-model="grade" :placeholder="good&&good.grade||'合格品'" disabled>
+				<text class="cuIcon-right" @tap.stop="showGradeDialog"></text>
 			</view>
 			<view class="cu-form-group">
 				<view class="title" @tap.stop="this.$util.toast('直辖定位到区级，其余定位到市！')">
@@ -47,18 +48,18 @@
 			<view class="cu-form-group">
 				<view class="title">商品类别<text class="text-red margin-left-xs">*</text></view>
 				<input :placeholder="good&&good.category.name||'未定义'" v-model="category">
-				<text class="cuIcon-more" @tap.stop="navToCategory(good.category.id)"></text>
+				<text class="cuIcon-right" @tap.stop="navToCategory(good.category.id)"></text>
 			</view>
 			<view class="cu-form-group">
 				<view class="title" @tap.stop="this.$util.toast('最近一次入库价，仅作为录入商品时计算（参考）毛利率，不影响库存成本和实际毛利率！')">
-					参考进价<text class="cuIcon-info"></text>
+					预置进价<text class="cuIcon-info"></text>
 				</view>
 				<text class="text-price"></text>
 				<input :placeholder="good&&good.storage.lastPurchasePrice||'0.00/PCS'" :value="purchasePrice"
 					type="digit" @blur="purchasePriceBlur">
 			</view>
 			<view class="cu-form-group">
-				<view class="title" @tap.stop="this.$util.toast('0.00元为灵活定价商品，POS系统每次销售时会询问售价！')">
+				<view class="title" @tap.stop="this.$util.toast('0.00元表示为未定价商品，POS系统每次销售时都会询问售价！')">
 					零&nbsp;&nbsp;售&nbsp;&nbsp;价<text class="cuIcon-info text-sm test"></text></view>
 				<text class="text-price"></text>
 				<view class="flex flex-sub">
@@ -96,7 +97,9 @@
 			</view>
 			<view class="cu-form-group solid-bottom">
 				<view class="title">保&nbsp;&nbsp;质&nbsp;&nbsp;期</view>
-				<input :placeholder="good&&good.shelfLife||'0天'" :value="shelfLife" type="number" @blur="shelfLifeBlur">
+				<input :placeholder="good&&good.shelfLife||'0 天'" :value="shelfLife" type="number"
+					@blur="shelfLifeBlur">
+				<text class="cuIcon-right" @tap.stop="showOriginDialog"></text>
 			</view>
 			<view class="cu-bar bg-white">
 				<view class="action title">商品图片</view>
@@ -142,8 +145,8 @@
 		<view class="cu-modal" :class="aliasModalDialog?'show':''">
 			<view class="cu-dialog">
 				<view class="flex align-center solid-bottom padding text-left">
-					<view class="margin-right-sm">商品别名：</view>
-					<input type="text" :placeholder="good&&good.name.alias||'请输入商品的另外一个名称'" v-model="alias"
+					商品别名：
+					<input type="text" focus :placeholder="(good&&good.name.alias)||'请输入商品的另外一个名称'" v-model="alias"
 						class="flex-sub">
 				</view>
 				<view class="cu-bar bg-white">
@@ -152,19 +155,15 @@
 			</view>
 		</view>
 		<!--商品等级对话框-->
-		<view class="cu-modal" :class="gradeRadioDialog?'show':''" @tap="hideGradeRadioDialog">
+		<view :class="['cu-modal',{'show':gradeDialog}]" @tap="hideGradeDialog">
 			<view class="cu-dialog" @tap.stop="">
-				<radio-group class="block" @change="gradeRadioChange">
-					<view class="cu-list menu text-left">
-						<view class="cu-item" v-for="(item,index) in grades" :key="index">
-							<label class="flex justify-between align-center flex-sub">
-								<view class="flex-sub">{{item}}</view>
-								<radio class="round" :class="presetGrade === item?'checked':''"
-									:checked="presetGrade === item?true:false" :value="item"></radio>
-							</label>
-						</view>
+				<block v-for="(grade,index) in grades" :key="grade">
+					<view class="grade" :class="{'text-green text-bold': presetGrade === grade}"
+						@tap="grade_selected(grade)">
+						<text>{{grade}}</text>
+						<text class="cuIcon-check text-lg text-bold" v-if="presetGrade === grade"></text>
 					</view>
-				</radio-group>
+				</block>
 			</view>
 		</view>
 		<!-- 产地选择对话框 -->
@@ -175,7 +174,7 @@
 					<text @tap.stop.prevent="hideOriginDialog">取消</text>
 					<text class="text-orange" @tap.stop.prevent="originDialogConfirm">确定</text>
 				</view>
-				<hop-region-picker @change="handlerChange" :value="initPlaceOfOrigin"></hop-region-picker>
+				<hoprxi-region-picker @change="handlerChange" :value="initPlaceOfOrigin"></hoprxi-region-picker>
 			</view>
 		</view>
 		<!-- 单位选择抽屉框 -->
@@ -221,10 +220,11 @@
 				placeOfOrigin: '',
 				category: null,
 				purchasePrice: '',
+				memberPrice: '',
 				retailPrice: '',
 				imgList: [],
 				aliasModalDialog: false,
-				gradeRadioDialog: false,
+				gradeDialog: false,
 				presetGrade: '合格品',
 				grades: [],
 				originDialog: false,
@@ -260,10 +260,12 @@
 			//let pattern = new RegExp(/(^\d+)天$/i);
 			//let result = pattern.exec("35") //"内蒙古.呼和浩特"
 			//console.log(this.computedGrossProfitRate(null, 65));
-			//console.log(this.good)
+			//console.log(this.good)	
+		},
+		onReady() {
 			let query = uni.createSelectorQuery().in(this);
-			query.select('#navBar').boundingClientRect().exec(res => {
-				this.navBarHeight=res[0].height;
+			query.select('#navBar').boundingClientRect().exec(rect => {
+				this.navBarHeight = rect[0].height;
 			});
 		},
 		watch: {
@@ -318,7 +320,14 @@
 					},
 				});
 			},
-			generate(sign) {},
+			generate(sign) {
+				switch (sign) {
+					case 'plu':
+						break;
+					case 'barcode':
+						break;
+				}
+			},
 			scanResultBlur(sign) {},
 			showAliasModalDialog() {
 				this.aliasModalDialog = true;
@@ -326,11 +335,16 @@
 			aliasModalDialogConfirm() {
 				this.aliasModalDialog = false;
 			},
-			showGradeRadioDialog() {
-				this.gradeRadioDialog = true;
+			showGradeDialog() {
+				this.gradeDialog = true;
 			},
-			hideGradeRadioDialog() {
-				this.gradeRadioDialog = false;
+			grade_selected(grade) {
+				this.grade = grade;
+				this.presetGrade = grade;
+				this.gradeDialog = false;
+			},
+			hideGradeDialog() {
+				this.gradeDialog = false;
 			},
 			gradeRadioChange(event) {
 				this.gradeRadio = event.detail.value;
@@ -433,7 +447,7 @@
 				if (this.shelfLife) {
 					let pattern = new RegExp(/天$/);
 					let temp = this.shelfLife.replace(pattern, '');
-					this.shelfLife = temp + '天';
+					this.shelfLife = temp + ' 天';
 				}
 			},
 			chooseImage() {
@@ -528,6 +542,19 @@
 		width: 100vw;
 		position: fixed;
 		bottom: 1.5vh;
+	}
+
+	.grade {
+		display: flex;
+		justify-content: space-between;
+		padding: 0 32rpx;
+		margin: 20rpx 24rpx;
+		border-bottom: 1rpx dashed #e1e1e1;
+
+		>text {
+			height: 78rpx;
+			line-height: 78rpx;
+		}
 	}
 
 	.units {

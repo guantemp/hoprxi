@@ -138,7 +138,14 @@ export default {
 				name: "调和油"
 			}, {
 				id: "2r5423",
-				name: "调味油"
+				name: "调味油",
+				sub: [{
+					id: "2r54231",
+					name: "藤椒油"
+				}, {
+					id: "2r54232",
+					name: "小磨香油"
+				}]
 			}]
 		}, {
 			id: "898er956",
@@ -295,9 +302,9 @@ export default {
 	catalog: [{
 		id: "201451060435585024",
 		name: {
-			"name": "彩虹柠檬香电热灭蚊香液",
-			"mnemonic": "chlmxdrmwxy",
-			"alias": "彩虹电热灭蚊香液"
+			name: "彩虹柠檬香电热灭蚊香液",
+			mnemonic: "chlmxdrmwxy",
+			alias: "彩虹电热灭蚊香液"
 		},
 		barcode: 6907861191394,
 		specs: '150ml',
@@ -330,7 +337,11 @@ export default {
 		},
 	}, {
 		plu: 133,
-		name: '广西沃柑',
+		name: {
+			name: "广西沃柑",
+			mnemonic: "chlmxdrmwxy",
+			alias: "沃柑"
+		},
 		specs: '500g',
 		placeOfOrigin: '广西壮族自治区.桂林市',
 		grade: '优等品',
@@ -354,7 +365,11 @@ export default {
 		},
 	}, {
 		id: '201452393217567744',
-		name: '哇哈哈营养快线水果牛奶饮品（菠萝味）',
+		name: {
+			name: "娃哈哈营养快线水果牛奶饮品（菠萝味）",
+			mnemonic: "chlmxdrmwxy",
+			alias: "营养快线"
+		},
 		barcode: 6902083898625,
 		specs: '550ml',
 		placeOfOrigin: '浙江省.杭州市',
@@ -378,7 +393,11 @@ export default {
 		},
 	}, {
 		id: '201452853459475457',
-		name: '川骄无芯卷纸（白四层）',
+		name: {
+			name: "川骄无芯卷纸（白四层）",
+			mnemonic: "chlmxdrmwxy",
+			alias: "川骄卷纸"
+		},
 		barcode: 6970981171003,
 		specs: '1800g',
 		category: {
@@ -398,7 +417,11 @@ export default {
 		vipPrice: '0.00/提',
 	}, {
 		id: '201452966564125697',
-		name: '云南三七牙膏（清新留兰）',
+		name: {
+			"name": "云南三七牙膏（清新留兰）",
+			"mnemonic": "chlmxdrmwxy",
+			"alias": "云南三七牙膏（清新留兰）"
+		},
 		barcode: 6953067200880,
 		specs: '220g',
 		category: {
@@ -422,7 +445,11 @@ export default {
 		},
 	}, {
 		plu: 123,
-		name: '红苋菜',
+		name: {
+			"name": "红苋菜",
+			"mnemonic": "chlmxdrmwxy",
+			"alias": "红苋菜"
+		},
 		specs: '500g',
 		placeOfOrigin: '江阳区',
 		grade: '一级品',
@@ -443,7 +470,11 @@ export default {
 		},
 	}, {
 		id: '201452966564158972',
-		name: '菊品郁金银屑片',
+		name: {
+			"name": "菊品郁金银屑片",
+			"mnemonic": "chlmxdrmwxy",
+			"alias": "菊品郁金银屑片"
+		},
 		barcode: 6926094418474,
 		specs: '100片',
 		category: {
@@ -467,7 +498,11 @@ export default {
 		vipPrice: '35.00/瓶',
 	}, {
 		id: '201452966564158973',
-		name: '阿维A胶囊',
+		name: {
+			"name": "阿维A胶囊",
+			"mnemonic": "chlmxdrmwxy",
+			"alias": "阿维A胶囊"
+		},
 		barcode: '6920327600247',
 		specs: '10粒/板*3板',
 		placeOfOrigin: '重庆市',
@@ -491,7 +526,11 @@ export default {
 		vipPrice: '0.00/盒',
 	}, {
 		id: '201452966564158974',
-		name: '阿莫西林胶囊',
+		name: {
+			"name": "阿莫西林胶囊",
+			"mnemonic": "chlmxdrmwxy",
+			"alias": "阿莫西林胶囊"
+		},
 		barcode: 6931435340314,
 		specs: '0.25g*50粒',
 		placeOfOrigin: '黑龙江.哈尔滨市',
@@ -515,7 +554,11 @@ export default {
 		vipPrice: '0.00/盒',
 	}, {
 		id: '201452564158974',
-		name: '伊利金典有机纯牛奶',
+		name: {
+			"name": "伊利金典有机纯牛奶",
+			"mnemonic": "chlmxdrmwxy",
+			"alias": "伊利金典有机纯牛奶"
+		},
 		barcode: 6907992508191,
 		specs: '250ml',
 		placeOfOrigin: '内蒙古.呼和浩特市',

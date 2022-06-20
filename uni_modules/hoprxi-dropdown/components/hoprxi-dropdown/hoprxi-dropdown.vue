@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<scroll-view scroll-x class="navigation bg-white" scroll-with-animation :scroll-left="scrollLeft">
+		<scroll-view scroll-x class="navigation bg-white" scroll-with-animation :scroll-left="tab_scroll">
 			<view class="tab" :ref="tab" :class="{'text-orange cur text-bold':index === selected}"
 				v-for="(tab,index) in tabs" :key="tab.id" :data-id="tab.id" @tap="tabSelect">
 				<text>{{tab.name}}</text>
@@ -12,19 +12,21 @@
 		<view :class="['mask',{'show':popupShow}]" @tap="closePopup"></view>
 		<!--4个层级-->
 		<view :class="['popup',{'hide':!popupShow}]" v-if="tabs[selected].depth >= 4">
-			<scroll-view class="left" :scroll-y="true" :scroll-into-view="'left_'+ leftScrollInto">
+			<scroll-view class="left" :scroll-y="true"
+				scroll-into-view="{{select[selected]&&'label_'+select[selected].level2_id}}">
 				<block v-for="(one,index) in tabs[selected].sub" :key="one.id">
-					<view class="left_menu" :id="'left_'+ one.id"
+					<view class="left_menu" :id="'label_'+one.id"
 						:class="{'bg-white text-red':select[selected]&&select[selected].level2_id === one.id&&!select[selected].level2_cancel}"
 						@tap.stop="second_menu_selected(one.id)">
 						<text>{{one.name}}</text>
 					</view>
 				</block>
 			</scroll-view>
-			<scroll-view class="right" :scroll-y="true" :scroll-into-view="'label_'+rightScrollInto">
+			<scroll-view class="right" :scroll-y="true"
+				:scroll-into-view="select[selected]&&'label_'+ (select[selected].level4_id||select[selected].level3_id)">
 				<block v-for="(two,index) in children()" :key="two.id">
 					<view class="label" :class="{'text-orange':select[selected]&&select[selected].level3_id === two.id}"
-						:id="'label_'+ two.id" @tap.top="three_menu_selected(two.id)">
+						:id="'label_'+two.id" @tap.top="three_menu_selected(two.id)">
 						<text>{{two.name}}</text>
 						<text class="cuIcon-check text-lg text-bold"
 							v-if="select[selected]&&select[selected].level3_id === two.id"></text>
@@ -33,7 +35,7 @@
 						<block v-for="(three,three_index) in two.sub" :key="three.id">
 							<view class="item" @tap.top="four_menu_selected(three.id)"
 								:class="{'selected':select[selected]&&select[selected].level4_id === three.id}"
-								:id="'label_'+ three.id">
+								:id="'label_'+three.id">
 								<text>{{three.name}}</text>
 							</view>
 						</block>
@@ -45,6 +47,7 @@
 		<!--3个层级-->
 		<view :class="['popup',{'hide':!popupShow}]" v-else-if="tabs[selected].depth <= 3">
 			<scroll-view class="filter" scroll-y :scroll-with-animation="true" :enable-back-to-top="true"
+				scroll-into-view="{{select[selected]&&'label_'+(select[selected].level3_id||select[selected].level2_id)}}"
 				:style="{'height:calc(52vh - 108rpx);' : tabs[selected].selector === 'multi'}">
 				<block v-for="(one,index) in tabs[selected].sub" :key="one.id">
 					<view class="label"
@@ -56,7 +59,7 @@
 					</view>
 					<view class="items items-extend" v-if="one.sub">
 						<block v-for="(two,three_index) in one.sub" :key="two.id">
-							<view class="item item-extend" @tap.top="three_menu_selected(two.id)"
+							<view class="item item-extend" @tap.top="three_menu_selected(two.id)" :id="'label_'+ two.id"
 								:class="{'selected':select[selected]&&select[selected].level3_id === two.id}">
 								<text>{{two.name}}</text>
 							</view>
@@ -106,11 +109,10 @@
 		data() {
 			return {
 				tabs: [],
-				scrollLeft: 0,
+				tab_scroll: 0,
 				popupShow: false,
 				select: [],
-				selected: 0,
-				leftScrollInto: 0,
+				selected: 0
 			}
 		},
 		created() {
@@ -122,7 +124,7 @@
 				const id = event.currentTarget.dataset.id;
 				this.selected = this.indexOf(id, this.tabs);
 				//css tab中 (margin:10+padding:20)*2=60
-				this.scrollLeft = (this.selected - 1) * 60;
+				this.tab_scroll = (this.selected - 1) * 60;
 				if (this.popupShow && !this.tabs[this.selected].sub) this.popupShow = false
 			},
 			triangledown(event) {

@@ -9,22 +9,12 @@
 				<view class="bg-gray light content">
 					<view class="cu-capsule radius">
 						<view class="cu-tag bg-green">version 0.1</view>
-						<view class="cu-tag line-green">2022-06-10</view>
+						<view class="cu-tag line-green">2022-06-19</view>
 					</view>
 					<view class="margin-top flex flex-direction">
-						<text>1、使用vue3改写</text>
-						<text>2、一个勉强的下拉菜单，后面逻辑复杂了要改</text>
-					</view>
-				</view>
-			</view>
-			<view class="cu-item text-gray">
-				<view class="bg-gray light content">
-					<view class="cu-capsule radius">
-						<view class="cu-tag bg-cyan">version 0.0.9</view>
-						<view class="cu-tag line-cyan">2021-08-05</view>
-					</view>
-					<view class="margin-top flex flex-direction">
-						<text>一个可以拖拽，自动靠边的悬浮球弹出菜单</text>
+						<text>1、使用vue3开始改写</text>
+						<text>2、一个下拉菜单，完成度90%</text>
+						<text>3、组件中使用v-for的solt现在不弹警告消息了</text>
 					</view>
 				</view>
 			</view>
@@ -35,8 +25,8 @@
 						<view class="cu-tag line-cyan">2021-07-22</view>
 					</view>
 					<view class="margin-top flex flex-direction">
-						<text>1、一个基础版本的树组件</text>
-						<text>2、编译器回档到3.1.17版本</text>
+						<text>1、一个可以拖拽，自动靠边的悬浮球弹出菜单</text>
+						<text>2、一个基础版本的树组件</text>
 					</view>
 				</view>
 			</view>
@@ -47,7 +37,8 @@
 						<view class="cu-tag line-cyan">2021-06-17</view>
 					</view>
 					<view class="margin-top flex flex-direction">
-						<text>呕！更新左滑删除组件，头大了</text>	
+						<text>呕！更新左滑删除组件，头大了</text>
+						<text>改用vue3或者是uni修复了bug,似乎一切正常起来了</text>	
 					</view>
 				</view>
 			</view>
@@ -84,7 +75,7 @@
 					</view>
 					<view class="margin-top flex flex-direction">
 						<text>1、调价单据的优化及本地js实现</text>
-						<text>2、优化navbar组件,增加额外部分高度可变</text>
+						<text>2、hoprxi-navigation组件,增加额外部分高度可变</text>
 						<text>3、打印标签展示</text>
 					</view>
 				</view>
@@ -98,7 +89,7 @@
 					<view class="margin-top flex flex-direction">
 						<text>1、实现门店定位或手动选择 </text>
 						<text>2、调价单据的显示 </text>
-						<text>3、优化listCell组件，使其符合easycom规范，自定义字体颜色、大小、粗细，箭头图标并丢出点击事件 </text>
+						<text>3、hoprxi_cell组件，自定义字体颜色、大小、粗细，箭头图标并丢出点击事件 </text>
 					</view>
 				</view>
 			</view>
