@@ -9,7 +9,19 @@
 				<view class="bg-gray light content">
 					<view class="cu-capsule radius">
 						<view class="cu-tag bg-green">version 0.1</view>
-						<view class="cu-tag line-green">2022-06-19</view>
+						<view class="cu-tag line-green">2022-11-10</view>
+					</view>
+					<view class="margin-top flex flex-direction">
+						<text>1、setup修改使用reactive中的Map要用es6内置的</text>
+						<text>2、tree组件中终于可以显示了</text>
+					</view>
+				</view>
+			</view>
+			<view class="cu-item text-gray">
+				<view class="bg-gray light content">
+					<view class="cu-capsule radius">
+						<view class="cu-tag bg-cyan">version 0.1</view>
+						<view class="cu-tag line-cyan">2022-06-19</view>
 					</view>
 					<view class="margin-top flex flex-direction">
 						<text>1、使用vue3开始改写</text>

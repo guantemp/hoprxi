@@ -8,7 +8,7 @@
 				<view class="loading-animation"></view>
 				<text class="pull-down-text">释放刷新~~</text>
 			</view>
-			<view class="cu-form-group" >
+			<view class="cu-form-group">
 				<view class="title">
 					<text v-if="good && good.plu">PLU码</text>
 					<text v-else>商品条码</text>
@@ -57,6 +57,8 @@
 				<text class="text-price"></text>
 				<input :placeholder="good&&good.storage.lastPurchasePrice||'0.00/PCS'" :value="purchasePrice"
 					type="digit" @blur="purchasePriceBlur">
+				<text class="icon-unit text-blue" @tap.stop="showUnitDrawerModal"></text>
+				<text class="cuIcon-more" @tap.stop=""></text>
 			</view>
 			<view class="cu-form-group">
 				<view class="title" @tap.stop="this.$util.toast('0.00元表示为未定价商品，POS系统每次销售时都会询问售价！')">
@@ -144,13 +146,12 @@
 		<!-- 别名对话框 -->
 		<view class="cu-modal" :class="aliasModalDialog?'show':''">
 			<view class="cu-dialog">
-				<view class="flex align-center solid-bottom padding text-left">
+				<view class="flex align-center solid-bottom padding text-left bg-white">
 					商品别名：
-					<input type="text" focus :placeholder="(good&&good.name.alias)||'请输入商品的另外一个名称'" v-model="alias"
-						class="flex-sub">
+					<input type="text" :placeholder="(good&&good.name.alias)||'请输入商品的另外一个名称'" v-model="alias">
 				</view>
-				<view class="cu-bar bg-white">
-					<view class="action margin-0 flex-sub" @tap="aliasModalDialogConfirm">好</view>
+				<view class="cu-bar" @tap="aliasModalDialogConfirm">
+					<text class="action margin-0 flex-sub">好</text>
 				</view>
 			</view>
 		</view>
@@ -161,7 +162,7 @@
 					<view class="grade" :class="{'text-green text-bold': presetGrade === grade}"
 						@tap="grade_selected(grade)">
 						<text>{{grade}}</text>
-						<text class="cuIcon-check text-lg text-bold" v-if="presetGrade === grade"></text>
+						<text class="cuIcon-check text-xl" v-if="presetGrade === grade"></text>
 					</view>
 				</block>
 			</view>
@@ -174,7 +175,8 @@
 					<text @tap.stop.prevent="hideOriginDialog">取消</text>
 					<text class="text-orange" @tap.stop.prevent="originDialogConfirm">确定</text>
 				</view>
-				<hoprxi-region-picker @change="handlerChange" :value="initPlaceOfOrigin"></hoprxi-region-picker>
+				<hoprxi-region-picker @change="handlerChange" :value="initPlaceOfOrigin" hideArea>
+				</hoprxi-region-picker>
 			</view>
 		</view>
 		<!-- 单位选择抽屉框 -->
@@ -549,7 +551,7 @@
 		justify-content: space-between;
 		padding: 0 32rpx;
 		margin: 20rpx 24rpx;
-		border-bottom: 1rpx dashed #e1e1e1;
+		border-bottom: 1rpx solid #e1e1e1;
 
 		>text {
 			height: 78rpx;

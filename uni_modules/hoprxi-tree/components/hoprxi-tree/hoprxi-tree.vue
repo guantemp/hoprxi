@@ -1,10 +1,8 @@
 <template>
-	<view>
-		<block v-for="(tree,index) in treesList" :key="index">
-			<hoprxi-tree-item :position='index' :node="tree.root" :checkType="checkType"
-				:checkOnlyLeaf="checkOnlyLeaf" :indent="indent"></hoprxi-tree-item>
-		</block>
-	</view>
+	<block v-for="(tree,index) in treeList" :key="index">
+		<hoprxi-tree-item :position='index' :node="tree.root" :checkType="checkType" :checkOnlyLeaf="checkOnlyLeaf"
+			:indent="indent"></hoprxi-tree-item>
+	</block>
 </template>
 
 <script>
@@ -13,13 +11,18 @@
 	 * @property {Number} indent,每层级间的缩进
 	 */
 	import {
+		reactive,
+		onMounted,
+		provide
+	} from 'vue';
+	import {
 		getPropertyFromData,
 	} from '@/common/js/util.js';
 	import HoprxiTreeItem from './hoprxi-tree-item.vue';
 	import {
-		Node,
+		TreeNode,
 		Tree
-	} from './Tree.js';
+	} from './tree.js';
 	export default {
 		name: 'hoprxi-tree',
 		components: {
@@ -74,9 +77,48 @@
 			},
 			lazy: Function,
 		},
+		setup(props) {
+			let treeList = reactive([]);
+			const initTreeList = () => {
+				const _toTree = (tree = undefined, parent, sub = []) => {
+					if (props.expendAll) parent.expanded = true;
+					for (const node of sub) {
+						const id = getPropertyFromData(node, props.props, 'id');
+						const label = getPropertyFromData(node, props.props, 'label');
+						const icon = getPropertyFromData(node, props.props, 'icon');
+						let child = new TreeNode(id, label, icon);
+						if (parent.expanded) child.visible = true;
+						if (props.checkedIds.includes(child.id)) child.checked = true;
+						if (props.disabledIds.includes(child.id)) child.disabled = true;
+						tree.addChild(parent, child);
+						let sub = getPropertyFromData(node, props.props, 'sub');
+						if (Array.isArray(sub) && sub.length > 0) {
+							_toTree(tree, child, sub);
+						}
+					}
+					//return tree;
+				}
+				for (const tree of props.trees) {
+					const id = getPropertyFromData(tree, props.props, 'id');
+					const label = getPropertyFromData(tree, props.props, 'label');
+					const icon = getPropertyFromData(tree, props.props, 'icon');
+					let root = new Tree(new TreeNode(id, label, icon), props.checkOnlyLeaf);
+					if (props.disabledIds.includes(root.root.id)) root.root.disabled = true;
+					const sub = getPropertyFromData(tree, props.props, 'sub');
+					if (Array.isArray(sub) && sub.length > 0) {
+						_toTree(root, root.root, sub);
+					}
+					treeList.push(root);
+				}
+			}
+			onMounted(initTreeList);
+			provide("treeList", treeList);
+			return {
+				treeList,
+			}
+		},
 		data() {
 			return {
-				treesList: [],
 				selected: [],
 				btnArr: [{
 					name: '编辑',
@@ -93,9 +135,15 @@
 				}],
 			}
 		},
+		mounted() {
+			console.log(this.treeList);
+		},
+		/*
 		created() {
 			if (typeof this.props !== 'object') throw new Error('props must be of object type.');
-			this.toTreeList(this.trees);
+			//console.log(this.treesList);
+			/*this.toTreeList(this.trees);
+			
 			for (const tree of this.treesList) {
 				if (!this.expendAll) tree.presetExpanded(this.expandedIds);
 				this.selected = tree.presetChecked(this.checkedIds);
@@ -104,13 +152,7 @@
 			//let hm = new HashMap();
 			//for (let i = 0; i < 16; i++) hm.put(i+'哈哈', i + '是我');
 			//for (let i = 0; i < 16; i++) console.log(hm.get('0哈哈'));
-		},
-		provide() {
-			return {
-				treesList: this.treesList,
-				selected: this.selected,
-				trees: this
-			}
+			
 		},
 		watch: {
 			checkedIds() {
@@ -133,7 +175,7 @@
 							this.$set(this.treesList[i].nodeHashMap.get(this.checkedIds[0]),'checked',true);
 							i++;
 						}
-				*/
+			
 				}
 			},
 			expandedIds() {
@@ -145,39 +187,8 @@
 				this.toTreeList(this.trees);
 			}
 		},
+		*/
 		methods: {
-			toTreeList(trees) {
-				for (const tree of trees) {
-					const id = getPropertyFromData(tree, this.props, 'id');
-					const label = getPropertyFromData(tree, this.props, 'label');
-					const icon = getPropertyFromData(tree, this.props, 'icon');
-					let root = new Tree(new Node(id, label, icon), this.checkOnlyLeaf);
-					if (this.disabledIds.includes(root.root.id)) root.root.disabled = true;
-					const sub = getPropertyFromData(tree, this.props, 'sub');
-					if (Array.isArray(sub) && sub.length > 0) {
-						this.toTree(root, root.root, sub);
-					}
-					this.treesList.push(root);
-				}
-			},
-			toTree(tree = undefined, parent, sub = []) {
-				if (this.expendAll) parent.expanded = true;
-				for (const node of sub) {
-					const id = getPropertyFromData(node, this.props, 'id');
-					const label = getPropertyFromData(node, this.props, 'label');
-					const icon = getPropertyFromData(node, this.props, 'icon');
-					let child = new Node(id, label, icon);
-					if (parent.expanded) child.visible = true;
-					if (this.checkedIds.includes(child.id)) child.checked = true;
-					if (this.disabledIds.includes(child.id)) child.disabled = true;
-					tree.addChild(parent, child);
-					let sub = getPropertyFromData(node, this.props, 'sub');
-					if (Array.isArray(sub) && sub.length > 0) {
-						this.toTree(tree, child, sub);
-					}
-				}
-				return tree;
-			},
 			getSelectedNodes(includeHalfChecked) {
 				//this.checkedIds=this.checkedIds;
 				//console.log(this.selected);

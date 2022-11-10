@@ -31,11 +31,11 @@
 <script>
 	/*
 	 * 1、自己引用自己是递归组件的关键,必须在components中声明
-	 * 2、否则需要去pages.json中的globalStyle项使用usingComponents添加此组件，小程序中将不会显示
+	 * 2、需要去pages.json中的globalStyle项使用usingComponents添加此组件，否则小程序中将不会显示
 	 */
 	import {
 		inject,
-		reactive
+		reactive,
 	} from 'vue'
 	import HoprxiCheckbox from './hoprxi-checkbox.vue';
 	import HoprxiTreeItem from './hoprxi-tree-item.vue';
@@ -62,10 +62,15 @@
 			checkOnlyLeaf: Boolean,
 			indent: Number,
 		},
-		inject: ['treesList'],
+		setup() {
+			let treeList = inject("treeList");
+			return {
+				treeList
+			}
+		},
 		computed: {
 			children: function() {
-				return this.treesList[this.position].children(this.node);
+				return this.treeList[this.position].children(this.node);
 			}
 		},
 		methods: {
@@ -74,36 +79,33 @@
 				const _collapse = (children) => {
 					for (const child of children) {
 						this.$set(child, 'visible', false);
-						console.log(child);
-						children = this.treesList[this.position].children(child);
+						children = this.treeList[this.position].children(child);
 						if (children) _collapse(children);
 					}
 				};
 				const _expand = (children) => {
 					for (const child of children) {
 						child.visible = true;
-						//this.$set(child, 'visible', true);
-						console.log(child);
+						//this.$set(this.treeList[this.position].getNode(child.id),'visible', true)
 						if (child.expanded) {
-							children = this.treesList[this.position].children(child);
+							children = this.treeList[this.position].children(child);
 							if (children) _expand(children);
 						}
 					}
 				}
-				let children = this.treesList[this.position].children(this.node);
+				let children = this.treeList[this.position].children(this.node);
 				if (this.node.expanded) {
 					_collapse(children);
 					this.$emit('collapse', this.node);
 				} else {
-					//this.treesList[this.position]._expandOrCollapseChild(this.node,true);
+					//this.treeList[this.position]._expandOrCollapseChild(this.node,true);
 					_expand(children);
 					this.$emit('expand', this.node);
 				}
 				this.node.expanded = !this.node.expanded
 			},
 			check() {
-				let checkedNodes = this.treesList[this.position].checked(this.node, !this.node.checked, this
-				.checkOnlyLeaf);
+				let checkedNodes = this.treeList[this.position].checked(this.node, !this.node.checked, this.checkOnlyLeaf);
 				this.$emit('check', {
 					node: this.node,
 					//data: this.node.data,c

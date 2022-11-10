@@ -1,43 +1,45 @@
 <template>
 	<view class="price_adjustment_add">
-		<hop-nav-bar title="新增调价单" :backgroundColor="[1, ['#AC32E4', '#7918F2', -225]]" tabPage="/pages/index/index"
-			:titleFont="['#FFF']" :surplusHeight="fold?'80':'15'" id="navBar">
+		<hoprxi-navigation title="新增调价单" :backgroundColor="[1, ['#AC32E4', '#7918F2', -225]]"
+			tabPage="/pages/index/index" buttonType="back" :titleFont="['#FFF']"
+			:surplusHeight="isNavigationBarFold?12:85" id="navigation">
 			<view slot="extendSlot">
-				<view v-show="fold">
-					<view class="flex flex-direction text-white margin-tb-xs margin-lr">
-						<view class="grid-item-container">
-							<text class="shop1">适用门店：</text>
-							<text class="shop2">{{currentShop}}</text>
-							<text class="cuIcon-locationfill" @click="showDateModal"></text>
-						</view>
-						<view class="grid-item-container">
-							<text class="shop1">生效日期：</text>
-							<text class="shop2">{{effectiveDateTime}}</text>
-							<text class="cuIcon-calendar" @click="showDateModal"></text>
-						</view>
-						<view class="grid-item-container">
-							<text class="shop1">备&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;注：</text>
-							<input v-model="remarks" type="text" class="remarks shop2"
-								placeholder-style="color:#dbdbdb;" placeholder="备注信息" />
-						</view>
+				<view v-show="!isNavigationBarFold"
+					class="flex flex-direction text-white margin-tb-xs margin-lr text-df">
+					<view class="grid-item-container">
+						<text class="shop1">适用门店：</text>
+						<text class="flex-sub">{{shop}}</text>
+						<text class="cuIcon-locationfill"
+							@click="this.$util.navTo('/pages/workflow/store_selection')"></text>
+					</view>
+					<view class="grid-item-container">
+						<text class="shop1">生效日期：</text>
+						<text class="shop2">{{effectiveDateTime}}</text>
+						<text class="cuIcon-calendar" @click="showDateModal"></text>
+					</view>
+					<view class="grid-item-container">
+						<text class="shop1">备&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;注：</text>
+						<input v-model="remarks" type="text" class="remarks shop2" placeholder-style="color:#dbdbdb;"
+							placeholder="备注信息" />
 					</view>
 				</view>
-				<text class="flex justify-center text-white text-bold" :class="fold?'cuIcon-fold':'cuIcon-unfold'"
-					@click="foldClick"></text>
+				<view @click="fold" class="flex justify-center text-white text-bold text-lg">
+					<text :class="isNavigationBarFold?'cuIcon-triangledownfill':'cuIcon-triangleupfill'"></text>
+				</view>
 			</view>
-		</hop-nav-bar>
+		</hoprxi-navigation>
 		<!--items show-->
-		<view v-if="items.length === 0" class="flex justify-center flex-direction align-center padding-bottom-lg"
-			:style="{height: fold?'calc(100vh - 190px)':'calc(100vh - 125px)'}">
-			<text class="cuIcon-like text-red margin-bottom tips"></text>
+		<view v-if="items.length === 0" class="flex justify-center flex-direction align-center"
+			:style="{height:'calc(100vh - ' + navigationBarHeight + 'px)'}">
+			<text class="cuIcon-like text-red text-xsl"></text>
 			<text>空空如也...</text>
 		</view>
 		<scroll-view v-else scroll-y :scroll-with-animation="true" :enable-back-to-top="true"
-			:style="{height: fold?'calc(100vh - 190px)':'calc(100vh - 125px)'}">
-			<block v-for="(item,index) in items" :key="index">
+			:style="{height:'calc(100vh - ' + navigationBarHeight + 'px)'}">
+			<block v-for="(item,index) in items" :key="item.id||item.plu">
 				<view class="flex flex-direction radius margin-xs bg-white light ">
 					<view class='flex justify-between padding-lr-sm padding-top-sm align-center'>
-						<text class="text-bold">品名：{{item.name}}</text>
+						<text class="text-bold">品名：{{item&&item.name}}</text>
 						<text class="cuIcon-delete text-blue" @click="deleteItem(item.id||item.plu)"></text>
 					</view>
 					<view class="flex justify-between padding-lr-sm margin-tb-xs dashed-bottom"
@@ -121,8 +123,8 @@
 				</view>
 			</block>
 		</scroll-view>
-		<!--bootom-->
-		<view class="bottom cu-bar bg-white tabbar border">
+		<!--bottom-->
+		<view class="bottom cu-bar bg-white tabbar border" id="bottom">
 			<view class="action" @tap.stop="this.$util.navTo('/pages/workflow/label/label')">
 				<view class="icon-label-print margin-bottom-xs" style="font-size: 38rpx"></view>打印标签
 			</view>
@@ -143,7 +145,7 @@
 					<text @tap.stop.prevent="hideDateModal" class="text-green">取消</text>
 					<text class="text-orange" @tap.stop.prevent="pickerConfirm">确定</text>
 				</view>
-				<hop-date-picker :startYear="startYear" fields="second" :current="current" :value="initDateTime"
+				<hop-date-picker :startYear="startYear" fields="second" current :value="initDateTime"
 					@change="handlerChange" @touchstart="touchStart" @touchend="touchEnd">
 				</hop-date-picker>
 			</view>
@@ -184,7 +186,7 @@
 						</view>
 					</view>
 					<view class="flex justify-between padding-lr-sm" :class="addSign?'':'padding-top-sm'">
-						<text class="text-bold">品名：{{item.name||'--'}}</text>
+						<text class="text-bold">品名：{{item&&item.name||'--'}}</text>
 						<text class="icon-unit text-blue" @tap.stop="showUnitDrawerModal"></text>
 					</view>
 					<view class="flex justify-between padding-lr-sm padding-tb-xs">
@@ -198,30 +200,32 @@
 							<text class="cuIcon-vip"
 								@click.stop="this.$util.toast('普通用户定位到省，vip用户定位到周边3-5KM')">区域参考售价</text>
 							<text
-								class="text-lg text-bold text-cyan text-price padding-tb-xs">{{item.vip.referenceSalePrice||'--'}}</text>
+								class="text-lg text-bold text-cyan text-price padding-tb-xs">{{item.vip&&item.vip.referenceSalePrice||'--'}}</text>
 						</view>
 						<view class='cu-item padding-left-sm flex flex-direction'>
 							<text class="cuIcon-vip"
 								@click.stop="this.$util.toast('普通用户定位到省，vip用户定位到周边3-5KM')">区域参考进价</text>
 							<text
-								class="text-lg text-bold text-cyan text-price padding-tb-xs">{{item.vip.referencePurchasePrice||'--'}}</text>
+								class="text-lg text-bold text-cyan text-price padding-tb-xs">{{item.vip&&item.vip.referencePurchasePrice||'--'}}</text>
 						</view>
 						<view class='cu-item padding-left-sm flex flex-direction'>
 							<text>最近入库价</text>
 							<text
-								class="text-lg text-bold text-price padding-tb-xs text-yellow">{{item.storage.lastPurchasePrice||'--'}}</text>
+								class="text-lg text-bold text-price padding-tb-xs text-yellow">{{item.vip&&item.storage.lastPurchasePrice||'--'}}</text>
 						</view>
 						<view class='cu-item padding-left-sm flex flex-direction'>
 							<text class="padding-tb-xs">库存数量</text>
-							<text class="text-lg text-bold text-pink">{{item.storage.number||'--'}}</text>
+							<text class="text-lg text-bold text-pink">{{item.storage&&item.storage.number||'--'}}</text>
 						</view>
 						<view class='cu-item padding-left-sm flex flex-direction'>
 							<text class="padding-tb-xs">库存金额</text>
-							<text class="text-lg text-bold text-pink text-price">{{item.storage.amount||'--'}}</text>
+							<text
+								class="text-lg text-bold text-pink text-price">{{item.storage&&item.storage.amount||'--'}}</text>
 						</view>
 						<view class='cu-item padding-left-sm flex flex-direction'>
 							<text class="padding-tb-xs cuIcon-question">存货周转率</text>
-							<text class="text-lg text-bold text-green">{{item.storage.stockTurn||'--'}}</text>
+							<text
+								class="text-lg text-bold text-green">{{item.storage&&item.storage.stockTurn||'--'}}</text>
 						</view>
 					</view>
 					<view class="flex flex-direction margin-lr-sm">
@@ -319,13 +323,12 @@
 		<!-- 单位选择抽屉框 -->
 		<view class="cu-modal drawer-modal justify-end" :class="unitDrawerModal?'show':''" @tap="hideUnitDrawerModal">
 			<view class="cu-dialog basis-lg bg-white" @tap.stop=""
-				:style="{top:navBarHeight + 'rpx',height:'calc(100vh - ' + navBarHeight + 'rpx)'}">
+				:style="{top:navigationBarHeight + 'rpx',height:'calc(100vh - ' + navigationBarHeight + 'rpx)'}">
 				<view class="padding-sm solid-bottom text-left">
-					<text class="cuIcon-titles text-orange"></text>
-					<text>重置价格单位</text>
+					<text class="cuIcon-titles text-orange"></text>重置价格单位
 				</view>
 				<view class="units text-df">
-					<block v-for="(unitItem, index) in units" :key="index">
+					<block v-for="(unitItem, index) in units" :key="unitItem">
 						<text class="padding-tb-xs padding-lr text-center margin-top-sm"
 							:class="unitItem===unit?'unitSelected text-red light bg-orange':'unit bg-grey'"
 							@tap.stop="selectUnit(unitItem)">{{unitItem}}</text>
@@ -341,14 +344,31 @@
 		formatDate,
 		formatMoney
 	} from '@/common/js/util.js';
+	import {
+		ref,
+		reactive
+	} from 'vue';
 	import catalog from '@/data/catalog_test_data.js'; //用例数据库
 	let pattern = new RegExp(/\/?([\u4e00-\u9fa5]{1,2}|500g|kg|pcs)?$/);
 	export default {
+		setup() {
+			const items = reactive([]);
+			const units = catalog.units;
+			let item = {};
+			let shop = '泸州市龙马潭区嘉诚超市';
+			let navigationBarHeight = ref(0);
+			let isNavigationBarFold = ref(false);
+			return {
+				items,
+				item,
+				shop,
+				navigationBarHeight,
+				isNavigationBarFold,
+				units
+			}
+		},
 		data() {
 			return {
-				navBarHeight: 0,
-				fold: true,
-				currentShop: '泸州市龙马潭区嘉诚超市',
 				remarks: null,
 				dateModal: false,
 				effectiveDateTime: null,
@@ -358,12 +378,9 @@
 				resultDate: {},
 				unitDrawerModal: false,
 				unit: null,
-				units: [],
 				clearModalDialog: false,
 				addOrEditItemModalDialog: false,
 				scanResult: null,
-				items: [],
-				item: null,
 				addSign: false,
 				newRetailPrice: null,
 				newMemberPrice: null,
@@ -379,9 +396,20 @@
 			this.effectiveDateTime = formatDate(currentDate, "yyyy-MM-dd hh:mm:ss");
 			currentDate.setDate(currentDate.getDate() - 31);
 			this.startYear = currentDate.getFullYear();
-			this.units = catalog.units;
 			//new RegExp("^([1-9][0-9]+(.[0-9]{1,4})?)/([\u4e00-\u9fa5]{1,2}|500g|kg|pcs)$", "i");
 			//console.log("00564".replace(new RegExp(/^(0+)([0-9]+(\.[0-9]{0,})?$)/).$1, ""));
+		},
+		onReady() {
+			let query = uni.createSelectorQuery().in(this);
+			query.select('#navigation').boundingClientRect().exec(rect => {
+				this.navigationBarHeight = rect[0].height;
+			});
+			//复用query得到单位是rpx,似乎不太准确
+			query = uni.createSelectorQuery().in(this); //再一次单位是px,
+			query.select('#bottom').boundingClientRect().exec(rect => {
+				this.navigationBarHeight = this.navigationBarHeight + rect[0].height;
+				//this.$util.toast("height:" + this.navigationBarHeight);
+			});
 		},
 		watch: {
 			unit() {
@@ -396,12 +424,6 @@
 					if (this.item.newVipPrice) this.item.newVipPrice = this.item.newVipPrice.replace(pattern, '') + "/" +
 						this.unit;
 				}
-			},
-			fold() {
-				const query = uni.createSelectorQuery().in(this);
-				query.select('#navBar').boundingClientRect(res => {
-					this.navBarHeight = res.height;
-				}).exec();
 			}
 		},
 		computed: {
@@ -425,8 +447,8 @@
 			},
 		},
 		methods: {
-			foldClick() {
-				this.fold = !this.fold;
+			fold() {
+				this.isNavigationBarFold = !this.isNavigationBarFold;
 			},
 			showDateModal() {
 				this.initDateTime = this.effectiveDateTime ? this.effectiveDateTime : formatDate(new Date(),
@@ -665,18 +687,6 @@
 				this.items = [];
 				this.hideClearModalDialog();
 			},
-			computedHeight() {
-				let query = uni.createSelectorQuery().in(this);
-				query.select('#navBar').boundingClientRect().exec(rect => {
-					//console.log(rect);
-					this.occupiedHeight = rect[0].height;
-				});
-				query = uni.createSelectorQuery().in(this);
-				query.select('.bottom').boundingClientRect().exec(rect => {
-					this.occupiedHeight = this.occupiedHeight + rect[0].height;
-					this.$util.toast("height:" + this.occupiedHeight);
-				});
-			},
 		}
 	}
 </script>
@@ -694,13 +704,13 @@
 		flex-wrap: wrap;
 
 		.shop1 {
-			width: 22%;
+			width: 24%;
 		}
 
 		.shop2 {
 			flex: 1;
 		}
-	}	
+	}
 
 	.remarks {
 		flex: 1;
@@ -713,10 +723,6 @@
 
 	.tips {
 		font-size: 164rpx;
-	}
-
-	.drag {
-		font-size: 48rpx;
 	}
 
 	.bottom {

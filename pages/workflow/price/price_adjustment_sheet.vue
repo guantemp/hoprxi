@@ -109,7 +109,7 @@
 				dateShow: false,
 				dateShowHeight: 0,
 				tabCur: 0,
-				tabList: ['今日', '昨日', '本周', '上周', ],
+				tabList: ['今日', '昨日', '本周', '上周', '本月'],
 				priceAdjustmentSheet: [],
 				dateSelectModalDialog: false,
 				startYear: null,

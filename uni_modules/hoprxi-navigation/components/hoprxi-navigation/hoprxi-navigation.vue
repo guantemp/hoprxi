@@ -1,48 +1,46 @@
 <template>
-	<view class="navBar text-lg">
-		<view class="navBarContent"
-			:style="{width:barWidth,height:barHeight,'background-color': navBarBackgroudColor,'background-image':navBarBackgroudColor,navShadow:navShadow}">
-			<!--全局背景 -->
-			<view class="background" v-if="navBarBackgroudImg">
-				<image :style="{height:barHeight,width:barWidth}" :src="navBarBackgroudImg" mode="scaleToFill"></image>
-			</view>
-			<view class="capsuleContent"
-				:style="{maxWidth: barCapsuleContentMaxWidth,paddingTop:menuButtonBounding.top + 'px','line-height':menuButtonBounding.height + 'px'}">
-				<view class="btn" v-if="!firstPage">
-					<slot name="btnSlot">
-						<view v-if="btnType === 'back'" @click="navBack" class="text-xl">
-							<text class="cuIcon-back" :style="{color:surplusTitle.color}"></text>
-						</view>
-						<view v-else-if="btnType === 'home'" @click="navHome">
-							<text class="cuIcon-home" :style="{color:surplusTitle.color}"></text>
-						</view>
-						<view v-else-if="btnType==='tower'" class="tower"
-							:style="{width:menuButtonBounding.width+'px','line-height':menuButtonBounding.height-2 + 'px'}">
-							<text class="cuIcon-back" :style="{color:surplusTitle.color}" @click="navBack"></text>
-							<text class="cuIcon-home" :style="{color:surplusTitle.color}" @click="navHome"></text>
-						</view>
-					</slot>
-				</view>
-				<view class="surplus">
-					<slot name="surplusSlot">
-						<view v-if="title"
-							:style="{color:surplusTitle.color,'text-align':surplusTitle.align,'font-weight':surplusTitle.weight}"
-							class="title">
-							<text>{{title}}</text>
-						</view>
-						<view v-else class="searchBtn" @click="searchClick">
-							<text class="iconfont icon-lookup searchIcon"></text>
-							<input type="text" class="input" placeholder-style="color:#dbdbdb;" confirm-type="search"
-								:placeholder="placeholder" @confirm="searchConfirm"
-								:style="{'height':menuButtonBounding.height +'px'}" />
-						</view>
-					</slot>
-				</view>
-			</view>
-			<view>
-				<slot name="extendSlot">
+	<view class="navBar navBarContent"
+		:style="{width:barWidth,height:barHeight,'background-color': navBarBackgroudColor,'background-image':navBarBackgroudColor,navShadow:navShadow}">
+		<!--全局背景 -->
+		<view class="background" v-if="navBarBackgroudImg">
+			<image :style="{height:barHeight,width:barWidth}" :src="navBarBackgroudImg" mode="scaleToFill"></image>
+		</view>
+		<view class="capsuleContent"
+			:style="{maxWidth: barCapsuleContentMaxWidth,paddingTop:menuButtonBounding.top + 'px','line-height':menuButtonBounding.height + 'px'}">
+			<view v-if="!firstPage">
+				<slot name="btnSlot">
+					<view v-if="buttonType === 'back'" @click="navBack">
+						<text class="cuIcon-back text-xl" :style="{color:surplusTitle.color}"></text>
+					</view>
+					<view v-else-if="buttonType === 'home'" @click="navHome">
+						<text class="cuIcon-home" :style="{color:surplusTitle.color}"></text>
+					</view>
+					<view v-else-if="buttonType ==='tower'" class="tower"
+						:style="{width:menuButtonBounding.width+'px','line-height':menuButtonBounding.height-2 + 'px'}">
+						<text class="cuIcon-back text-xl" :style="{color:surplusTitle.color}" @click="navBack"></text>
+						<text class="cuIcon-home" :style="{color:surplusTitle.color}" @click="navHome"></text>
+					</view>
 				</slot>
 			</view>
+			<view class="surplus">
+				<slot name="surplusSlot">
+					<view v-if="title"
+						:style="{color:surplusTitle.color,'text-align':surplusTitle.align,'font-weight':surplusTitle.weight}"
+						class="title">
+						<text>{{title}}</text>
+					</view>
+					<view v-else class="searchBtn" @click="searchClick">
+						<text class="iconfont icon-lookup searchIcon"></text>
+						<input type="text" class="input" placeholder-style="color:#dbdbdb;" confirm-type="search"
+							:placeholder="placeholder" @confirm="searchConfirm"
+							:style="{'height':menuButtonBounding.height +'px'}" />
+					</view>
+				</slot>
+			</view>
+		</view>
+		<view>
+			<slot name="extendSlot">
+			</slot>
 		</view>
 	</view>
 </template>
@@ -56,17 +54,16 @@
 				default: 0
 			},
 			backgroundColor: {
-				type: [String,Array],
+				type: [String, Array],
 				//背景色,参数一：透明度,参数二：背景颜色（array则为线性渐变，string为单色背景）渐变轴角度
 				// 比如：[1,['#24bdab','#80c54c'，45]]
 				default: []
 			},
-			backgroundImg: {
+			backgroundImg: { // 背景图片
 				type: String,
-				// 背景图片
 				default: ''
 			},
-			btnType: {
+			buttonType: {
 				type: String,
 				default: 'back'
 			},
@@ -76,8 +73,7 @@
 			},
 			titleFont: {
 				type: Array,
-				//字体选项，颜色，排列,粗细
-				//比如：['#000', 'center', 400]
+				//字体选项，颜色，排列,粗细,比如：['#000', 'center', 400]
 				default: []
 			},
 			title: {
@@ -95,10 +91,8 @@
 				barWidth: 0,
 				barHeight: 0,
 				barCapsuleContentMaxWidth: 0,
-
 				navBarBackgroudColor: '#FFF',
 				navBarBackgroudImg: null,
-
 				menuButtonBounding: {
 					top: 0,
 					height: 0,
@@ -106,7 +100,6 @@
 					right: 0,
 				},
 				firstPage: false,
-
 				surplusTitle: {
 					color: '#000',
 					align: 'left',
@@ -145,15 +138,14 @@
 			let currentPages = getCurrentPages();
 			let pageLen = currentPages.length;
 			//判断是否是第一个页面，如果是将不显示左边按键
-			if (pageLen == 1)
-				this.firstPage = true;
+			if (pageLen == 1) this.firstPage = true;
 			this.setSurplusTitle(this.titleFont);
 			//console.log(this.barHeight);
 		},
 		methods: {
 			computeBarHeight() {
 				uni.getSystemInfo({
-					success: res => {	
+					success: res => {
 						this.statusBarHeight = res.statusBarHeight + 'px';
 						this.barWidth = res.screenWidth + 'px';
 						this.barHeight = res.statusBarHeight + this.menuButtonBounding.height + (this
@@ -273,27 +265,20 @@
 			z-index: 2;
 			padding: 0 10rpx 0 18rpx;
 
-			.btn {
-				.tower {
-					display: flex;
-					justify-content: space-between;
-					align-items: center;
-					padding: 0 28rpx;
-					border-radius: 33px;
-					border-style: solid;
-					border-width: 2rpx;
-					border-color: rgba(0, 0, 0, 0.1);
-					background-color: rgba(255, 255, 255, 0.65);
-					/* #ifndef APP-PLUS-NVUE */
-					box-sizing: border-box;
-					/* #endif */
-					//transition: color,background 0.2s !important;
-				}
-
-				.line {
-					border-left: 2rpx solid;
-				}
+			.tower {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				padding: 0 28rpx;
+				border-radius: 33px;
+				border: 2rpx solid rgba(0, 0, 0, 0.1);
+				background-color: rgba(255, 255, 255, 0.65);
+				/* #ifndef APP-PLUS-NVUE */
+				box-sizing: border-box;
+				/* #endif */
+				//transition: color,background 0.2s !important;
 			}
+
 
 			.surplus {
 				width: 100%;

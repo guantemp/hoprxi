@@ -1,6 +1,6 @@
 <template>
-	<view class="catalog">
-		<hoprxi-navigation title="商品目录" :backgroundColor="[1, ['#6B73FF', '#000DFF', 135]]" :titleFont="['#FFF']"
+	<view class="catalog text-df">
+		<hoprxi-navigation title="商品目录" :backgroundColor="[1, ['#6B73FF', '#000DFF', 135]]" :titleFont="['#FFF','left',1200]"
 			id="navBar" :surplusHeight="43">
 			<template slot="extendSlot" class="cu-bar search">
 				<view class="search-form radius">
@@ -17,7 +17,8 @@
 		<hoprxi-dropdown :menus="categories" id="dropdown"></hoprxi-dropdown>
 		<scroll-view scroll-y :scroll-with-animation="true" :enable-back-to-top="true"
 			:style="{height:'calc(100vh - ' + navigatorHeight + 'px)'}">
-			<hoprxi-slider :buttons="buttons" :items="catalog" @del="del" @click="navigationToDetail">
+			<hoprxi-slider :buttons="buttons" :items="catalog" @del="del" @history="history"
+				@click="navigationToDetail">
 				<template v-slot="{item}">
 					<view class="flex padding-lr-sm padding-tb-xs align-center solid-top" @longpress="onLongPress"
 						:data-id="item.id||item.plu" :data-sign="item.id?'id':'plu'">
@@ -71,6 +72,7 @@
 					width: 200,
 					color: '#fff',
 					background: '#007AFF',
+					event: 'history',
 					selectedColor: '#007AFF',
 				}],
 				menus: [{
@@ -115,6 +117,7 @@
 			query.select('#dropdown').boundingClientRect().exec(rect => {
 				this.navigatorHeight = this.navigatorHeight + rect[0].height;
 			});
+			console.log(this.navigatorHeight)
 			uni.hideLoading();
 		},
 		methods: {
@@ -150,6 +153,9 @@
 			del(data) {
 				console.log(data);
 				this.$util.toast('删除：' + (data.id || data.plu));
+			},
+			history(data) {
+				console.log(data);
 			}
 		}
 	}

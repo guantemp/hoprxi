@@ -189,7 +189,7 @@
 		height: 476rpx;
 		overflow: hidden;
 		background-color: rgba(255, 255, 255, 1);
-		z-index: 999;
+		z-index: 9;
 	}
 
 	.regionPickerView {

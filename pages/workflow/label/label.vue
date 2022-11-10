@@ -1,8 +1,8 @@
 <template>
 	<view>
-		<hop-nav-bar title="标签打印" :backgroundColor="[1, ['#3C8CE7', '#00EAFF', -45]]" tabPage="/pages/index/index"
+		<hoprxi-navigation title="标签打印" :backgroundColor="[1, ['#3C8CE7', '#00EAFF', -45]]" tabPage="/pages/index/index"
 			:titleFont="['#FFF']" id="navBar">
-		</hop-nav-bar>
+		</hoprxi-navigation>
 		<!--labels show-->
 		<view v-if="labels.length === 0" class="flex justify-center flex-direction align-center padding-bottom-lg"
 			:style="{height:'calc(100vh - 190px)'}">

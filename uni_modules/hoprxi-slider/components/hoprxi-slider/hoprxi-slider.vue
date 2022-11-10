@@ -85,7 +85,7 @@
 				}
 				return style;
 			},
-			//单击行
+			//单击整行
 			itemClick(item) {
 				this.$emit('click', item);
 			},
