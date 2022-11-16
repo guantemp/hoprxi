@@ -64,10 +64,10 @@
 		},
 		setup(props) {
 			let treeList = inject("treeList");
-			let con = inject("content");
+			let content = inject("content");
 			const check = () => {
 				let selected = treeList[props.position].checked(props.node, !props.node.checked, props.checkOnlyLeaf);
-				con.emit('check', {
+				content.emit('check', {
 					node: props.node,
 					selected: selected
 				})

@@ -39,6 +39,7 @@
 		},
 		methods: {
 			check(object) {
+				console.log("member");
 				console.log(object);
 			}
 		}
