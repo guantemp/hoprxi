@@ -8,7 +8,9 @@
 <script>
 	/*
 	 * @property {Array} trees 层级数组，id项目的列不能有重复的值
-	 * @property {Number} indent,每层级间的缩进
+	 * @property {Number} indent,层级间的缩进
+	 * @property {Array} checkedIds,选中id集
+	 * @property {Array} expandedIds,展开的id集
 	 */
 	import {
 		reactive,
@@ -36,7 +38,7 @@
 			},
 			indent: {
 				type: Number,
-				default: 48
+				default: 56
 			},
 			checkedIds: {
 				type: Array,
@@ -77,8 +79,8 @@
 			},
 			lazy: Function,
 		},
-		setup(props) {
-			let treeList = reactive([]);
+		setup(props, content) {
+			const treeList = reactive([]);
 			const initTreeList = () => {
 				const _toTree = (tree = undefined, parent, sub = []) => {
 					if (props.expendAll) parent.expanded = true;
@@ -90,13 +92,12 @@
 						if (parent.expanded) child.visible = true;
 						if (props.checkedIds.includes(child.id)) child.checked = true;
 						if (props.disabledIds.includes(child.id)) child.disabled = true;
-						tree.addChild(parent, child);
+						tree.append(parent, child);
 						let sub = getPropertyFromData(node, props.props, 'sub');
 						if (Array.isArray(sub) && sub.length > 0) {
 							_toTree(tree, child, sub);
 						}
 					}
-					//return tree;
 				}
 				for (const tree of props.trees) {
 					const id = getPropertyFromData(tree, props.props, 'id');
@@ -112,7 +113,15 @@
 				}
 			}
 			onMounted(initTreeList);
+			onMounted(() => {
+				for (const tree of treeList) {
+					if (!props.expendAll) tree.presetExpanded(props.expandedIds);
+					tree.presetChecked(props.checkedIds);
+					//props.selected = tree.presetChecked(props.checkedIds);
+				}
+			});	
 			provide("treeList", treeList);
+			provide("content", content);
 			return {
 				treeList,
 			}
@@ -120,40 +129,24 @@
 		data() {
 			return {
 				selected: [],
-				btnArr: [{
+				buttons: [{
 					name: '编辑',
 					background: '#00aaff',
 					width: 120,
+					icon: 'edit.png',
 					color: '#fff',
 					events: 'edit'
 				}, {
 					name: '删除',
 					width: 120,
 					background: '#ff5500',
+					icon: 'delete.png',
 					color: '#fff',
 					events: 'del'
 				}],
 			}
 		},
-		mounted() {
-			console.log(this.treeList);
-		},
 		/*
-		created() {
-			if (typeof this.props !== 'object') throw new Error('props must be of object type.');
-			//console.log(this.treesList);
-			/*this.toTreeList(this.trees);
-			
-			for (const tree of this.treesList) {
-				if (!this.expendAll) tree.presetExpanded(this.expandedIds);
-				this.selected = tree.presetChecked(this.checkedIds);
-				//console.log(tree.depth("4"))
-			}
-			//let hm = new HashMap();
-			//for (let i = 0; i < 16; i++) hm.put(i+'哈哈', i + '是我');
-			//for (let i = 0; i < 16; i++) console.log(hm.get('0哈哈'));
-			
-		},
 		watch: {
 			checkedIds() {
 				for (const tree of this.treesList) {
@@ -202,9 +195,6 @@
 			 */
 			getNodePath(key) {
 				return [];
-			},
-			check(object) {
-				//console.log(object);
 			},
 			checkAll() {},
 			uncheckAll() {},

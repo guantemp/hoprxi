@@ -62,10 +62,19 @@
 			checkOnlyLeaf: Boolean,
 			indent: Number,
 		},
-		setup() {
+		setup(props) {
 			let treeList = inject("treeList");
+			let con = inject("content");
+			const check = () => {
+				let selected = treeList[props.position].checked(props.node, !props.node.checked, props.checkOnlyLeaf);
+				con.emit('check', {
+					node: props.node,
+					selected: selected
+				})
+			};
 			return {
-				treeList
+				treeList,
+				check,
 			}
 		},
 		computed: {
@@ -75,7 +84,6 @@
 		},
 		methods: {
 			expandOrCollapse() {
-				if (this.node.isLeaf) return;
 				const _collapse = (children) => {
 					for (const child of children) {
 						this.$set(child, 'visible', false);
@@ -93,6 +101,7 @@
 						}
 					}
 				}
+				if (this.node.isLeaf) return;
 				let children = this.treeList[this.position].children(this.node);
 				if (this.node.expanded) {
 					_collapse(children);
@@ -104,17 +113,21 @@
 				}
 				this.node.expanded = !this.node.expanded
 			},
-			check() {
-				let checkedNodes = this.treeList[this.position].checked(this.node, !this.node.checked, this.checkOnlyLeaf);
-				this.$emit('check', {
+			/*
+			check(data) {
+				//let checkedNodes = this.treeList[this.position].checked(this.node, !this.node.checked, this.checkOnlyLeaf);
+				//this.tree.$emit('check',this.node);
+				
+				this.$emit('checkNode', {
 					node: this.node,
-					//data: this.node.data,c
+					//data: this.node.data,
 					checkedNodes: checkedNodes
 					//checkedKeys: this.tree.store.getCheckedKeys(),
 					//halfCheckedNodes: this.tree.store.getHalfCheckedNodes(),
 					//halfCheckedKeys: this.tree.store.getHalfCheckedKeys()
 				});
-			},
+				
+			},*/
 		}
 	}
 </script>

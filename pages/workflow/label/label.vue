@@ -11,7 +11,7 @@
 		</view>
 		<scroll-view scroll-y :scroll-with-animation="true" :enable-back-to-top="true"
 			:style="{height: 'calc(100vh - 150px)'}">
-			<hop-slider :btnArr="btnArr" :items="labels" @del="del" @itemClick="itemClick"
+			<hoprxi-slider :btnArr="btnArr" :items="labels" @del="del" @itemClick="itemClick"
 				hierarchyClass="flex flex-direction margin-lr-xs margin-top-xs" radius='5'>
 				<template v-slot="{item}">
 					<view class="grid-item-container">
@@ -44,7 +44,7 @@
 						</view>
 					</view>
 				</template>
-			</hop-slider>
+			</hoprxi-slider>
 		</scroll-view>
 		<!--bootom-->
 		<view class="bottom cu-bar bg-white tabbar border shop">
@@ -81,49 +81,49 @@
 						</view>
 					</view>
 					<view class="padding-lr-sm">
-						<text class="text-bold">品名：{{item.name||'--'}}</text>
+						<text class="text-bold">品名：{{(item&&item.name)||'--'}}</text>
 					</view>
 					<view class="flex justify-between padding-lr-sm padding-tb-xs">
-						<text v-if="item.plu">plu号：{{item.plu}}</text>
-						<text v-else>商品条码：{{item.barcode||'--'}}</text>
-						<text>规格：{{item.specs||'--'}}</text>
+						<text v-if="item&&item.plu">plu号：{{item&&item.plu}}</text>
+						<text v-else>商品条码：{{item&&item.barcode||'--'}}</text>
+						<text>规格：{{item&&item.specs||'--'}}</text>
 					</view>
 					<view class="flex justify-between padding-lr-sm padding-bottom-xs">
-						<text>产地：{{item.placeOfOrigin||'中国'}}</text>
-						<text>等级：{{item.grade||'合格品'}}</text>
+						<text>产地：{{item&&item.placeOfOrigin||'中国'}}</text>
+						<text>等级：{{item&&item.grade||'合格品'}}</text>
 					</view>
 					<view class="grid col-3 bg-cyan padding-tb-sm margin-lr-sm radius margin-bottom-xs">
 						<view class='cu-item padding-left-sm flex flex-direction'>
 							<text>零售价</text>
-							<text class="text-lg text-price padding-top-xs">{{item.retailPrice||'--'}}</text>
+							<text class="text-lg text-price padding-top-xs">{{item&&item.retailPrice||'--'}}</text>
 						</view>
 						<view class='cu-item padding-left-sm flex flex-direction'>
 							<text>会员价</text>
-							<text class="text-lg text-price padding-top-xs">{{item.memberPrice||'--'}}</text>
+							<text class="text-lg text-price padding-top-xs">{{item&&item.memberPrice||'--'}}</text>
 						</view>
 						<view class='cu-item padding-left-sm flex flex-direction'>
 							<text>PLUS会员价</text>
-							<text class="text-lg text-price padding-top-xs">{{item.vipPrice||'--'}}</text>
+							<text class="text-lg text-price padding-top-xs">{{item&&item.vipPrice||'--'}}</text>
 						</view>
 					</view>
 					<view class="margin-lr-xs flex align-center">
 						<switch class='orange radius' style="transform:scale(0.78)" @change="SwitchD"
 							:class="switchD?'':'checked'" :checked="switchD?false:true"
-							:disabled="item.promotion?false:true"></switch>
+							:disabled="item&&item.promotion?false:true"></switch>
 						<text class="margin-left-xs">价格促销信息</text>
 					</view>
 					<view v-show="!switchD" class="text-left">
 						<view class="flex padding-lr-sm padding-bottom-xs">
 							<text style="flex-basis: 25%;">促销日期：</text>
-							<text>{{item.promotion.startDate}} 至 {{item.promotion.endDate}}</text>
+							<text>{{item&&item.promotion.startDate}} 至 {{item&&item.promotion.endDate}}</text>
 						</view>
 						<view class="flex padding-lr-sm padding-bottom-xs">
 							<text style="flex-basis: 25%;">促销价格：</text>
-							<text>{{item.promotion.price}}</text>
+							<text>{{item&&item.promotion.price}}</text>
 						</view>
 						<view class="flex padding-lr-sm padding-bottom-xs">
 							<text style="flex-basis: 25%;">促销说明：</text>
-							<text>{{item.promotion.explain}}</text>
+							<text>{{item&&item.promotion.explain}}</text>
 						</view>
 					</view>
 					<view class="flex padding-lr-sm align-center">
@@ -136,7 +136,7 @@
 						<swiper-item v-for="(item,index) in labelList" :key="index"
 							:class="swiperIndex === index?'cur':''" @tap.stop="showLabelTipsModalDialog">
 							<view class="swiperItem">
-								<image :src="item.url" mode="scaleToFill"></image>
+								<image :src="item&&item.url" mode="scaleToFill"></image>
 							</view>
 						</swiper-item>
 					</swiper>
@@ -307,6 +307,7 @@
 			this.prints = label.prints;
 			this.seclectLabel();
 			this.labels = label.labels;
+			console.log(this.labels);
 		},
 		methods: {
 			del(data) {

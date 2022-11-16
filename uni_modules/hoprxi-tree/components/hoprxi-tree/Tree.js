@@ -14,7 +14,7 @@ export class TreeNode {
 		this.expanded = false;
 		this.disabled = false;
 		this.checked = false;
-		this.indeterminate = false;
+		this.indeterminate = false;//半切
 	}
 }
 export class Tree {
@@ -26,13 +26,14 @@ export class Tree {
 		this.isCheckOnlyLeaf = false;
 		this.nodeCheckType = 'indeterminate';
 		this.nodeMap.set(root.id, this.root);
+		this.selected=new Set();
 	}
 	/*
 	 * @description 增加子元素
 	 * @param {parent} 父亲节点
 	 * @param {child} 儿子节点
 	 */
-	addChild(parent, child) {
+	append(parent, child) {
 		if (!parent instanceof TreeNode || !child instanceof TreeNode) throw new Error(
 			'parent and child required Node class');
 		const _sibling = (previous, next) => {
@@ -66,16 +67,16 @@ export class Tree {
 		if (node) return this.nodeMap.get(node.parentId);
 		return null;
 	}
-	siblings(sibling) {
-		if (!sibling instanceof TreeNode) throw new Error('sibling required Node class');
-		if (sibling.parentId) {
-			let parent = this.nodeMap.get(sibling.parentId);
+	siblings(node) {
+		if (!node instanceof TreeNode) throw new Error('node required Node class');
+		if (node.parentId) {
+			let parent = this.nodeMap.get(node.parentId);
 			return children(parent);
 		}
 		return [];
 	}
-	children(parent) {
-		if (!parent instanceof TreeNode) throw new Error('parent required Node class');
+	children(node) {
+		if (!node instanceof TreeNode) throw new Error('node required Node class');
 		const _child = (children, next) => {
 			let nextNode = this.nodeMap.get(next);
 			children.push(nextNode);
@@ -84,8 +85,8 @@ export class Tree {
 			}
 		}
 		let children = [];
-		if (parent.firstChild) {
-			_child(children, parent.firstChild);
+		if (node.firstChild) {
+			_child(children, node.firstChild);
 		}
 		return children;
 	}
@@ -169,16 +170,16 @@ export class Tree {
 	}
 	//与直接check有些区别
 	presetChecked(checkedIds = []) {
-		const _child = (selected, node) => {
+		const _child = (node) => {
 			if (node) {
 				node.checked = true;
-				selected.push(node);
+				this.selected.add(node);
 				if (node.isLeaf) return;
 				let children = this.children(node);
-				for (const child of children) _child(selected, child);
+				for (const child of children) _child(child);
 			}
 		}
-		const _primordial = (selected, node) => {
+		const _primordial = (node) => {
 			let parent = this.nodeMap.get(node.parentId);
 			if (parent) {
 				let children = this.children(parent);
@@ -189,21 +190,21 @@ export class Tree {
 					}
 				}
 				if (!parent.indeterminate) {
-					parent.checked = true;
-					selected.push(parent);
+					parent.checked = true;				
 				}
-				_primordial(selected, parent);
+				this.selected.add(parent);
+				_primordial(parent);
 			}
 		}
-		let selected = [];
 		for (const id of checkedIds) {
 			let basic = this.nodeMap.get(id);
 			if (basic) {
-				_child(selected, basic);
-				_primordial(selected, basic);
+				_child(basic);
+				_primordial( basic);
 			}
 		}
-		return Array.from(new Set(selected)); //去重
+		//
+		//return Array.from(new Set(selected)); //去重
 	}
 	
 	checked(node, isChecked, isCheckOnlyLeaf) {
@@ -259,5 +260,8 @@ export class Tree {
 	
 	remove(node) {
 		if (node.firstChild) {}
+	}
+	selected(){
+		return this.selected;
 	}
 }

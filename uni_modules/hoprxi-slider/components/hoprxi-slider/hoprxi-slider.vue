@@ -44,12 +44,14 @@
 					name: '编辑',
 					width: 180,
 					background: '#00aaff',
+					icon:'edit.png',
 					color: '#fff',
 					event: 'edit'
 				}, {
 					name: '删除',
 					width: 180,
 					background: '#ff5500',
+					icon:'del.png',
 					color: '#fff',
 					event: 'del'
 				}, ]

@@ -1,25 +1,22 @@
 <template>
-	<view>
-		<hoprxi-navigation title="会员管理" :backgroundColor="[1, ['#6B73FF', '#000DFF', 135]]"
-			:titleFont="['#FFF','center',700]" :surplusHeight=43>
-			<view slot="extendSlot" class="cu-bar search">
-				<view class="search-form radius">
-					<text class="cuIcon-search"></text>
-					<input v-model="scanResult" :adjust-position="false" type="text" placeholder="请输入类目名称、拼音助记码"
-						confirm-type="search">
-					<text class="cuIcon-scan text-blue text-bold" @tap="scan"></text>
-				</view>
-				<view class="action text-white">
-					<text class="cuIcon-close "></text>
-					<text @click="computedScrollViewHeight">取消</text>
-				</view>
+	<hoprxi-navigation title="会员管理" :backgroundColor="[1, ['#6B73FF', '#000DFF', 135]]"
+		:titleFont="['#FFF','center',700]" :surplusHeight=43>
+		<view slot="extendSlot" class="cu-bar search">
+			<view class="search-form radius">
+				<text class="cuIcon-search"></text>
+				<input v-model="scanResult" :adjust-position="false" type="text" placeholder="请输入类目名称、拼音助记码"
+					confirm-type="search">
+				<text class="cuIcon-scan text-blue text-bold" @tap="scan"></text>
 			</view>
-		</hoprxi-navigation>
-		<hoprxi-tree :trees="categories" checkType="checkbox" :disabledIds="disabledIds"
-			:expandedIds="expandedIds" :expendAll="false" :checkedIds="checkedIds" class="margin-left-sm"
-			@check="check">
-		</hoprxi-tree>
-	</view>
+			<view class="action text-white">
+				<text class="cuIcon-close "></text>
+				<text @click="computedScrollViewHeight">取消</text>
+			</view>
+		</view>
+	</hoprxi-navigation>
+	<hoprxi-tree :trees="categories" checkType="checkbox" :disabledIds="disabledIds" :expandedIds="expandedIds"
+		:expendAll="false" :checkedIds="checkedIds" class="margin-left-sm" @check="check">
+	</hoprxi-tree>
 </template>
 
 <script>
@@ -29,7 +26,7 @@
 			return {
 				categories: [],
 				disabledIds: ["-99"],
-				expandedIds: ["1","3446"],
+				expandedIds: ["1", "3446", "a25423", "gj"],
 				checkedIds: ["754", "1234", "98874", "1532", "24323465345", "b25423", "24325", "24326"],
 				defaultProps: {
 					children: 'sub',

@@ -2,7 +2,7 @@
 	<view class="content">
 		<text class="tit">未实现，请等待....</text>
 		<button class="cu-btn bg-cyan lg shadow confirmBtn" @click="navBack()">返回</button>
-		<view style="height: 130rpx;width:95%" class="flex bg-cyan radius margin align-center justify-center text-xl"
+		<view style="height: 80rpx;width:95%" class="flex bg-cyan radius margin align-center justify-center text-xl"
 			@longpress="onLongPress" @longTap="onLongPress" @tap="listTap" data-action="hahaha">
 			长按菜单
 		</view>

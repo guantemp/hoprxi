@@ -8,7 +8,7 @@
 			<view class="cu-item text-gray">
 				<view class="bg-gray light content">
 					<view class="cu-capsule radius">
-						<view class="cu-tag bg-green">version 0.1</view>
+						<view class="cu-tag bg-green">version 0.1.1</view>
 						<view class="cu-tag line-green">2022-11-10</view>
 					</view>
 					<view class="margin-top flex flex-direction">
