@@ -13,7 +13,8 @@
 					</view>
 					<view class="margin-top flex flex-direction">
 						<text>1、setup修改使用reactive中的Map要用es6内置的</text>
-						<text>2、tree组件中终于可以显示了</text>
+						<text>2、tree组件中终于可以显示了,其实是个拼写错误</text>
+						<text>3、tree组件check时间可以传给使用者了</text>
 					</view>
 				</view>
 			</view>
