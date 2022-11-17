@@ -103,7 +103,7 @@
 					const id = getPropertyFromData(tree, props.props, 'id');
 					const label = getPropertyFromData(tree, props.props, 'label');
 					const icon = getPropertyFromData(tree, props.props, 'icon');
-					let root = new Tree(new TreeNode(id, label, icon), props.checkOnlyLeaf);
+					let root = new Tree(new TreeNode(id, label, icon), props.checkOnlyLeaf,props.checkType);
 					if (props.disabledIds.includes(root.root.id)) root.root.disabled = true;
 					const sub = getPropertyFromData(tree, props.props, 'sub');
 					if (Array.isArray(sub) && sub.length > 0) {

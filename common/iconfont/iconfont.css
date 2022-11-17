@@ -7,6 +7,7 @@
 	-moz-osx-font-smoothing: grayscale;
 }
 
+/* CDN 服务仅供平台体验和调试使用，平台不承诺服务的稳定性，企业客户需下载字体包自行发布使用并做好备份。 */
 @font-face {
   font-family: 'iconfont';  /* Project id 2371605 */
   src: url('//at.alicdn.com/t/font_2371605_4x5ftul051q.eot?t=1627289539798'); /* IE9 */
@@ -29,9 +30,6 @@
 	content: "\e610";
 }
 
-.icon-captcha:before {
-	content: "\e60f";
-}
 
 .icon-tel:before {
 	content: "\e612";
@@ -81,9 +79,6 @@
 	content: "\e61f";
 }
 
-.icon-triangle-arrow::before {
-	content: "\e620";
-}
 .icon-open-eye::before {
 	content: "\e622";
 }

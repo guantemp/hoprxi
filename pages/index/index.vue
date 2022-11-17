@@ -9,12 +9,12 @@
 				<view class="bg-gray light content">
 					<view class="cu-capsule radius">
 						<view class="cu-tag bg-green">version 0.1.1</view>
-						<view class="cu-tag line-green">2022-11-10</view>
+						<view class="cu-tag line-green">2022-11-17</view>
 					</view>
 					<view class="margin-top flex flex-direction">
-						<text>1、setup修改使用reactive中的Map要用es6内置的</text>
-						<text>2、tree组件中终于可以显示了,其实是个拼写错误</text>
-						<text>3、tree组件check时间可以传给使用者了</text>
+						<text>1、reactive,要用es6中的Map才不会失去响应性</text>
+						<text>2、tree组件中递归子组件可以显示了,在传递给子组件出现低级拼写错误</text>
+						<text>3、tree组件递归checkbox点击可以传给最上层使用者了</text>
 					</view>
 				</view>
 			</view>

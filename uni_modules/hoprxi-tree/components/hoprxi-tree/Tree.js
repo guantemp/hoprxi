@@ -14,7 +14,7 @@ export class TreeNode {
 		this.expanded = false;
 		this.disabled = false;
 		this.checked = false;
-		this.indeterminate = false;//半切
+		this.indeterminate = false; //半切
 	}
 }
 export class Tree {
@@ -23,10 +23,10 @@ export class Tree {
 		this.root = root;
 		this.root.visible = true;
 		this.nodeMap = new Map();
-		this.isCheckOnlyLeaf = false;
-		this.nodeCheckType = 'indeterminate';
+		this.isCheckOnlyLeaf = isCheckOnlyLeaf;
+		this.nodeCheckType = nodeCheckType; //'indeterminate';
 		this.nodeMap.set(root.id, this.root);
-		this.selected=new Set();
+		this.selected = new Set();
 	}
 	/*
 	 * @description 增加子元素
@@ -190,7 +190,7 @@ export class Tree {
 					}
 				}
 				if (!parent.indeterminate) {
-					parent.checked = true;				
+					parent.checked = true;
 				}
 				this.selected.add(parent);
 				_primordial(parent);
@@ -198,15 +198,26 @@ export class Tree {
 		}
 		for (const id of checkedIds) {
 			let basic = this.nodeMap.get(id);
-			if (basic) {
+			if (basic === undefined) continue;
+			if (this.nodeCheckType === "radio") {
+				if (basic.isLeaf) {
+					basic.checked = true;
+					this.selected.add(basic);
+					break;
+				}
+			} else if (this.isCheckOnlyLeaf) {
+				if (basic.isLeaf) {
+					basic.checked = true;
+					this.selected.add(basic);
+				}
+			} else {
 				_child(basic);
-				_primordial( basic);
+				_primordial(basic);
 			}
 		}
 		//
 		//return Array.from(new Set(selected)); //去重
 	}
-	
 	checked(node, isChecked, isCheckOnlyLeaf) {
 		const _child = (selected, node) => {
 			if (node) {
@@ -257,11 +268,10 @@ export class Tree {
 		}
 		return selected;
 	}
-	
 	remove(node) {
 		if (node.firstChild) {}
 	}
-	selected(){
+	selected() {
 		return this.selected;
 	}
 }

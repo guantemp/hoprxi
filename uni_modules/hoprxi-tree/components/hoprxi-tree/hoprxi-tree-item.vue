@@ -2,7 +2,7 @@
 	<view v-show="node.visible" class="flex padding-tb-xs bg-white align-center text-xl"
 		:style="{paddingLeft: node.depth * indent + 'rpx',background:true?'#F5F7FA':'#FFF'}"
 		@tap.stop="expandOrCollapse">
-		<text class="icon-triangle-arrow padding-left-xs margin-right-xs node-expand-icon" :class="[
+		<text class="cuIcon-playfill padding-left-xs margin-right-xs node-expand-icon" :class="[
 				{
 					'leaf': node.isLeaf, 
 					'expended': !node.isLeaf && node.expanded
@@ -66,7 +66,8 @@
 			let treeList = inject("treeList");
 			let content = inject("content");
 			const check = () => {
-				let selected = treeList[props.position].checked(props.node, !props.node.checked, props.checkOnlyLeaf);
+				treeList[props.position].checked(props.node, !props.node.checked, props.checkOnlyLeaf);
+				let selected = treeList[props.position].selected;
 				content.emit('check', {
 					node: props.node,
 					selected: selected

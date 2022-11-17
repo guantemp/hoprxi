@@ -14,8 +14,8 @@
 			</view>
 		</view>
 	</hoprxi-navigation>
-	<hoprxi-tree :trees="categories" checkType="checkbox" :disabledIds="disabledIds" :expandedIds="expandedIds"
-		:expendAll="false" :checkedIds="checkedIds" class="margin-left-sm" @check="check">
+	<hoprxi-tree :trees="categories" checkType="radio" :disabledIds="disabledIds" :expandedIds="expandedIds"
+		:expendAll="false" :checkedIds="checkedIds" :checkOnlyLeaf='true' class="margin-left-sm" @check="check">
 	</hoprxi-tree>
 </template>
 
@@ -27,7 +27,7 @@
 				categories: [],
 				disabledIds: ["-99"],
 				expandedIds: ["1", "3446", "a25423", "gj"],
-				checkedIds: ["754", "1234", "98874", "1532", "24323465345", "b25423", "24325", "24326"],
+				checkedIds: ["43645", "754", "1234", "98874", "1532", "b25423", "24325", "24326", "24323465345" ],
 				defaultProps: {
 					children: 'sub',
 					label: 'name'

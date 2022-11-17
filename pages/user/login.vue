@@ -13,7 +13,7 @@
 						@input="check(mobile,smsCode,password)">
 				</view>
 				<view v-if="verification" class="cu-form-group form-group">
-					<text class="icon-captcha from-tit"></text>
+					<text class="cuIcon-safe from-tit"></text>
 					<input placeholder="请填写手机验证码" name="input" type="number" v-model="smsCode" maxlength="6"
 						@input="check(mobile,smsCode,password)">
 					<button class="cu-btn smsBtn" :class="sendCodeBtnDisable?'':'smsBtnEnable'"
