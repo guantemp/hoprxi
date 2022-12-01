@@ -11,7 +11,7 @@
 				<hop-list-cell title="当前门店" titleColor="#ff9700" :arrow="false" borderStyle="dashed" />
 				<view class="currentShop text-lg">
 					<text>{{currentShop}}</text>
-					<view @click="location">
+					<view @click="authorizedPositioningPromise">
 						<text class='cuIcon-locationfill text-orange margin-right-xs'></text>
 						<text class="text-olive">重新定位</text>
 					</view>
@@ -129,6 +129,54 @@
 			}).exec()
 		},
 		methods: {
+			authorizedPositioningPromise() {
+				const promise = new Promise((resolve, reject) => {
+					let _that = this;
+					uni.getSystemInfo({
+						success({
+							locationEnabled, // locationEnabled 判断手机定位GPS服务是否开启
+							locationAuthorized // locationAuthorized 判断GPS定位服务是否允许微信授权
+						}) {
+							if (!locationEnabled && !locationAuthorized) {
+								reject("GPSnotOpen");
+							} else if (locationEnabled && !locationAuthorized) {
+								reject("GPSauthorization");
+							} else if (locationEnabled && locationAuthorized) {
+								uni.authorize({
+									scope: "scope.userLocation",
+									success() { // 微信小程序位置信息已开启
+										uni.getLocation({
+											type: 'gcj02', //gcj02//wgs84
+											success: res => {
+												resolve(res);
+											},
+											fail: res => {
+												_that.$util.toast("获取位置失败，请手动选择。");
+											},
+										});
+									},
+									fail() {
+										reject("weixinPositionNotOpen");
+									}
+								})
+							}
+						},
+						fail(err) {
+							let reg = /request:fail/;
+							if (reg.test(err.errMsg)) {
+								// 无网络
+								reject("noNetWork");
+							} else {
+								// 请求超时'
+								reject("requestTimeOut");
+							}
+						}
+					})
+				});
+				promise.then((latitude, longitude) => {
+					this.$util.toast('当前位置的经度：' + longitude + '\n当前位置的纬度：' + latitude);
+				})
+			},
 			//获取位置
 			location() {
 				uni.getLocation({

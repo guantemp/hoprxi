@@ -90,6 +90,9 @@ export class Tree {
 		}
 		return children;
 	}
+	descendants(node){
+		
+	}
 	getNode(id) {
 		return this.nodeMap.get(id);
 	}
@@ -154,7 +157,7 @@ export class Tree {
 				if (parent.expanded && parent.visible) return; //兄弟节点处理过
 				parent.expanded = true; //控制展开，收缩图标
 				parent.visible = true; //控制显示隐藏
-				_sibling(this.nodeMap.get(parent.firstChild)); //兄弟节点显示，不处理兄弟的字节点
+				_sibling(this.nodeMap.get(parent.firstChild)); //兄弟节点显示，不处理兄弟的子节点
 				_primordial(parent);
 			}
 		}
@@ -168,7 +171,7 @@ export class Tree {
 			}
 		}
 	}
-	//与直接check有些区别
+	//与直接check有区别
 	presetChecked(checkedIds = []) {
 		const _child = (node) => {
 			if (node) {
@@ -215,23 +218,21 @@ export class Tree {
 				_primordial(basic);
 			}
 		}
-		//
 		//return Array.from(new Set(selected)); //去重
 	}
-	checked(node, isChecked, isCheckOnlyLeaf) {
-		const _child = (selected, node) => {
+	checked(node, isChecked) {
+		const _child = (node, isChecked) => {
 			if (node) {
+				node.checked = isChecked;
+				node.indeterminate = false;
+				isChecked ? this.selected.add(node) : this.selected.delete(node);
 				let children = this.children(node);
 				for (const child of children) {
-					if (child.indeterminate) child.indeterminate = false;
-					child.checked = node.checked;
-					if (child.checked) selected.push(child);
-					if (child.isLeaf) continue;
-					_child(selected, child)
+					_child(child, isChecked)
 				};
 			}
 		}
-		const _primordial = (selected, node) => {
+		const _primordial = (node) => {
 			let parent = this.nodeMap.get(node.parentId);
 			if (parent) {
 				parent.indeterminate = false; //init
@@ -244,34 +245,35 @@ export class Tree {
 				}
 				if (checkSign && noCheckSign) {
 					parent.indeterminate = true;
+					parent.checked = true;
+					this.selected.add(parent);
 				} else if (checkSign && !noCheckSign) {
 					parent.checked = true;
-					selected.push(parent);
+					this.selected.add(parent);
 				} else {
 					parent.checked = false;
+					this.selected.delete(parent);
 				}
-				_primordial(selected, parent);
+				_primordial(parent);
 			}
 		}
-		let selected = [];
-		if (node && isCheckOnlyLeaf) {
+		if (node !== undefined) {
 			node.checked = isChecked;
-			if (node.checked) return [node];
-			return selected
+			if (this.nodeCheckType === "radio") {
+				for (const s of this.selected.values()) s.checked = !s.checked;
+				this.selected.clear();
+				this.selected.add(node)
+			} else if (this.isCheckOnlyLeaf) {
+				isChecked ? this.selected.add(node) : this.selected.delete(node);
+			} else {
+				_child(node, isChecked);
+				_primordial(node);
+			}
 		}
-		if (node) {
-			node.indeterminate = false;
-			node.checked = isChecked;
-			if (node.checked) selected.push(node);
-			_child(selected, node);
-			_primordial(selected, node);
-		}
-		return selected;
 	}
 	remove(node) {
-		if (node.firstChild) {}
-	}
-	selected() {
-		return this.selected;
+		if (node.firstChild) {
+			
+		}
 	}
 }

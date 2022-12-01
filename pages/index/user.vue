@@ -2,17 +2,14 @@
 	<view class="flex flex-direction">
 		<!--info-->
 		<view class="user_info bg-gradual-purple">
-			<image class="top-bg" src="/static/user_icon/user-bg.png"></image>
-			<view class="flex align-center margin-left-sm margin-top-xs" @tap="this.$util.navTo(hasLogin?'/pages/user/userInfo':'/pages/user/login')">
-				<image class="user_portrait_img" :src="userInfo.avatarUrl || '/static/user_icon/face.png'"></image>
-				<view class="user_portrait_hasLogin" v-if="hasLogin">
-					<text
-						class="user_portrait_hasLogin_text">{{ userInfo.nickName || userInfo.username || '无名' }}</text>
-					<text class="user_portrait_hasLogin_bonus">积分：{{userInfo.bonus}}</text>
+			<view class="flex align-center margin-left-sm margin-top-xs">
+				<image @tap="this.$util.navTo(hasLogin?'/pages/user/userInfo':'/pages/user/login')"
+					:src="userInfo.avatarUrl || '/static/user_icon/face.png'"></image>
+				<view class="user_portrait_hasLogin" v-if="hasLogin" @tap="this.$util.navTo('/pages/user/userInfo')">
+					<text>{{ userInfo.nickName || userInfo.username || '无名' }}</text>
+					<text class="bonus">积分：{{userInfo.bonus || 99999999}}</text>
 				</view>
-				<view class="user_portrait_noLogin_text" v-else >
-					<text class="text-white" @tap="this.$util.navTo('/pages/user/login')">登录</text>
-				</view>
+				<view class="text-white text-xl" @tap="this.$util.navTo('/pages/user/login')" v-else>登录</view>
 			</view>
 		</view>
 		<view class="arc">
@@ -22,10 +19,13 @@
 		<view class="pay">
 			<hoprxi-cell decorateIcon="/static/user_icon/pay.png" title="我的工资"
 				@eventClick="this.$util.navTo(hasLogin?'':'/pages/user/login')" />
+			<view style="height: 180rpx;width: 60%;margin-top: 20rpx;">
+				<qiun-data-charts type="arcbar" :opts="opts" :chartData="chartData" />
+			</view>
 		</view>
 		<!--个人服务-->
 		<view class="service">
-			<hoprxi-cell decorateIcon="/static/user_icon/service.png" title="我的服务" :arrow='true'/>
+			<hoprxi-cell decorateIcon="/static/user_icon/service.png" title="我的服务" :arrow='true' />
 			<view class="cu-list grid col-3 no-border">
 				<view class="cu-item " @tap.stop="this.$util.navTo('/pages/public/not_implemented')">
 					<view class="text-red">
@@ -78,12 +78,62 @@
 	import {
 		mapState,
 		mapGetters
-	} from 'vuex'
+	} from 'vuex';
+	import {
+		reactive,
+		onMounted,
+	} from 'vue';
 	export default {
 		data() {
 			return {
-				bonus: 9999,
-			};
+				chartData: {},
+				opts: {
+					animation: true,
+					background: "#FFFFFF",
+					padding: [5, 5, 5, 5],
+					dataLabel: true,
+					legend: {
+						show: true,
+						position: "bottom",
+						lineHeight: 5
+					},
+					title: {
+						name: '工资收入',
+						color: '#000000',
+						fontSize: 16,
+						offsetY: 0,
+					},
+					subtitle: {
+						name: '¥ 25168',
+						color: '#333333',
+						fontSize: 16,
+						offsetY: 10,
+					},
+					xAxis: {
+						disableGrid: true
+					},
+					yAxis: {
+						data: [{
+							min: 0
+						}]
+					},
+					extra: {
+						ring: {
+							ringWidth: 40,
+							activeOpacity: 0.5,
+							activeRadius: 10,
+							offsetAngle: 0,
+							labelWidth: 15,
+							border: true,
+							borderWidth: 3,
+							borderColor: "#FFFFFF",
+						}
+					}
+				}
+			}
+		},
+		onReady() {
+			this.getServerData();
 		},
 		computed: {
 			...mapState(['userInfo']),
@@ -94,16 +144,69 @@
 			//console.log(this.$store.state.userInfo);
 		},
 		methods: {
-
+			getServerData() {
+				setTimeout(() => {
+					let res = {
+						"series": [{
+							"data": [{
+								"name": "一月",
+								"value": 50
+							}, {
+								"name": "二月",
+								"value": 19.98
+							}, {
+								"name": "三月",
+								"value": 26.8
+							}, {
+								"name": "四月",
+								"value": 26.8
+							}, {
+								"name": "五月",
+								"value": 12.8
+							}, {
+								"name": "刘月",
+								"value": 50
+							}, {
+								"name": "七月",
+								"value": 19.98
+							}, {
+								"name": "捌月",
+								"value": 26.8
+							}, {
+								"name": "玖月",
+								"value": 26.8
+							}, {
+								"name": "十月",
+								"value": 12.8
+							}, {
+								"name": "十以月",
+								"value": 26.8
+							}, {
+								"name": "十二月",
+								"value": 12.8
+							}]
+						}]
+					};
+					this.chartData = JSON.parse(JSON.stringify(res));
+				}, 500);
+			}
 		}
 	}
 </script>
 
 <style lang="scss">
+	.charts-box {}
+
+	.content {
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+	}
+
 	.user_info {
 		position: relative;
 		height: 350rpx;
-		padding: 120rpx 0rpx 0rpx 20rpx;
+		padding: 120rpx 0rpx 0rpx 0rpx;
 
 		.top-bg {
 			position: absolute;
@@ -115,16 +218,8 @@
 			opacity: .7;
 		}
 
-		.user_portrait {
-			display: flex;
-			align-items: center;
-			margin-left: 20rpx;
-			margin-top: 10rpx;
-			color: #FFF;
-		}
-
-		.user_portrait_img {
-			margin-right: 20rpx;
+		image {
+			margin: 0 20rpx;
 			width: 128rpx;
 			height: 128rpx;
 			border-radius: 50%;
@@ -135,24 +230,14 @@
 			flex-direction: column;
 			font-size: 36rpx;
 			font-weight: bold;
-		}
 
-		.user_portrait_hasLogin_text {
-			font-size: 32rpx;
-			font-weight: bold;
-		}
-
-		.user_portrait_hasLogin_bonus {
-			padding: 10rpx 14rpx;
-			margin-top: 10rpx;
-			font-size: 20rpx;
-			text-align: center;
-			background-color: rgba(255, 255, 255, .3);
-			border-radius: 40rpx;
-		}
-
-		.user_portrait_noLogin_text {
-			font-size: 36rpx;
+			.bonus {
+				padding: 10rpx 24rpx;
+				margin-top: 10rpx;
+				font-size: 20rpx;
+				background-color: rgba(255, 255, 255, .3);
+				border-radius: 40rpx;
+			}
 		}
 	}
 
@@ -169,10 +254,9 @@
 	.pay {
 		display: flex;
 		flex-direction: column;
-		height: 320rpx;
 		border-radius: 20rpx;
-		margin: 0rpx 20rpx;
-		padding: 20rpx;
+		margin: 0rpx 10rpx;
+		padding: 0rpx 10rpx;
 		background-color: #FFFFFF;
 
 		.img {
@@ -189,7 +273,6 @@
 		padding: 20rpx 20rpx 0rpx 20rpx;
 		background-color: #FFFFFF;
 		margin: 20rpx 20rpx 0rpx 20rpx;
-		;
 
 		.grid_img {
 			width: 80rpx;

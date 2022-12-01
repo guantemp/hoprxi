@@ -1,7 +1,7 @@
 <template>
 	<view class="catalog text-df">
-		<hoprxi-navigation title="商品目录" :backgroundColor="[1, ['#6B73FF', '#000DFF', 135]]" :titleFont="['#FFF','left',1200]"
-			id="navBar" :surplusHeight="43">
+		<hoprxi-navigation title="商品目录" :backgroundColor="[1, ['#6B73FF', '#000DFF', 135]]"
+			:titleFont="['#FFF','left',1200]" id="navBar" :surplusHeight="43">
 			<template slot="extendSlot" class="cu-bar search">
 				<view class="search-form radius">
 					<text class="cuIcon-search"></text>
@@ -10,7 +10,7 @@
 					<text class="cuIcon-scan text-blue text-bold" @tap="scan"></text>
 				</view>
 				<view class="action text-white">
-					<text class="cuIcon-close" @click="computedScrollViewHeight">取消</text>
+					<text class="cuIcon-filter" @click="computedScrollViewHeight"></text>
 				</view>
 			</template>
 		</hoprxi-navigation>
@@ -65,6 +65,7 @@
 					name: '删除',
 					width: 200,
 					background: '#ff5500',
+					icon: 'cuIcon-delete',
 					color: '#fff',
 					event: 'del'
 				}, {
@@ -72,6 +73,7 @@
 					width: 200,
 					color: '#fff',
 					background: '#007AFF',
+					icon: 'cuIcon-time',
 					event: 'history',
 					selectedColor: '#007AFF',
 				}],

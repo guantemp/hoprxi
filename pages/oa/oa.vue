@@ -1,33 +1,47 @@
 <template>
-	<view>
-		<hoprxi-navigation title="OA" :backgroundColor="[1, ['#6B73FF', '#000DFF', 135]]" :titleFont="['#FFF']"
-			id="navBar" :surplusHeight="43">
-			<view slot="extendSlot" class="cu-bar search">
-				<view class="search-form radius">
-					<text class="cuIcon-search"></text>
-					<input v-model="scanResult" :adjust-position="false" type="text" placeholder="请输入商品条码、名称、拼音助记码"
-						confirm-type="search">
-					<text class="cuIcon-scan text-blue text-bold" @tap="scan"></text>
-				</view>
-				<view class="action text-white">
-					<text class="cuIcon-close "></text>
-					<text @click="computedScrollViewHeight">取消</text>
-				</view>
-			</view>
+	<view class="bg-gradual-green" style="height: 100vh;">
+		<hoprxi-navigation title="办公自动化" :backgroundColor="[1, ['#39b54a', '#8dc63f', 135]]" :titleFont="['#FFF']"
+			id="navBar" :surplusHeight="12">
 		</hoprxi-navigation>
-
-		<!--<hop-filterDropdown :menus="menus_filter"></hop-filterDropdown>-->
-
-		<!--工作流-->
 		<view class="work">
-			<hoprxi-cell decorateIcon="/static/user_icon/attendance.png" title="工作流" />
-			<view class="cu-list grid col-5 no-border grid_list">
-				<view class="cu-item" v-for="(item, index) in attendanceList" :key="index"
+			<hoprxi-cell decorateIcon="/static/oa_icon/affair.png" title="事务" />
+			<view class="cu-list grid col-4 no-border item_grid_list">
+				<view class="cu-item" v-for="(item, index) in affair" :key="index"
 					@tap.stop="this.$util.navTo('/pages/public/not_implemented')">
 					<view class="text-red">
 						<image class="img" :src="item.icon" />
-						<view class="cu-tag badge">
-							<block>2</block>
+						<view class="cu-tag badge" v-if="item.new && item.new >0">
+							<block>{{item.new}}</block>
+						</view>
+					</view>
+					<text>{{ item.title }}</text>
+				</view>
+			</view>
+		</view>
+		<view class="work">
+			<hoprxi-cell decorateIcon="/static/oa_icon/logistics.png" title="后勤" :line="['dashed','#e4e7ed','bootom']"/>
+			<view class="cu-list grid col-4 no-border item_grid_list">
+				<view class="cu-item" v-for="(item, index) in logistics" :key="index"
+					@tap.stop="this.$util.navTo('/pages/public/not_implemented')">
+					<view class="text-red">
+						<image class="img" :src="item.icon" />
+						<view class="cu-tag badge" v-if="item.new && item.new >0">
+							<block>{{item.new}}</block>
+						</view>
+					</view>
+					<text>{{ item.title }}</text>
+				</view>
+			</view>
+		</view>
+		<view class="work">
+			<hoprxi-cell decorateIcon="/static/oa_icon/finance.png" title="财务" />
+			<view class="cu-list grid col-4 no-border item_grid_list">
+				<view class="cu-item" v-for="(item, index) in finance" :key="index"
+					@tap.stop="this.$util.navTo('/pages/public/not_implemented')">
+					<view class="text-red">
+						<image class="img" :src="item.icon" />
+						<view class="cu-tag badge" v-if="item.new && item.new >0">
+							<block>{{item.new}}</block>
 						</view>
 					</view>
 					<text>{{ item.title }}</text>
@@ -35,85 +49,85 @@
 			</view>
 		</view>
 		<hoprxi-drag-fab :menus="menus" direction="vertical"></hoprxi-drag-fab>
-		<!--<uni-fab :pattern="fabPattern" :content="menus" horizontal="left" vertical="bottom" direction="vertical"
-			@trigger="trigger"></uni-fab>
-		
-		<hop-slides :items="dataList" radius @click="itemClick" @del="del" @edit="edit">
-			<template v-slot="{data}">
-				<view>{{data.content}}</view>
-				<view>{{data.content}}</view>
-			</template>
-		</hop-slides>
-	-->
-		<block v-for="(item,index) in dataList" :key="index">
-			<hop-slide :item="item" @edit="edit" @del="del" @item_click="slide_item_click" :position="index">
-				<template v-slot:default="{data}">
-					<view>{{data.content}}</view>
-					<view>{{data.content}}</view>
-				</template>
-			</hop-slide>
-		</block>
-
 	</view>
 </template>
 
 <script>
 	import catalog_test from '@/data/catalog_test_data.js'; //用例数据库
 	export default {
+		setup() {
+			const affair = [{
+				icon: '/static/oa_icon/notice.png',
+				url: '/pages/oa/clock_in',
+				title: '公告',
+				new: 2,
+				color: '#ff6b81'
+			}, {
+				icon: '/static/oa_icon/log.png',
+				url: '/pages/oa/work_overtime',
+				title: '工作日志',
+				new: 4,
+				color: '#ff6b81'
+			}, {
+				icon: '/static/oa_icon/clock.png',
+				url: '/pages/oa/clock',
+				title: '考勤',
+				color: '#ff6b81'
+			}, {
+				icon: '/static/oa_icon/leave.png',
+				url: '/pages/oa/leave',
+				title: '请假',
+				color: '#ff6b81'
+			}, {
+				icon: '/static/oa_icon/travel.png',
+				url: '/pages/oa/warehouse',
+				title: '出差',
+				color: '#ff6b81'
+			}, ];
+			const logistics = [{
+				icon: '/static/user_icon/repair.png',
+				url: '/pages/oa/warehouse',
+				title: '报修',
+				color: '#ff6b81'
+			}, {
+				icon: '/static/user_icon/apply.png',
+				url: '/pages/oa/warehouse',
+				title: '申领',
+				new: 15,
+				color: '#ff6b81'
+			}, {
+				icon: '/static/user_icon/apply_for_car.png',
+				url: '/pages/oa/warehouse',
+				title: '用车',
+				color: '#ff6b81'
+			}];
+			const finance = [{
+				icon: '/static/user_icon/purchase.png',
+				url: '/pages/oa/warehouse',
+				title: '申购',
+				new: 2,
+				color: '#ff6b81'
+			}, {
+				icon: '/static/oa_icon/advance.png',
+				url: '/pages/oa/warehouse',
+				title: '预支',
+				color: '#ff6b81'
+			}, {
+				icon: '/static/user_icon/reimbursement.png',
+				url: '/pages/oa/go_out',
+				title: '报销',
+				new: 3,
+				color: '#ff6b81'
+			}];
+			return {
+				affair,
+				logistics,
+				finance
+			}
+		},
 		data() {
 			return {
-				attendanceList: [{
-					icon: '/static/user_icon/clock_in.png',
-					url: '/pages/user/clock_in',
-					title: '打卡',
-					color: '#ff6b81'
-				}, {
-					icon: '/static/user_icon/work_overtime.png',
-					url: '/pages/user/work_overtime',
-					title: '加班',
-					color: '#ff6b81'
-				}, {
-					icon: '/static/user_icon/leave.png',
-					url: '/pages/user/leave',
-					title: '请假',
-					color: '#ff6b81'
-				}, {
-					icon: '/static/user_icon/apply_for_car.png',
-					url: '/pages/warehouse/warehouse',
-					title: '用车',
-					color: '#ff6b81'
-				}, {
-					icon: '/static/user_icon/travel.png',
-					url: '/pages/warehouse/warehouse',
-					title: '出差',
-					color: '#ff6b81'
-				}, {
-					icon: '/static/user_icon/repair.png',
-					url: '/pages/warehouse/warehouse',
-					title: '报修',
-					color: '#ff6b81'
-				}, {
-					icon: '/static/user_icon/apply.png',
-					url: '/pages/warehouse/warehouse',
-					title: '申领',
-					color: '#ff6b81'
-				}, {
-					icon: '/static/user_icon/purchase.png',
-					url: '/pages/warehouse/warehouse',
-					title: '申购',
-					color: '#ff6b81'
-				}, {
-					icon: '/static/user_icon/reimbursement.png',
-					url: '/pages/user/go_out',
-					title: '报销',
-					color: '#ff6b81'
-				}, ],
 				dataList: [],
-				fabPattern: {
-					color: '#7A7E83',
-					backgroundColor: '#fff',
-					selectedColor: '#027A6F',
-				},
 				menus: [{
 					iconPath: '/static/workflow_icon/new.png',
 					selectedIconPath: '/static/workflow_icon/new.png',
@@ -136,7 +150,7 @@
 					event: 'addGood'
 				}, ],
 				menus_filter: [],
-				scanResult:'',
+				scanResult: '',
 			}
 		},
 		created() {
@@ -186,34 +200,7 @@
 	}
 </script>
 
-<style lang="scss" scoped>
-	.hop-slide {
-		margin: 15rpx;
-		background: #fff;
-	}
-
-	.cont {
-		display: flex;
-		flex: 1;
-		justify-content: space-between;
-		//transform: translateX(300rpx);
-		margin-left: -300rpx;
-
-
-		.left {
-			display: flex;
-			flex: 1 1 auto;
-		}
-
-		.btn {
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			font-weight: bold;
-		}
-
-	}
-
+<style lang="scss">
 	.top {
 		position: absolute;
 		top: calc(var(--status-bar-height) + 20rpx);
@@ -231,35 +218,12 @@
 		margin: 20rpx 20rpx 0rpx 20rpx;
 
 		.img {
-			width: 48rpx;
-			height: 48rpx;
+			width: 64rpx;
+			height: 64rpx;
 		}
 
-		.grid_list {
+		.item_grid_list {
 			padding: 20rpx 0rpx 0rpx 0rpx;
 		}
-	}
-
-	.t-wrap {
-		padding: 0 30rpx;
-	}
-
-	.t-conten {
-		/*  #ifdef  APP-PLUS||H5||MP  */
-		display: flex;
-		/*  #endif  */
-		flex-direction: row;
-		padding: 10rpx 0;
-	}
-
-	.t-conten-image {
-		flex: 1;
-		height: 100rpx;
-		margin-right: 10rpx;
-	}
-
-	.t-conten-text {
-		flex: 2;
-		font-size: 24rpx;
 	}
 </style>

@@ -137,21 +137,10 @@
 
 <script>
 	export default {
-		data() {
-			return {
-				title: 'Hello'
-			}
-		},
-		onLoad() {
-
-		},
-		methods: {
-
-		}
 	}
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 	.content {
 		display: flex;
 		flex-direction: column;

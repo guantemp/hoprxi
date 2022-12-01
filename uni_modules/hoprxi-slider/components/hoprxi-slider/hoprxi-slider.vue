@@ -9,7 +9,8 @@
 				</view>
 				<view class="button" v-for="(button,num) in buttons" :key="num"
 					@tap.stop="buttonClick(button.event,item)" :style="[buttonStyle(num)]">
-					<text class="text-df" :style="{color:button.color}">{{button.name}}</text>
+					<text :style="{color:button.fontColor}" :class="button.icon" v-if="button.icon"></text>
+					<text :style="{color:button.fontColor}">{{button.name}}</text>
 				</view>
 			</view>
 		</view>
@@ -20,7 +21,7 @@
 	/*
 	 * items：{Array}，使用者需要在mounted中赋值，created中则使用Vue.$nextTick(() => {}赋值
 	 * @property {String} intervalClass,用于item之间的css3风格，比如item之间的间隔
-	 * @property {Array} buttons 按钮格式为：[{name: 'xxx', background:'xxx',width:'xxx',color:'xxx',event:'xxx'}]
+	 * @property {Array} buttons 按钮格式为：[{name: 'xxx', background:'xxx',width:'xxx',icon:'xxx',fontColor:'xxx',event:'xxx'}]
 	 */
 	export default {
 		name: 'hoprxi-slider',
@@ -41,20 +42,13 @@
 			buttons: {
 				type: Array,
 				default: [{
-					name: '编辑',
-					width: 180,
-					background: '#00aaff',
-					icon:'edit.png',
-					color: '#fff',
-					event: 'edit'
-				}, {
 					name: '删除',
 					width: 180,
 					background: '#ff5500',
-					icon:'del.png',
-					color: '#fff',
+					icon: 'cuIcon-delete',
+					fontColor: '#fff',
 					event: 'del'
-				}, ]
+				}]
 			},
 		},
 		data() {
@@ -173,6 +167,7 @@
 		/*  #ifdef APP-PLUS||H5||MP  */
 		display: flex;
 		/*  #endif  */
+		flex-direction: column;
 		font-weight: bold;
 		align-items: center;
 		justify-content: center;

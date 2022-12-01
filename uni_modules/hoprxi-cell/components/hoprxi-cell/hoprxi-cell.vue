@@ -4,7 +4,8 @@
 		<view class="show" :style="{padding:isTop?'10rpx 0rpx 0rpx 0rpx':'0 16rpx 16rpx 16rpx'}">
 			<view class="decorate">
 				<slot name="decorateIconSlot">
-					<image v-if="decorateIcon && !isTop &&!decorateIconClass" class="decorateIcon" :src="decorateIcon"></image>
+					<image v-if="decorateIcon && !isTop &&!decorateIconClass" class="decorateIcon" :src="decorateIcon">
+					</image>
 					<text v-if="decorateIconClass && !isTop" class="margin-right-xs" :class="decorateIconClass"></text>
 					<!-- 线在顶上不显示-->
 				</slot>
@@ -12,7 +13,7 @@
 					:style="{color:textDecorate.color,'fontSize':textDecorate.size + 'rpx','fontWeight':textDecorate.weight}">{{ title }}</text>
 			</view>
 			<slot name="executableSlot">
-				<text v-if="arrow" class="iconfont icon-right_arrow text-gray" @click="executable"></text>
+				<text v-if="arrow" class="cuIcon-right text-gray" @click="executable"></text>
 			</slot>
 		</view>
 		<view v-if="!isTop" class="line" :style="[lineStyle]" />
@@ -20,33 +21,62 @@
 </template>
 
 <script>
+	import {
+		onMounted
+	} from "vue";
 	export default {
 		name: 'hoprxi-cell',
-		data() {
-			return {
-				isTop: false,
-				textDecorate: {
-					color: '#000',
-					size: 28,
-					weight: 400
-				},
-				lineDecorate: {
-					style: 'solid',
-					color: '#e4e7ed',
-					postion: 'bottom'
+		setup(props, content) {
+			const isTop = false;
+			let textDecorate = {
+				color: '#000',
+				size: 28,
+				weight: 400
+			};
+			let lineDecorate = {
+				style: 'solid',
+				color: '#e4e7ed',
+				postion: 'bottom'
+			};
+			const init = () => {
+				if (Array.isArray(props.line)) {
+					if (props.line.length === 1) {
+						lineDecorate.style = props.line[0];
+					} else if (props.line.length === 2) {
+						lineDecorate.style = props.line[0];
+						lineDecorate.color = props.line[1];
+					} else if (props.line.length === 3) {
+						lineDecorate.style = props.line[0];
+						lineDecorate.color = props.line[1];
+						if (props.line[2] === 'top') isTop = true;
+					}
+				}
+				if (Array.isArray(props.titleFont)) {
+					if (props.titleFont.length === 1) {
+						textDecorate.color = props.titleFont[0]
+					} else if (props.titleFont.length === 2) {
+						textDecorate.color = props.titleFont[0]
+						textDecorate.size = props.titleFont[1]
+					} else if (props.titleFont.length === 3) {
+						textDecorate.color = props.titleFont[0]
+						textDecorate.size = props.titleFont[1]
+						textDecorate.weight = props.titleFont[2]
+					}
 				}
 			};
+			onMounted(init);
+			return {
+				isTop,
+				textDecorate,
+				lineDecorate
+			}
 		},
 		props: {
 			decorateIcon: {
 				type: String,
 				default: ''
 			},
-			decorateIconClass:{
-				type:String,
-				default: ''
-			},
-			executableClass: {
+			decorateIconClass: {
 				type: String,
 				default: ''
 			},
@@ -88,8 +118,7 @@
 				} else if (this.line.length === 3) {
 					this.lineDecorate.style = this.line[0];
 					this.lineDecorate.color = this.line[1];
-					if (this.line[2] === 'top')
-						this.isTop = true;
+					if (this.line[2] === 'top') this.isTop = true;
 				}
 			}
 			if (Array.isArray(this.titleFont)) {
@@ -128,7 +157,7 @@
 		display: flex;
 		flex-direction: column;
 		background-color: #FFF;
-	
+
 	}
 
 	.show {

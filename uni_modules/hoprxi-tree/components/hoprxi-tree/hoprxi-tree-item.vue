@@ -66,11 +66,10 @@
 			let treeList = inject("treeList");
 			let content = inject("content");
 			const check = () => {
-				treeList[props.position].checked(props.node, !props.node.checked, props.checkOnlyLeaf);
-				let selected = treeList[props.position].selected;
+				treeList[props.position].checked(props.node, !props.node.checked);
 				content.emit('check', {
 					node: props.node,
-					selected: selected
+					selected: treeList[props.position].selected
 				})
 			};
 			return {
