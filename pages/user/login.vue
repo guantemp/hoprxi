@@ -71,7 +71,7 @@
 		checkMobile,
 		checkPassword,
 		checkSmsCode
-	} from '@/common/js/util.js';
+	} from '@/js_sdk/util.js';
 	import wxAuth from '@/common/js/auth/wechatAuth.js'
 	export default {
 		mixins: [wxAuth],

@@ -97,7 +97,7 @@
 <script>
 	import {
 		formatDate,
-	} from '@/common/js/util.js';
+	} from '@/js_sdk/util.js';
 	import priceAdjustmentSheetTestData from '@/data/price_adjustment_sheet_test_data.js'; //测试数据
 	export default {
 		data() {

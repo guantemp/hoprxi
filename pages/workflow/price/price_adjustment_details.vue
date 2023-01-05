@@ -1,7 +1,7 @@
 <template>
-	<view class="price_adjustment_datails">
-		<hoprxi-navigation title="调价明细" :backgroundColor="[1, ['#AC32E4', '#7918F2', -225]]" tabPage="/pages/index/index"
-			:titleFont="['#FFF']" :surplusHeight="fold?'80':'15'">
+	<view class="price_adjustment_datails bg-grey">
+		<hoprxi-navigation title="调价明细" :backgroundColor="[1, ['#AC32E4', '#7918F2', -225]]"
+			tabPage="/pages/index/index" :titleFont="['#FFF']" :surplusHeight="fold?80:15">
 			<view slot="extendSlot">
 				<view v-show="fold">
 					<view class="flex flex-direction text-white margin-tb-xs margin-lr">
@@ -35,11 +35,11 @@
 					<view class="flex justify-between margin-lr-sm padding-tb-xs dashed-bottom"
 						@click='editItem(item.id||item.plu)'>
 						<text v-if="item.barcode">商品条码：{{item.barcode}}</text>
-						<text v-if="item.plu">plu号：{{item.plu}}</text>
+						<text v-else>plu号：{{item.plu}}</text>
 						<text>规格：{{item.specs}}</text>
 					</view>
 					<template
-						v-if="(item.newRetailPrice&&item.newMemberPrice)||(item.newRetailPrice&&item.newVipPrice)||(item.newMemberPrice&&items[index].newVipPrice)">
+						v-if="(item.newRetailPrice&&item.newMemberPrice)||(item.newRetailPrice&&item.newVipPrice)||(item.newMemberPrice&&item.newVipPrice)">
 						<view class='grid col-3' @click='editItem(item.id||item.plu)'>
 							<view class='cu-item padding-left flex flex-direction'>
 								<text>原零售价</text>
@@ -135,9 +135,9 @@
 			<view class="bg-orange submit" @click.stop="showAddItemModalDialog" data-target="DialogModalAdd">添加商品</view>
 			<view class="bg-red submit">保存</view>
 		</view>
-		<hop-drag-button @click="this.$util.toast('测试')" class="text-xxl" radius>
+		<hoprxi-drag-button @click="this.$util.toast('测试')" class="text-xxl" radius>
 			<text class="text-grey icon-print"></text>
-		</hop-drag-button>
+		</hoprxi-drag-button>
 		<!-- 清空商品对话框 -->
 		<view class="cu-modal" :class="clearModalDialog?'show':''">
 			<view class="cu-dialog">
@@ -174,13 +174,13 @@
 						</view>
 					</view>
 					<view class="flex justify-between padding-lr-sm" :class="addSign?'':'padding-top-sm'">
-						<text class="text-bold">品名：{{item.name||'--'}}</text>
+						<text class="text-bold">品名：{{item.name}}</text>
 						<text class="icon-unit text-blue" @tap.stop="showUnitDrawerModal"></text>
 					</view>
 					<view class="flex justify-between padding-lr-sm padding-tb-xs">
 						<text v-if="item.plu">plu号：{{item.plu}}</text>
-						<text v-else>商品条码：{{item.barcode||'--'}}</text>
-						<text>规格：{{item.specs||'--'}}</text>
+						<text v-else>商品条码：{{item.barcode}}</text>
+						<text>规格：{{item.specs}}</text>
 					</view>
 					<view class="grid col-3 padding-tb-sm margin-lr-sm radius margin-bottom-xs"
 						style="background-color: #7918F2;color:#fff">
@@ -188,30 +188,30 @@
 							<text class="cuIcon-vip"
 								@click.stop="this.$util.toast('普通用户定位到省，vip用户定位到周边3-5KM')">区域参考售价</text>
 							<text
-								class="text-lg text-bold text-cyan text-price padding-tb-xs">{{item.vip.referenceSalePrice||'--'}}</text>
+								class="text-lg text-bold text-cyan text-price padding-tb-xs">{{item.vip.referenceSalePrice}}</text>
 						</view>
 						<view class='cu-item padding-left-sm flex flex-direction'>
 							<text class="cuIcon-vip"
 								@click.stop="this.$util.toast('普通用户定位到省，vip用户定位到周边3-5KM')">区域参考进价</text>
 							<text
-								class="text-lg text-bold text-cyan text-price padding-tb-xs">{{item.vip.referencePurchasePrice||'--'}}</text>
+								class="text-lg text-bold text-cyan text-price padding-tb-xs">{{item.vip.referencePurchasePrice}}</text>
 						</view>
 						<view class='cu-item padding-left-sm flex flex-direction'>
 							<text>最近入库价</text>
 							<text
-								class="text-lg text-bold text-price padding-tb-xs text-yellow">{{item.storage.lastPurchasePrice||'--'}}</text>
+								class="text-lg text-bold text-price padding-tb-xs text-yellow">{{item.storage.lastPurchasePrice}}</text>
 						</view>
 						<view class='cu-item padding-left-sm flex flex-direction'>
 							<text class="padding-tb-xs">库存数量</text>
-							<text class="text-lg text-bold text-pink">{{item.storage.number||'--'}}</text>
+							<text class="text-lg text-bold text-pink">{{item.storage.number}}</text>
 						</view>
 						<view class='cu-item padding-left-sm flex flex-direction'>
 							<text class="padding-tb-xs">库存金额</text>
-							<text class="text-lg text-bold text-pink text-price">{{item.storage.amount||'--'}}</text>
+							<text class="text-lg text-bold text-pink text-price">{{item.storage.amount}}</text>
 						</view>
 						<view class='cu-item padding-left-sm flex flex-direction'>
 							<text class="padding-tb-xs cuIcon-question">存货周转率</text>
-							<text class="text-lg text-bold text-green">{{item.storage.stockTurn||'--'}}</text>
+							<text class="text-lg text-bold text-green">{{item.storage.stockTurn}}</text>
 						</view>
 					</view>
 					<view class="flex flex-direction margin-lr-sm">
@@ -329,17 +329,36 @@
 <script>
 	import {
 		formatDate,
-	} from '@/common/js/util.js';
+	} from '@/js_sdk/util.js';
 	import price_adjustment from '@/data/price_adjustment_details_test_data.js'; //测试数据
 	import catalog from '@/data/catalog_test_data.js'; //用例数据库
 	export default {
 		data() {
 			return {
 				fold: true,
-
+				addSign: true,
 				price_adjustment: {},
-				item: null,
-
+				item: {
+					id: "--",
+					name: '--',
+					barcode: '--',
+					specs: '--',
+					retailPrice: '--',
+					memberPrice: '--',
+					vipPrice: '--',
+					newRetailPrice: '--',
+					newMemberPrice: '--',
+					vip: {
+						referenceSalePrice: '--',
+						referencePurchasePrice: '--'
+					},
+					storage: {
+						lastPurchasePrice: '--',
+						amount: 226,
+						number: 12,
+						stockTurn: 1.33
+					}
+				},
 				itemModalDialog: false,
 				newRetailPrice: null,
 				newMemberPrice: null,
@@ -350,11 +369,9 @@
 				retailGrossProfitRate: '',
 				memberGrossProfitRate: '',
 				vipGrossProfitRate: '',
-
 				unitDrawerModal: false,
 				unit: null,
 				units: [],
-
 				clearModalDialog: false,
 			}
 		},
@@ -364,6 +381,7 @@
 				for (const i of price_adjustment.price_adjustment) {
 					if (sheetNumber === i.sheetNumber) {
 						this.price_adjustment = i;
+						console.log(this.price_adjustment.items.length);
 						break;
 					}
 				}
@@ -373,18 +391,15 @@
 		watch: {
 			unit() {
 				let pattern = new RegExp(/\/?([\u4e00-\u9fa5]{1,2}|500g|kg|pcs)?$/);
-				if (this.newRetailPrice)
-					this.newRetailPrice = this.newRetailPrice.replace(pattern, '') + "/" + this.unit;
-				if (this.item.newRetailPrice)
-					this.item.newRetailPrice = this.item.newRetailPrice.replace(pattern, '') + "/" + this.unit;
-				if (this.newMemberPrice)
-					this.newMemberPrice = this.newMemberPrice.replace(pattern, '') + "/" + this.unit;
-				if (this.item.newMemberPrice)
-					this.item.newMemberPrice = this.item.newMemberPrice.replace(pattern, '') + "/" + this.unit;
-				if (this.newVipPrice)
-					this.newVipPrice = this.newVipPrice.replace(pattern, '') + "/" + this.unit;
-				if (this.item.newVipPrice)
-					this.item.newVipPrice = this.item.newVipPrice.replace(pattern, '') + "/" + this.unit;
+				if (this.newRetailPrice) this.newRetailPrice = this.newRetailPrice.replace(pattern, '') + "/" + this.unit;
+				if (this.item.newRetailPrice) this.item.newRetailPrice = this.item.newRetailPrice.replace(pattern, '') +
+					"/" + this.unit;
+				if (this.newMemberPrice) this.newMemberPrice = this.newMemberPrice.replace(pattern, '') + "/" + this.unit;
+				if (this.item.newMemberPrice) this.item.newMemberPrice = this.item.newMemberPrice.replace(pattern, '') +
+					"/" + this.unit;
+				if (this.newVipPrice) this.newVipPrice = this.newVipPrice.replace(pattern, '') + "/" + this.unit;
+				if (this.item.newVipPrice) this.item.newVipPrice = this.item.newVipPrice.replace(pattern, '') + "/" + this
+					.unit;
 			}
 		},
 		methods: {
@@ -412,28 +427,25 @@
 							that.memberGrossProfitRate = that.computedGrossProfitRate(cost, that.item.newMemberPrice
 								.replace(pattern, '')) + '%';
 						}
-						that.oldVipGrossProfitRate = that.computedGrossProfitRate(cost, that.item.vipPrice.replace(
-							pattern, '')) + '%';
+						that.oldVipGrossProfitRate = that.computedGrossProfitRate(cost, that.item.vipPrice.replace(pattern,
+							'')) + '%';
 						if (that.item.newVipPrice) {
-							that.vipGrossProfitRate = that.computedGrossProfitRate(cost, that.item.newVipPrice
-								.replace(pattern, '')) + '%';
+							that.vipGrossProfitRate = that.computedGrossProfitRate(cost, that.item.newVipPrice.replace(
+								pattern, '')) + '%';
 						}
 						break;
 					}
 				}
 			},
 			computedGrossProfitRate(cost, price) {
-				if (cost === 0 || cost === '0')
-					return '100';
-				if (price === 0 || price === '0' || price === '0.00' || price === '0.0')
-					return '0';
+				if (cost === 0 || cost === '0') return '100';
+				if (price === 0 || price === '0' || price === '0.00' || price === '0.0') return '0';
 				let difference = price - cost;
 				return (difference / price * 100).toFixed(2);
 			},
 			hideItemModalDialog() {
 				this.itemModalDialog = false;
 			},
-
 			hideUnitDrawerModal() {
 				this.unitDrawerModal = false;
 			},
@@ -442,10 +454,8 @@
 			},
 			selectUnit(v) {
 				this.unitDrawerModal = false;
-				if (this.item)
-					this.unit = v;
+				if (this.item) this.unit = v;
 			},
-
 			deleteItem(key) {
 				var that = this;
 				let index = 0;
@@ -472,13 +482,7 @@
 	}
 </script>
 
-<style scoped lang='scss'>
-	.price_adjustment_datails {
-		width: 100vw;
-		height: 100vh;
-		background-color: rgba(191, 200, 217, 0.3);
-	}
-
+<style lang='scss'>
 	.grid-item-container {
 		display: flex;
 		justify-content: space-around;

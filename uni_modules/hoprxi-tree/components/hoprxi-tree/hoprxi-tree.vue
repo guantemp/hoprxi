@@ -19,7 +19,7 @@
 	} from 'vue';
 	import {
 		getPropertyFromData,
-	} from '@/common/js/util.js';
+	} from '@/js_sdk/util.js';
 	import HoprxiTreeItem from './hoprxi-tree-item.vue';
 	import {
 		TreeNode,

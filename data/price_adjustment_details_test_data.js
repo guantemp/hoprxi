@@ -26,7 +26,7 @@ export default {
 				amount: 226,
 				number: 12,
 				stockTurn: 1.33
-			},
+			}
 		}, {
 			plu: 133,
 			name: '精品沃柑',
@@ -118,7 +118,7 @@ export default {
 			retailPrice: '19.80/盒',
 			memberPrice: '18.80/盒',
 			vipPrice: '0.00/盒',
-			newVipPrice:'12.98/盒'
+			newVipPrice: '12.98/盒'
 		}, {
 			id: '201452966564158974',
 			name: '阿莫西林胶囊',

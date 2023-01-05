@@ -1,7 +1,7 @@
 <template>
 	<view class="cell">
 		<view v-if="isTop" class="line" :style="[lineStyle]" />
-		<view class="show" :style="{padding:isTop?'10rpx 0rpx 0rpx 0rpx':'0 16rpx 16rpx 16rpx'}">
+		<view class="show" :style="{padding:isTop?'0rpx 0rpx 0rpx 0rpx':'0 16rpx 16rpx 16rpx'}">
 			<view class="decorate">
 				<slot name="decorateIconSlot">
 					<image v-if="decorateIcon && !isTop &&!decorateIconClass" class="decorateIcon" :src="decorateIcon">
@@ -27,7 +27,7 @@
 	export default {
 		name: 'hoprxi-cell',
 		setup(props, content) {
-			const isTop = false;
+			let isTop = false;
 			let textDecorate = {
 				color: '#000',
 				size: 28,
@@ -157,7 +157,6 @@
 		display: flex;
 		flex-direction: column;
 		background-color: #FFF;
-
 	}
 
 	.show {

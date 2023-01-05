@@ -4,9 +4,7 @@
 		<hoprxi-navigation :backgroundColor="[1, ['#9000ff', '#5e00ff', 45]]" :titleFont="['#FFF','center']"
 			placeholder="请输入门店名称/全拼/首字母">
 		</hoprxi-navigation>
-		<scroll-view scroll-y class="indexes" :scroll-into-view="'indexes-'+ listCurID"
-			:style="{height:'calc(100vh - '+ navBar + 'rpx - 50rpx)'}" :scroll-with-animation="true"
-			:enable-back-to-top="true">
+		<view class="indexes" >
 			<view class="current text-df">
 				<hop-list-cell title="当前门店" titleColor="#ff9700" :arrow="false" borderStyle="dashed" />
 				<view class="currentShop text-lg">
@@ -18,11 +16,8 @@
 				</view>
 			</view>
 			<view class="footprint">
-				<hop-list-cell title="历史足迹" titleColor="#8dc63f" :arrow="false" borderStyle="dashed">
-					<view slot="decorateIconSlot">
-						<text class="cuIcon-footprint text-blue text-lg margin-right-sm"></text>
-					</view>
-				</hop-list-cell>
+				<hoprxi-cell decorateIconClass="cuIcon-footprint" title="历史足迹" borderStyle="dashed">
+				</hoprxi-cell>
 				<view class="footprintShops">
 					<block v-for="(item, index) in shops" :key="index">
 						<view class="item" @click="selectShop(item.value)" :data-id="item.value">
@@ -31,15 +26,16 @@
 					</block>
 				</view>
 			</view>
-			<scroll-view scroll-x class="bg-white nav margin-top-xs">
+			<view class="bg-white nav margin-top-xs">
 				<view class="flex text-center">
 					<view class="cu-item flex-sub" :class="index===TabCur?'text-orange cur':''"
 						v-for="(item,index) in tabList" :key="index" @tap="tabSelect" :data-id="index">
 						{{item}}
 					</view>
 				</view>
-			</scroll-view>
-			<!--
+			</view>
+		</view>
+		<!--
 			<swiper :current="TabCur3" class="swiper" duration="300" :circular="true"
 				indicator-color="rgba(255,255,255,0)" indicator-active-color="rgba(255,255,255,0)"
 				@change="swiperChange3">
@@ -48,19 +44,19 @@
 				</swiper-item>
 			</swiper>
 			-->
+		<scroll-view scroll-y>
 			<view>
 				<block v-for="(item,index) in list" :key="index">
-					<view :class="'indexItem-' + item.name" :id="'indexes-' + item.name" :data-index="item.name">
+					<view :class="'indexItem-' + item.name" :id="'indexes-' + item.name" :data-index="item.index">
 						<view class="padding-xs">{{item.name}}</view>
 						<view class="cu-list menu-avatar no-padding">
-							<view class="cu-item" v-for="(items,sub) in 3" :key="sub">
-								<view class="cu-avatar round lg">{{item.name}}</view>
+							<view class="cu-item" v-for="(shop,sub) in item.shops" :key="sub">
+								<view class="cu-avatar round lg">{{item.index}}</view>
 								<view class="content">
-									<view class="text-grey">{{item.name}}<text
-											class="text-abc">{{list[sub].name}}</text>君
+									<view class="text-grey">{{shop.name}}
 									</view>
 									<view class="text-gray text-sm">
-										有{{sub+2}}个主子需要伺候
+										{{shop.address}}
 									</view>
 								</view>
 							</view>
@@ -71,9 +67,9 @@
 		</scroll-view>
 		<view class="indexBar" :style="[{height:'calc(100vh - ' + navBar + 'px - 50px)'}]">
 			<view class="indexBar-box" @touchstart="tStart" @touchend="tEnd" @touchmove.stop="tMove">
-				<view class="indexBar-item" v-for="(item,index) in list" :key="index" :id="index" @touchstart="getCur"
-					@touchend="setCur">
-					{{item.name}}
+				<view class="indexBar-item" v-for="(item,index) in list" :key="index" :id="item.index"
+					@touchstart="getCur" @touchend="setCur">
+					{{item.index}}
 				</view>
 			</view>
 		</view>
@@ -86,23 +82,86 @@
 
 <script>
 	export default {
-		components: {},
 		data() {
 			return {
 				currentShop: '旺客隆关口店',
 				shops: [{
-					name: '旺客隆国美绿洲店我不能知道',
-					value: 10034
+					name: '旺客隆国美绿洲店我能不知道',
+					address: '龙马潭区龙马大道一段25号',
+					id: 1
 				}, {
 					name: '嘉诚超市',
-					value: 1733
+					address: '龙马潭区龙马大道三段9号',
+					id: 2
 				}, {
-					name: '旺客隆超市纳溪店',
-					value: 1546
-				}, ],
-				tabList: ['区域', '拼音'],
+					name: '旺客隆纳溪店',
+					address: '纳溪区云溪西路23号',
+					id: 3
+				}, {
+					name: '盛源超市',
+					address: '福集镇明星路76号',
+					id: 4
+				}, {
+					name: '旺客隆环城中心店',
+					address: '江阳区一品天下大街65号',
+					id: 5
+				}, {
+					name: '安心良品',
+					address: '向阳花香小区负一楼',
+					id: 6
+				}, {
+					name: '汇通龙南路店',
+					id: 7,
+					address: '龙马潭区陇南路44号',
+				}, {
+					name: '喜佳佳超市',
+					address: '福集镇龙老路36号',
+					id: 8
+				}, {
+					name: '家乐购超市',
+					address: '福集镇花园干道336号',
+					id: 9
+				}],
+				tabList: ['区域检索', '拼音检索'],
+				pinyin: [{
+					index: 'W',
+					name: 'W',
+					include: [1, 3, 5]
+				}, {
+					index: 'H',
+					name: 'H',
+					include: [10034, 1546]
+				}],
+				area: [{
+					index: '江',
+					name: '江阳区',
+					include: [1, 3, 5]
+				}, {
+					index: '龙',
+					name: '龙马潭区',
+					include: [10034, 1546]
+				}, {
+					index: '泸',
+					name: '泸县',
+					include: [10034, 1546]
+				}, {
+					index: '纳',
+					name: '纳溪区',
+					include: [10034, 1546]
+				}, {
+					index: '合',
+					name: '合江县',
+					include: [10034, 1546]
+				}, {
+					index: '叙',
+					name: '叙永县',
+					include: [10034, 1546]
+				}, {
+					index: '古',
+					name: '古蔺县',
+					include: [10034, 1546]
+				}],
 				TabCur: 0,
-				StatusBar: this.StatusBar,
 				navBar: 60,
 				hidden: true,
 				listCurID: '',
@@ -111,11 +170,67 @@
 			};
 		},
 		onLoad() {
-			let list = [{}];
-			for (let i = 0; i < 26; i++) {
-				list[i] = {};
-				list[i].name = String.fromCharCode(65 + i);
-			}
+			let list = [{
+				index: '江',
+				name: '江阳区',
+				shops: [{
+					name: '旺客隆环城中心店',
+					value: 10034
+				}, {
+					name: '步步高江阳公园店',
+					value: 1733
+				}, {
+					name: '安心良品',
+					value: 1546
+				}]
+			}, {
+				index: '龙',
+				name: '龙马潭区',
+				shops: [{
+					name: '旺客隆国美绿洲店',
+					value: 10034,
+					address: '龙马潭区龙马大道一段25号'
+				}, {
+					name: '步步高国美绿洲店',
+					value: 1733,
+					address: '龙马潭区龙马大道一段25号'
+				}, {
+					name: '旺客隆关口店',
+					value: 1733
+				}, {
+					name: '嘉诚超市',
+					value: 1546
+				}, {
+					name: '汇通龙南路店',
+					value: 15246
+				}]
+			}, {
+				index: '纳',
+				name: '纳溪区',
+				shops: [{
+					name: '旺客隆纳溪店',
+					value: 10034
+				}, {
+					name: '汇通纳溪店',
+					value: 15246
+				}]
+			}, {
+				index: '泸',
+				name: '泸县',
+				shops: [{
+					name: '盛源超市',
+					value: 210034
+				}, ]
+			}, {
+				index: '合',
+				name: '合江县'
+			}, {
+				index: '叙',
+				name: '叙永县'
+			}, {
+				index: '古',
+				name: '古蔺县'
+			}];
 			this.list = list;
 			this.listCur = this.list[0];
 		},
@@ -199,10 +314,7 @@
 			//获取文字信息
 			getCur(e) {
 				this.hidden = false;
-				this.listCur = this.list[e.target.id].name;
-			},
-			setCur(e) {
-				this.hidden = true;
+				this.listCur = this.list[e.target.id].index
 				this.listCur = this.listCur
 			},
 			//滑动选择Item
@@ -285,7 +397,7 @@
 				margin-right: calc(5rpx*3 /2);
 				border: 2rpx solid #9b9b9b;
 				border-radius: 6rpx;
-				background-color: #f5f5f5;
+				background-color: #8799a3;
 
 				/*设置上下左右居中*/
 				>text {

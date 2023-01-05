@@ -9,8 +9,9 @@
 				</view>
 				<view class="button" v-for="(button,num) in buttons" :key="num"
 					@tap.stop="buttonClick(button.event,item)" :style="[buttonStyle(num)]">
-					<text :style="{color:button.fontColor}" :class="button.icon" v-if="button.icon"></text>
-					<text :style="{color:button.fontColor}">{{button.name}}</text>
+					<text :style="{color:button.fontColor}" :class="button.icon" class="margin-bottom-xs text-lg"
+						v-if="button.icon"></text>
+					<text :style="{color:button.fontColor}" class="text-sm">{{button.name}}</text>
 				</view>
 			</view>
 		</view>
@@ -21,8 +22,12 @@
 	/*
 	 * items：{Array}，使用者需要在mounted中赋值，created中则使用Vue.$nextTick(() => {}赋值
 	 * @property {String} intervalClass,用于item之间的css3风格，比如item之间的间隔
-	 * @property {Array} buttons 按钮格式为：[{name: 'xxx', background:'xxx',width:'xxx',icon:'xxx',fontColor:'xxx',event:'xxx'}]
+	 * @property {Array} buttons 按钮格式为：[{name: 'xxx', background:'xxx',width:'xxx',icon:'cuIcon-xxx',fontColor:'xxx',event:'xxx'}]
 	 */
+	import {
+		ref,
+		onMounted
+	} from 'vue';
 	export default {
 		name: 'hoprxi-slider',
 		props: {
@@ -51,22 +56,34 @@
 				}]
 			},
 		},
-		data() {
-			return {
-				startX: 0, //开始坐标
-				startY: 0, //开始Y坐标
-				offset: 0, //按钮数组偏移量
-			}
-		},
-		created() {
-			if (Array.isArray(this.buttons)) {
-				for (const btn of this.buttons) {
-					this.offset += btn.width;
+		setup(props, content) {
+			const calculationOffset = () => {
+				let result = 0;
+				if (Array.isArray(props.buttons)) {
+					for (const btn of props.buttons) {
+						result += btn.width;
+					}
 				}
-			}
-			//console.log(this.items);
-			for (const v of this.items) {
-				this.$set(v, 'isTouchMove', false);
+				return result;
+			};
+			const offset = calculationOffset();
+			/*
+			onMounted(() => {
+				let i = 0;
+				for (let item of props.items) {
+					item = {
+						'isTouchMove': false,
+						...item
+					}
+				}
+			});
+			*/
+			let startX = ref(0); ////开始x坐标
+			let startY = ref(0); //开始Y坐标
+			return {
+				offset,
+				startX,
+				startY
 			}
 		},
 		methods: {
@@ -83,6 +100,7 @@
 			},
 			//单击整行
 			itemClick(item) {
+				if (!item.isTouchMove) item.touchmove = true;
 				this.$emit('click', item);
 			},
 			//单击按钮
@@ -96,14 +114,15 @@
 						break;
 					}
 				}
-				/*  #ifdef APP-PLUS||H5||MP  */
+				// #ifdef APP || H5 || MP
 				this.startX = event.changedTouches[0].clientX;
 				this.startY = event.changedTouches[0].clientY;
-				/*  #endif  */
-				/*  #ifdef APP-NVUE */
+				// #endif
+				// #ifdef APP
+				//nvue
 				this.startX = event.changedTouches[0].screenX;
 				this.startY = event.changedTouches[0].screenY;
-				/*  #endif  */
+				// #endif
 			},
 			touchmove(event) {
 				const _angle = (start, end) => {
@@ -134,7 +153,7 @@
 				});
 				let i = 0;
 				for (const v of that.items) {
-					if (Math.abs(angle) > 45) return; //角度小于45度
+					if (Math.abs(angle) > 45) return; //角度大于45度
 					if (i === index) {
 						//声明或者已经赋值过的对象或者数组（数组里边的值是对象）时，向对象中添加新的属性，
 						//如果更新此属性的值，是不会更新视图的,要使用vue.$set
@@ -168,7 +187,6 @@
 		display: flex;
 		/*  #endif  */
 		flex-direction: column;
-		font-weight: bold;
 		align-items: center;
 		justify-content: center;
 	}

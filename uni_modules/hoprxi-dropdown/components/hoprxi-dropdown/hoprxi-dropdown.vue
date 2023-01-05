@@ -81,7 +81,7 @@
 <script>
 	import {
 		getPropertyFromData,
-	} from '@/common/js/util.js';
+	} from '@/js_sdk/util.js';
 	import {
 		ref
 	} from "vue";
@@ -299,7 +299,7 @@
 
 	.navigation {
 		position: relative;
-		z-index: 9;
+		z-index: 7;
 		white-space: nowrap;
 		text-align: center;
 		border-bottom: solid 1rpx #eee;
@@ -332,7 +332,7 @@
 	.mask {
 		display: flex;
 		position: fixed;
-		z-index: 8;
+		z-index: 6;
 		top: 0;
 		left: 0;
 		right: 0;
@@ -356,7 +356,7 @@
 		width: 100%;
 		height: 52vh;
 		background-color: #fff;
-		z-index: 9;
+		z-index: 7;
 		box-shadow: 0 5px 5px rgba(0, 0, 0, .1);
 		opacity: 1;
 		transition: opacity .5s;
@@ -479,10 +479,6 @@
 			justify-content: center;
 			align-items: center;
 			background-color: #f5f5f5;
-
-			>button {
-				height: 78rpx;
-			}
 		}
 	}
 </style>

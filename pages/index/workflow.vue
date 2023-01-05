@@ -11,29 +11,31 @@
 			<hoprxi-cell decorateIcon="/static/workflow_icon/item.png" title="商品" />
 			<view class="cu-list grid col-4 no-border item_grid_list">
 				<view class="cu-item " @tap.stop="this.$util.navTo('/pages/workflow/catalog/catalog')">
-					<view class="text-red">
-						<image class="item_img" src="/static/workflow_icon/archives.png" />
+					<view class="icon-goods text-blue" style="font-size: 76rpx;">
+						<view class="cu-tag badge">
+							<block>1</block>
+						</view>
 					</view>
 					<text>商品档案</text>
 				</view>
 				<view class="cu-item" @tap.stop="this.$util.navTo('/pages/workflow/price/price_adjustment_sheet')">
-					<view>
-						<image class="item_img" src="/static/workflow_icon/readjust.png" />
+					<view class="icon-price-adjustment text-olive" style="font-size: 76rpx;">
 						<view class="cu-tag badge">
-							<block>2</block>
+							<block>3</block>
 						</view>
 					</view>
 					<text>调价</text>
 				</view>
 				<view class="cu-item" @tap.stop="this.$util.navTo('/pages/workflow/label/label')">
-					<view class="text-red">
-						<image class="item_img" src="/static/workflow_icon/label_printer.png" />
+					<view class="icon-label-print text-brown" style="font-size: 76rpx;">
 					</view>
 					<text>价签打印</text>
 				</view>
 				<view class="cu-item" @tap.stop="this.$util.navTo('/pages/workflow/price/promotion')">
-					<view class="text-red">
-						<image class="item_img" src="/static/workflow_icon/promotion.png" />
+					<view class="text-red icon-promotion" style="font-size: 76rpx;">
+						<view class="cu-tag badge">
+							<block>12</block>
+						</view>
 					</view>
 					<text>促销</text>
 				</view>
@@ -44,24 +46,27 @@
 				:line="['dashed','#e4e7ed','bootom']" />
 			<view class="cu-list grid col-4 no-border item_grid_list">
 				<view class="cu-item " @tap.stop="this.$util.navTo('/pages/workflow/purchase/order')">
-					<view class="text-red">
-						<image class="order_img" src="/static/workflow_icon/purchase.png" />
+					<view class="text-cyan icon-contract" style="font-size: 76rpx;">
+						<view class="cu-tag badge">
+							<block>2</block>
+						</view>
 					</view>
-					<text>下单</text>
+					<text>合同</text>
+				</view>
+				<view class="cu-item " @tap.stop="this.$util.navTo('/pages/workflow/purchase/order')">
+					<view class="text-grey icon-purchase-order" style="font-size: 76rpx;"></view>
+					<text>下订单</text>
 				</view>
 				<view class="cu-item" @tap.stop="this.$util.navTo('/pages/public/not_implemented')">
-					<view class="text-red">
-						<image class="order_img" src="/static/workflow_icon/put_in.png" />
+					<view class="text-blue icon-purchase-receipt" style="font-size: 76rpx;">
 						<view class="cu-tag badge">
 							<block>10</block>
 						</view>
 					</view>
-					<text>验收</text>
+					<text>入库验收</text>
 				</view>
 				<view class="cu-item" @tap.stop="this.$util.navTo('/pages/public/not_implemented')">
-					<view class="text-red">
-						<image class="order_img" src="/static/workflow_icon/chargeback.png" />
-					</view>
+					<view class="text-olive icon-return-goods" style="font-size: 76rpx;"></view>
 					<text>退单</text>
 				</view>
 			</view>

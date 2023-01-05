@@ -84,7 +84,6 @@
 				const sys = uni.getSystemInfoSync();
 				this.windowWidth = sys.windowWidth;
 				this.windowHeight = sys.windowHeight;
-				console.log(sys.windowHeight);
 				// #ifdef APP-PLUS
 				this.existTabBar && (this.windowHeight -= 50);
 				// #endif

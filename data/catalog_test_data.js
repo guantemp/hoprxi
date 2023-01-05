@@ -306,6 +306,7 @@ export default {
 			mnemonic: "chlmxdrmwxy",
 			alias: "彩虹电热灭蚊香液"
 		},
+		img:"https://gd4.alicdn.com/imgextra/i3/478986120/O1CN01d9KJwK1v50WLzCYx3_!!478986120.jpg",
 		barcode: 6907861191394,
 		specs: '150ml',
 		placeOfOrigin: '四川省.成都市',
@@ -316,8 +317,8 @@ export default {
 			name: "杀虫芳香"
 		},
 		retailPrice: '19.59/盒',
-		memberPrice: '18.00/盒',
-		vipPrice: '0.00/盒',
+		memberPrice: '18.88/盒',
+		vipPrice: '17.15/盒',
 		vip: {
 			referenceSalePrice: '19.00/瓶',
 			referencePurchasePrice: '12.60/瓶'
@@ -343,6 +344,7 @@ export default {
 			alias: "沃柑"
 		},
 		specs: '500g',
+		img:'https://gd1.alicdn.com/imgextra/i1/1844773088/O1CN01KhI8VV1YgLqtKA4O6_!!1844773088.jpg',
 		placeOfOrigin: '广西壮族自治区.桂林市',
 		grade: '优等品',
 		category: {
@@ -372,6 +374,7 @@ export default {
 		},
 		barcode: 6902083898625,
 		specs: '550ml',
+		img:'https://gd3.alicdn.com/imgextra/i3/2380078362/O1CN01m8D6Qi2BdqcFco9Eb_!!2380078362.jpg',
 		placeOfOrigin: '浙江省.杭州市',
 		grade: '合格品',
 		category: {
@@ -400,6 +403,7 @@ export default {
 		},
 		barcode: 6970981171003,
 		specs: '1800g',
+		img:'https://gd4.alicdn.com/imgextra/i4/3053115674/TB2LRXVisIrBKNjSZK9XXagoVXa_!!3053115674.jpg',
 		category: {
 			id: "234",
 			name: "纸品"
@@ -424,6 +428,7 @@ export default {
 		},
 		barcode: 6953067200880,
 		specs: '220g',
+		img:'https://gd2.alicdn.com/imgextra/i2/2270196201/O1CN017IoRqi1vg6fAvkZey_!!2270196201.jpg',
 		category: {
 			id: "24325",
 			name: "牙膏牙刷",
@@ -451,6 +456,7 @@ export default {
 			"alias": "红苋菜"
 		},
 		specs: '500g',
+		img:'https://img.alicdn.com/imgextra/i4/1071273746/O1CN0132LZ5q1dXiPRSpI2l_!!1071273746.jpg',
 		placeOfOrigin: '江阳区',
 		grade: '一级品',
 		category_id: "98874",
@@ -561,6 +567,7 @@ export default {
 		},
 		barcode: 6907992508191,
 		specs: '250ml',
+		img:'https://gd3.alicdn.com/imgextra/i3/2968065430/O1CN01geurKn1pyzQnSUi1m_!!2968065430.png',
 		placeOfOrigin: '内蒙古.呼和浩特市',
 		grade: '合格品',
 		category: {
@@ -577,8 +584,35 @@ export default {
 			number: 36,
 			stockTurn: 21.98
 		},
-		retailPrice: '5.29/盒',
-		memberPrice: '0.00/盒',
+		retailPrice: '5.19/盒',
+		memberPrice: '5.02/盒',
 		vipPrice: '4.98/盒',
-	}]
+	},
+	{
+		plu: 1243,
+		name: {
+			"name": "方山梨",
+			"mnemonic": "fsl",
+			"alias": "方山梨"
+		},
+		specs: '500g',
+		placeOfOrigin: '江阳区',
+		grade: '一级品',
+		category_id: "98874",
+		shelfLife: "0天",
+		retailPrice: '1.99/500g',
+		memberPrice: '1.95/500g',
+		vipPrice: '1.85/500g',
+		vip: {
+			referenceSalePrice: '1.59/500g',
+			referencePurchasePrice: '0.59/500g'
+		},
+		storage: {
+			lastPurchasePrice: '0.652/500g',
+			amount: 3.578,
+			number: 6.587,
+			stockTurn: 12.24
+		},
+	}
+	]
 }

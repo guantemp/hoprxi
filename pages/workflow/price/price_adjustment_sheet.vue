@@ -1,7 +1,7 @@
 <template>
-	<view class="price_adjustment_sheet">
+	<view class="bg-grey">
 		<hoprxi-navigation title="调价单" :backgroundColor="[1, ['#AC32E4', '#7918F2', 90]]"
-			:titleFont="['#FFF','left',700]" :surplusHeight="43" id="navBar">
+			:titleFont="['#FFF','left',700]" :surplusHeight="45" id="navBar">
 			<template slot="extendSlot" class="cu-bar search">
 				<view class="search-form radius">
 					<text class="cuIcon-search"></text>
@@ -10,8 +10,6 @@
 					<text class="cuIcon-scan text-blue text-bold" @tap="scan"></text>
 				</view>
 				<view class="action text-white">
-					<text class="cuIcon-close "></text>
-					<text @click="computedScrollViewHeight">取消</text>
 					<text class="cuIcon-filter margin-left-xs" @click="query"></text>
 				</view>
 			</template>
@@ -23,7 +21,7 @@
 		</view>
 		<scroll-view scroll-y :scroll-with-animation="true" :enable-back-to-top="true"
 			:style="{height:dateShow?'calc(98.5vh - '+(fixedHeight+dateShowHeight)+'px - 10rpx)':'calc(98.5vh - '+ fixedHeight +'px - 10rpx)'}">
-			<view class="bg-white margin-top-xs nav">
+			<view class="bg-white nav">
 				<view class="flex text-center">
 					<view class="cu-item flex-sub" :class="{'text-orange cur':index===tabCur}"
 						v-for="(item,index) in tabList" :key="index" @tap="tabSelect" :data-id="index">
@@ -42,7 +40,8 @@
 								data-target="DialogModalDelete"></text>
 						</template>
 					</hoprxi-cell>
-					<view class="sheetDetailed margin-top-xs padding-lr-xs" @tap.stop="navToSheet(sheet.sheetNumber)">
+					<view class="sheetDetailed margin-top-xs padding-lr-xs bg-white"
+						@tap.stop="navToSheet(sheet.sheetNumber)">
 						<text class="iconfont icon-price-adjustment left" :style="[{color:selectColor(sheet)}]"></text>
 						<view class="flex flex-direction midlle text-cut">
 							<text>申请日期：{{sheet.applyDate}}</text>
@@ -66,11 +65,11 @@
 		<view class="cu-modal" :class="{'show':deleteModalDialog}">
 			<view class="cu-dialog">
 				<view class="cu-bar bg-white">
-					<view class="content text-bold text-orange">警 告</view>
+					<view class="content text-bold text-red">警 告</view>
 				</view>
-				<view class="padding-xs bg-white">
-					<text class="text-bold">将删除调价单据</text><br /><br />
-					<text class="text-blue">单据号：{{selectedSheetNumber}}</text>
+				<view class="padding-lr-xs bg-white">
+					<text class="text-bold">删除调价单据：{{selectedSheetNumber}}</text><br />
+					<text class="text-blue margin-top-xl text-sm">若出现误操作，请当天在回收站找回</text>
 				</view>
 				<view class="cu-bar bg-white">
 					<view class="action margin-0 flex-sub text-green" @tap="hideDeleteModalDialog">取消</view>
@@ -97,7 +96,7 @@
 <script>
 	import {
 		formatDate,
-	} from '@/common/js/util.js';
+	} from '@/js_sdk/util.js';
 	import priceAdjustmentSheetTestData from '@/data/price_adjustment_sheet_test_data.js'; //测试数据
 	export default {
 		data() {
@@ -109,10 +108,10 @@
 				dateShow: false,
 				dateShowHeight: 0,
 				tabCur: 0,
-				tabList: ['今日', '昨日', '本周', '上周', '本月'],
+				tabList: ['今日', '昨日', '本周', '上周', '本月', '自定义'],
 				priceAdjustmentSheet: [],
 				dateSelectModalDialog: false,
-				startYear: null,
+				startYear: 2022,
 				initDate: null,
 				formattedStartDate: null,
 				formattedEndDate: null,
@@ -163,7 +162,7 @@
 						let query = uni.createSelectorQuery().in(this);
 						query.select('.flex.justify-around.align-center.bg-white').boundingClientRect().exec(
 						res => {
-							this.setDateShowHeight(res[0].height);
+							this.dateShowHeight = res[0].height;
 						});
 					}, 1);
 				}
@@ -205,10 +204,11 @@
 					}
 					index += 1;
 				}
+				this.$util.toast('删除成功');
 			},
 			//以下日期选择函数
 			selectDate(b) {
-				this.dateSign = b;
+				this.dateSign = true;
 				this.initDate = this.dateSign ? formatDate(new Date(this.formattedStartDate), "yyyy-MM-dd") : formatDate(
 					new Date(this.formattedEndDate), "yyyy-MM-dd");
 				this.dateSelectModalDialog = true;
@@ -248,24 +248,19 @@
 	}
 </script>
 
-<style scoped lang='scss'>
-	.price_adjustment_sheet {
-		width: 100vw;
-		height: 100vh;
-		background-color: #F8F8F8;
-	}
-
+<style lang='scss'>
 	.sheet {
 		display: flex;
 		flex-direction: column;
 		border-radius: 16rpx;
 		padding: 16rpx;
 		background-color: #FFF;
-		margin: 16rpx 16rpx 8rpx 16rpx;
+		margin: 8rpx 12rpx;
 
 		.sheetDetailed {
 			display: flex;
 			align-items: center;
+
 
 			.left {
 				font-size: 86rpx;
