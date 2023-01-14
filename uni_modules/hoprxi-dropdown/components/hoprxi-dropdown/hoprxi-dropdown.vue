@@ -21,7 +21,7 @@
 				</view>
 			</block>
 		</scroll-view>
-		<scroll-view class="right" :scroll-y="true"
+		<scroll-view class="right" :scroll-y="true" scroll-with-animation
 			:scroll-into-view="select[selected]&&'label_'+ (select[selected].level4_id||select[selected].level3_id)">
 			<block v-for="(two,index) in children()" :key="two.id">
 				<view class="label" :class="{'text-orange':select[selected]&&select[selected].level3_id === two.id}"

@@ -16,7 +16,7 @@
 		</hoprxi-navigation>
 		<hoprxi-dropdown :menus="categories" id="dropdown"></hoprxi-dropdown>
 		<scroll-view scroll-y :scroll-with-animation="true" :enable-back-to-top="true"
-			:style="{height:'calc(100vh - ' + navigatorHeight + 'px)'}">
+			:style="{height:'calc(100vh - ' + (navigatorHeight + dropdownHeight) + 'px)'}">
 			<hoprxi-slider :buttons="buttons" :items="catalog" @del="del" @history="history"
 				@click="navigationToDetail">
 				<template v-slot="{item}">
@@ -58,20 +58,20 @@
 		<!-- 遮罩层-->
 		<view :class="['mask',{'show':filterWindows}]" @tap="filterWindows = false"></view>
 		<!-- 高级过滤对话框 -->
-		<view class="drawerWindow" :class="{'show':filterWindows}">
+		<view class="drawerWindow" :class="{'show':filterWindows}" :style="{top:'calc(' + navigatorHeight + 'px)'}">
 			<view class="flex"><text class="cuIcon-roundclose text-xl" @tap="filterWindows = false"></text><text
 					class="flex-twice text-center">筛选</text> </view>
 			<scroll-view scroll-y class="margin-top">
 				<view class="flex justify-between padding-lr-xs">排序
 					<view class="text-sm" @tap="sortExchange==='asc'?sortExchange='desc':sortExchange='asc'"
 						:class="sortExchange==='asc'?'text-red':'text-green'">
-						{{sortExchange==='asc'?'升序':'降序'}}<text
-							:class="sortExchange==='asc'?'icon-asc':'icon-desc'"></text>
+						<text
+							:class="sortExchange==='asc'?'icon-asc':'icon-desc'"></text>{{sortExchange==='asc'?'升序':'降序'}}
 					</view>
 				</view>
 				<view class="flex flex-wrap margin-bottom-sm">
 					<block v-for="(sort,index) in sorts" :key="sort">
-						<view :class="['lattice',{'selected':sort==='零售价'}]" @tap.top="sort(sort)">
+						<view :class="['lattice',{'selected':sort === selected[0]}]" @tap.top="sortChecked(sort)">
 							<text>{{sort}}</text>
 						</view>
 					</block>
@@ -99,7 +99,7 @@
 				<view class="margin-top-sm solid-top padding-top-sm">品牌</view>
 				<view class="flex flex-wrap">
 					<block v-for="(brand,index) in brands" :key="brand">
-						<view :class="['lattice',{'selected':index===2||index===0}]" @tap.top="brand(brand)">
+						<view :class="['lattice',{'selected':isCheckedBrand(brand)}]" @tap.top="brandCheck(brand)">
 							<text>{{brand}}</text>
 						</view>
 					</block>
@@ -190,17 +190,22 @@
 				iconPath: '/static/workflow_icon/count.png',
 				selectedIconPath: '/static/workflow_icon/count.png',
 				text: '回收站',
-				event: 'rcyle'
+				event: 'recovery'
 			}];
-			const catalog = reactive([]);
 			const sorts = ['条码', '品名', '零售价', '毛利率', '规格', '新品', '新品待审', '会员价', 'VIP价', '异常'];
-			const brands = reactive([]);
 			const categories = reactive([]);
-			let filterWindows = ref(false);
-			let showPrice = ref(false);
-			let sortExchange = ref('asc');
-			let navigatorHeight = ref(0);
+			const catalog = reactive([]);
+			const brands = reactive([]);
+			const selected = reactive([sorts[0],
+				[],
+				[]
+			]);
 			let scanResult = ref('');
+			let navigatorHeight = ref(0);
+			let dropdownHeight = ref(0);
+			let filterWindows = ref(false);
+			let sortExchange = ref('asc');
+			let showPrice = ref(false);
 			let delGoodDialog = ref(false);
 			onBeforeMount(() => {
 				//categoryies
@@ -264,8 +269,10 @@
 				sorts,
 				sortExchange,
 				brands,
+				selected,
 				filterWindows,
 				navigatorHeight,
+				dropdownHeight,
 				scanResult,
 				delGoodDialog
 			}
@@ -285,7 +292,7 @@
 				//复用query得到单位是rpx,似乎不太准确
 				query = uni.createSelectorQuery().in(this); //再一次单位是px,
 				query.select('#dropdown').boundingClientRect().exec(rect => {
-					this.navigatorHeight = this.navigatorHeight + rect[0].height;
+					this.dropdownHeight = rect[0].height;
 				});
 			})
 			uni.hideLoading();
@@ -303,7 +310,11 @@
 					},
 				});
 			},
-			restFilter() {},
+			restFilter() {
+				this.selected[0] = this.sorts[0];
+				this.selected[1] = {};
+				this.selected[2] = []
+			},
 			navigationToDetail(data) {
 				if (data.id) this.$util.navTo('/pages/workflow/catalog/good?id=' + data.id);
 				if (data.plu) this.$util.navTo('/pages/workflow/catalog/good?plu=' + data.plu);
@@ -319,6 +330,26 @@
 			history(data) {
 				this.$util.toast('历史：' + (data.id || data.plu));
 				console.log(data);
+			},
+			sortChecked(sort) {
+				this.selected[0] = sort
+			},
+			brandCheck(brand) {
+				let brands = this.selected[2];
+				let has = false;
+				for (let i = 0, j = brands.length; i < j; i++) {
+					if (brands[i] === brand) {
+						this.selected[2].splice(i, 1);
+						has = true;
+						break;
+					}
+				}
+				if (!has) this.selected[2].push(brand)
+			},
+			isCheckedBrand(brand) {
+				for (const b of this.selected[2])
+					if (b === brand) return true;
+				return false;
 			}
 		}
 	}
@@ -363,7 +394,6 @@
 		position: fixed;
 		flex-direction: column;
 		width: 83vw;
-		top: 14vh;
 		right: 0;
 		bottom: 0;
 		z-index: 9;

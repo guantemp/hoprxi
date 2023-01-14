@@ -1,6 +1,6 @@
 <template>
-	<hoprxi-navigation title="会员管理" :backgroundColor="[1, ['#6B73FF', '#000DFF', 135]]"
-		:titleFont="['#FFF','left',400]" :surplusHeight=43>
+	<hoprxi-navigation title="会员管理" :backgroundColor="[1, ['#6B73FF', '#000DFF', 135]]" :titleFont="['#FFF','left',400]"
+		:surplusHeight=43>
 		<view slot="extendSlot" class="cu-bar search">
 			<view class="search-form radius">
 				<text class="cuIcon-search"></text>
@@ -10,7 +10,8 @@
 			</view>
 		</view>
 	</hoprxi-navigation>
-<!--
+	<hoprxi-dropdown :menus="categories" :props="defaultProps"></hoprxi-dropdown>
+	<!--
 	<hoprxi-tree :trees="categories" checkType="checkbox" :disabledIds="disabledIds" :expandedIds="expandedIds"
 		:expendAll="false" :checkedIds="checkedIds" class="margin-left-sm" @check="check">
 	</hoprxi-tree>
@@ -18,22 +19,39 @@
 </template>
 
 <script>
-	import catalog from '@/data/catalog_test_data.js'; //用例数据库
+	import {
+		reactive,
+		ref,
+		onBeforeMount,
+		watch
+	} from 'vue';
+	import catalog_test from '@/data/catalog_test_data.js'; //用例
 	export default {
-		data() {
+		setup(props, content) {
+			const categories = reactive([]);
+			onBeforeMount(() => {
+				for (const c of catalog_test.category) categories.push(c)
+				categories.splice(0, 0, {
+					id: "-9999",
+					name: "全部",
+				});
+			});
 			return {
-				categories: [],
-				disabledIds: ["-99"],
-				expandedIds: ["1", "3446", "a25423", "gj"],
-				checkedIds: ["-99","43645", "754", "1234", "98874", "1532", "b25423", "24325", "24326", "24323465345" ],
-				defaultProps: {
-					children: 'sub',
-					label: 'name'
-				},
+				categories,
 			}
 		},
-		created() {
-			this.categories = catalog.category;
+		data() {
+			return {
+				disabledIds: ["-99"],
+				expandedIds: ["1", "3446", "a25423", "gj"],
+				checkedIds: ["-99", "43645", "754", "1234", "98874", "1532", "b25423", "24325", "24326", "24323465345"],
+				defaultProps: {
+					id: 'id', // 指定id为节点对象的某个属性值
+					sub: 'sub', // 指定子树为节点对象的某个属性值
+					name: 'name', // 指定标签为节点对象的某个属性值
+					selector: 'selector' //选择类型 single_select,multi_select
+				},
+			}
 		},
 		methods: {
 			check(object) {
