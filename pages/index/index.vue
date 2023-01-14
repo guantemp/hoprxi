@@ -8,8 +8,20 @@
 			<view class="cu-item text-gray">
 				<view class="bg-gray light content">
 					<view class="cu-capsule radius">
-						<view class="cu-tag bg-green">version 0.1.1</view>
-						<view class="cu-tag line-green">2022-11-17</view>
+						<view class="cu-tag bg-green">version 0.1.2</view>
+						<view class="cu-tag line-green">2023-01-13</view>
+					</view>
+					<view class="margin-top flex flex-direction">
+						<text>1、根据hoprxi.tooo.top网站数据更新</text>
+						<text>2、自定义组件dropdown由父组件传递数据因为延迟，可以正常显示使用，但开发工具运行报错</text>
+					</view>
+				</view>
+			</view>
+			<view class="cu-item text-gray">
+				<view class="bg-gray light content">
+					<view class="cu-capsule radius">
+						<view class="cu-tag bg-cyan">version 0.1.1</view>
+						<view class="cu-tag line-cyan">2022-11-17</view>
 					</view>
 					<view class="margin-top flex flex-direction">
 						<text>1、reactive,要用es6中的Map才不会失去响应性</text>

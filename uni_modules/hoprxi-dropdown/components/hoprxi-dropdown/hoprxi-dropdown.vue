@@ -1,90 +1,96 @@
 <template>
-	<view>
-		<scroll-view scroll-x class="navigation bg-white" scroll-with-animation :scroll-left="tab_scroll">
-			<view class="tab" :ref="tab" :class="{'text-orange cur text-bold':index === selected}"
-				v-for="(tab,index) in tabs" :key="tab.id" :data-id="tab.id" @tap="tabSelect">
-				<text>{{tab.name}}</text>
-				<text v-if="tab.sub" class="cuIcon-triangledownfill subIcon" :data-id="tab.id"
-					:class="{'selected':index === selected && popupShow}" @tap="triangledown"></text>
-			</view>
-		</scroll-view>
-		<!-- 遮罩层-->
-		<view :class="['mask',{'show':popupShow}]" @tap="closePopup"></view>
-		<!--4个层级-->
-		<view :class="['popup',{'hide':!popupShow}]" v-if="tabs[selected].depth >= 4">
-			<scroll-view class="left" :scroll-y="true"
-				scroll-into-view="{{select[selected]&&'label_'+select[selected].level2_id}}">
-				<block v-for="(one,index) in tabs[selected].sub" :key="one.id">
-					<view class="left_menu" :id="'label_'+one.id"
-						:class="{'bg-white text-red':select[selected]&&select[selected].level2_id === one.id&&!select[selected].level2_cancel}"
-						@tap.stop="second_menu_selected(one.id)">
-						<text>{{one.name}}</text>
-					</view>
-				</block>
-			</scroll-view>
-			<scroll-view class="right" :scroll-y="true"
-				:scroll-into-view="select[selected]&&'label_'+ (select[selected].level4_id||select[selected].level3_id)">
-				<block v-for="(two,index) in children()" :key="two.id">
-					<view class="label" :class="{'text-orange':select[selected]&&select[selected].level3_id === two.id}"
-						:id="'label_'+two.id" @tap.top="three_menu_selected(two.id)">
-						<text>{{two.name}}</text>
-						<text class="cuIcon-check text-lg text-bold"
-							v-if="select[selected]&&select[selected].level3_id === two.id"></text>
-					</view>
-					<view class="items" v-if="two.sub">
-						<block v-for="(three,three_index) in two.sub" :key="three.id">
-							<view class="item" @tap.top="four_menu_selected(three.id)"
-								:class="{'selected':select[selected]&&select[selected].level4_id === three.id}"
-								:id="'label_'+three.id">
-								<text>{{three.name}}</text>
-							</view>
-						</block>
-					</view>
-					<view class="division"></view>
-				</block>
-			</scroll-view>
+	<scroll-view scroll-x class="navigation bg-white" scroll-with-animation :scroll-left="tab_scroll">
+		<view class="tab" :ref="tab" :class="{'text-orange cur text-bold':index === selected}"
+			v-for="(tab,index) in tabs" :key="tab.id" :data-id="tab.id" @tap="tabSelect">
+			<text>{{tab.name}}</text>
+			<text v-if="tab.sub" class="cuIcon-triangledownfill subIcon" :data-id="tab.id"
+				:class="{'selected':index === selected && popupShow}" @tap="triangledown"></text>
 		</view>
-		<!--3个层级-->
-		<view :class="['popup',{'hide':!popupShow}]" v-else-if="tabs[selected].depth <= 3">
-			<scroll-view class="filter" scroll-y :scroll-with-animation="true" :enable-back-to-top="true"
-				scroll-into-view="{{select[selected]&&'label_'+(select[selected].level3_id||select[selected].level2_id)}}"
-				:style="{'height:calc(52vh - 108rpx);' : tabs[selected].selector === 'multi'}">
-				<block v-for="(one,index) in tabs[selected].sub" :key="one.id">
-					<view class="label"
-						:class="{'text-red text-bold':select[selected]&&select[selected].level2_id === one.id&&!select[selected].level2_cancel}"
-						:id="'label_'+ one.id" @tap="second_menu_selected(one.id)">
-						<text>{{one.name}}</text>
-						<text class="cuIcon-check text-lg text-bold"
-							v-if="select[selected]&&select[selected].level2_id === one.id&&!select[selected].level2_cancel"></text>
-					</view>
-					<view class="items items-extend" v-if="one.sub">
-						<block v-for="(two,three_index) in one.sub" :key="two.id">
-							<view class="item item-extend" @tap.top="three_menu_selected(two.id)" :id="'label_'+ two.id"
-								:class="{'selected':select[selected]&&select[selected].level3_id === two.id}">
-								<text>{{two.name}}</text>
-							</view>
-						</block>
-					</view>
-					<view class="division"></view>
-				</block>
-			</scroll-view>
-			<view class="filterBtn" v-if="tabs[selected].selector === 'multi'">
-				<button class="cu-btn radius shadow bg-orange basis-sm margin-right-sm text-lg" @tap.stop="rest_multi">
-					<text>重置</text></button>
-				<button class="cu-btn radius shadow bg-orange basis-sm text-lg" @tap.stop="">
-					<text>确定</text></button>
-			</view>
+	</scroll-view>
+	<!-- 遮罩层-->
+	<view :class="['mask',{'show':popupShow}]" @tap="popupShow = false"></view>
+	<!--4个层级-->
+	<view :class="['popup',{'hide':!popupShow}]" v-if="tabs[selected].depth >= 4">
+		<scroll-view class="left" :scroll-y="true"
+			scroll-into-view="{{select[selected]&&'label_'+select[selected].level2_id}}">
+			<block v-for="(one,index) in tabs[selected].sub" :key="one.id">
+				<view class="left_menu" :id="'label_'+one.id"
+					:class="{'bg-white text-red':select[selected]&&select[selected].level2_id === one.id&&!select[selected].level2_cancel}"
+					@tap.stop="second_menu_selected(one.id)">
+					<text>{{one.name}}</text>
+				</view>
+			</block>
+		</scroll-view>
+		<scroll-view class="right" :scroll-y="true"
+			:scroll-into-view="select[selected]&&'label_'+ (select[selected].level4_id||select[selected].level3_id)">
+			<block v-for="(two,index) in children()" :key="two.id">
+				<view class="label" :class="{'text-orange':select[selected]&&select[selected].level3_id === two.id}"
+					:id="'label_'+two.id" @tap.top="three_menu_selected(two.id)">
+					<text>{{two.name}}</text>
+					<text class="cuIcon-check text-lg text-bold"
+						v-if="select[selected]&&select[selected].level3_id === two.id"></text>
+				</view>
+				<view class="items" v-if="two.sub">
+					<block v-for="(three,three_index) in two.sub" :key="three.id">
+						<view class="item" @tap.top="four_menu_selected(three.id)"
+							:class="{'selected':select[selected]&&select[selected].level4_id === three.id}"
+							:id="'label_'+three.id">
+							<text>{{three.name}}</text>
+						</view>
+					</block>
+				</view>
+				<view class="division"></view>
+			</block>
+		</scroll-view>
+	</view>
+	<!--3个层级-->
+	<view :class="['popup',{'hide':!popupShow}]" v-else-if="tabs[selected].depth <= 3">
+		<scroll-view class="filter" scroll-y :scroll-with-animation="true" :enable-back-to-top="true"
+			scroll-into-view="{{select[selected]&&'label_'+(select[selected].level3_id||select[selected].level2_id)}}"
+			:style="{'height:calc(52vh - 108rpx);' : tabs[selected].selector === 'multi'}">
+			<block v-for="(one,index) in tabs[selected].sub" :key="one.id">
+				<view class="label"
+					:class="{'text-red text-bold':select[selected]&&select[selected].level2_id === one.id&&!select[selected].level2_cancel}"
+					:id="'label_'+ one.id" @tap="second_menu_selected(one.id)">
+					<text>{{one.name.name}}</text>
+					<text class="cuIcon-check text-lg text-bold"
+						v-if="select[selected]&&select[selected].level2_id === one.id&&!select[selected].level2_cancel"></text>
+				</view>
+				<view class="items items-extend" v-if="one.sub">
+					<block v-for="(two,three_index) in one.sub" :key="two.id">
+						<view class="item item-extend" @tap.top="three_menu_selected(two.id)" :id="'label_'+ two.id"
+							:class="{'selected':select[selected]&&select[selected].level3_id === two.id}">
+							<text>{{two.name.name}}</text>
+						</view>
+					</block>
+				</view>
+				<view class="division"></view>
+			</block>
+		</scroll-view>
+		<view class="filterBtn" v-if="tabs[selected].selector === 'multi'">
+			<button class="cu-btn radius shadow bg-orange basis-sm margin-right-sm text-lg" @tap.stop="rest_multi">
+				<text>重置</text></button>
+			<button class="cu-btn radius shadow bg-orange basis-sm text-lg" @tap.stop="">
+				<text>确定</text></button>
 		</view>
 	</view>
 </template>
 
 <script>
+	/*
+	 *@description 一个下拉的菜单
+	 * @property {Array} menus 层级数组，id项目的列不能有重复的值
+	 * @value [{id:'xxx,name:'xxx',children:[{id:'xxx,name:'xxx'}]},{id:'xxx,name:'xxx',children:[{id:'xxx,name:'xxx'}]]
+	 */
+	import {
+		reactive,
+		ref,
+		onMounted,
+		watch
+	} from 'vue';
 	import {
 		getPropertyFromData,
 	} from '@/js_sdk/util.js';
-	import {
-		ref
-	} from "vue";
 	export default {
 		name: 'hoprxi-dropdown',
 		props: {
@@ -100,39 +106,107 @@
 				type: Object,
 				default: {
 					id: 'id', // 指定id为节点对象的某个属性值
-					sub: 'sub', // 指定子树为节点对象的某个属性值
+					sub: 'children', // 指定子树为节点对象的某个属性值
 					name: 'name', // 指定标签为节点对象的某个属性值
-					selector: 'selector' //选择类型 singleSelect,multiSelect
+					selector: 'selector' //选择类型 single_select,multi_select
 				}
 			},
 		},
-		data() {
+		setup(props, content) {
+			const tabs = reactive([{
+				depth: 1
+			}]);
+			let tab_scroll = ref(0);
+			let selected = ref(0);
+			watch(props.menus, (n, o) => { //使用()=>tabs.depth监视内部的,props的不使用
+				let i = 0;
+				for (const menu of props.menus) {
+					//console.log(menu)
+					const id = getPropertyFromData(menu, props.props, 'id');
+					const name = getPropertyFromData(menu, props.props, 'name');
+					let parent = {
+						id: id,
+						name: name,
+					}
+					const selector = getPropertyFromData(menu, props.props, 'selector');
+					if (selector) {
+						parent = {
+							...parent,
+							selector: selector
+						}
+					}
+					const sub = getPropertyFromData(menu, props.props, 'sub');
+					tabs[i] = {
+						..._translate(parent, sub),
+						depth: depth(sub),
+					}
+					i += 1;
+				}
+			});
+			const _translate = (parent, children = []) => {
+				if (!parent) return;
+				if (children && Array.isArray(children) && children.length > 0) {
+					let items = [];
+					for (const child of children) {
+						let temp = {
+							id: getPropertyFromData(child, props.props, 'id'),
+							name: getPropertyFromData(child, props.props, 'name'),
+						};
+						let sub = getPropertyFromData(child, props.props, 'sub');
+						if (sub && Array.isArray(sub) && sub.length > 0) {
+							items.push(_translate(temp, sub))
+						} else {
+							items.push(temp);
+						};
+					}
+					parent = {
+						...parent,
+						sub: items
+					}
+				}
+				return parent;
+			};
+			const depth = (treeData) => {
+				let floor = 0
+				let max = 0
+				const _each = (data, floor) => {
+					if (data && Array.isArray(data) && data.length > 0) {
+						data.forEach(e => {
+							max = floor > max ? floor : max;
+							let sub = getPropertyFromData(e, props.props, 'sub');
+							//if (sub && Array.isArray(sub) && sub.length > 0) {
+							_each(sub, floor + 1)
+							//}
+						})
+					}
+				}
+				_each(treeData, 1)
+				return max + 1;
+			};
+			onMounted(() => {});
 			return {
-				tabs: [],
-				tab_scroll: 0,
-				popupShow: false,
-				select: [],
-				selected: 0
+				tabs,
+				tab_scroll,
+				selected,
 			}
 		},
-		created() {
-			this.decorate();
+		data() {
+			return {
+				popupShow: false,
+				select: [],
+			}
 		},
-		watch: {},
 		methods: {
 			tabSelect(event) {
 				const id = event.currentTarget.dataset.id;
 				this.selected = this.indexOf(id, this.tabs);
 				//css tab中 (margin:10+padding:20)*2=60
-				this.tab_scroll = (this.selected - 1) * 60;
+				this.tab_scroll = (this.selected - 2) * 60; //左移时预先显示2个项目
 				if (this.popupShow && !this.tabs[this.selected].sub) this.popupShow = false
 			},
 			triangledown(event) {
 				this.tabSelect(event);
 				this.popupShow = !this.popupShow;
-			},
-			closePopup() {
-				this.popupShow = false;
 			},
 			children() {
 				let first_select = this.select[this.selected]; //第一次点击tab_select
@@ -225,70 +299,6 @@
 					index++;
 				}
 				return index;
-			},
-			depth(treeData) {
-				let floor = 0
-				let max = 0
-				const _each = (data, floor) => {
-					if (data && Array.isArray(data) && data.length > 0) {
-						data.forEach(e => {
-							max = floor > max ? floor : max;
-							let sub = getPropertyFromData(e, this.props, 'sub');
-							//if (sub && Array.isArray(sub) && sub.length > 0) {
-							_each(sub, floor + 1)
-							//}
-						})
-					}
-				}
-				_each(treeData, 1)
-				return max + 1;
-			},
-			decorate() {
-				const _translate = (parent, children = []) => {
-					if (!parent) return;
-					if (children && Array.isArray(children) && children.length > 0) {
-						let items = [];
-						for (const child of children) {
-							let temp = {
-								id: getPropertyFromData(child, this.props, 'id'),
-								name: getPropertyFromData(child, this.props, 'name'),
-							};
-							let sub = getPropertyFromData(child, this.props, 'sub');
-							if (sub && Array.isArray(sub) && sub.length > 0) {
-								items.push(_translate(temp, sub))
-							} else {
-								items.push(temp);
-							};
-						}
-						parent = {
-							...parent,
-							sub: items
-						}
-					}
-					return parent;
-				};
-				let i = 0;
-				for (const menu of this.menus) {
-					const id = getPropertyFromData(menu, this.props, 'id');
-					const name = getPropertyFromData(menu, this.props, 'name');
-					let parent = {
-						id: id,
-						name: name,
-					}
-					const selector = getPropertyFromData(menu, this.props, 'selector');
-					if (selector) {
-						parent = {
-							...parent,
-							selector: selector
-						}
-					}
-					const sub = getPropertyFromData(menu, this.props, 'sub');
-					this.tabs[i] = {
-						..._translate(parent, sub),
-						depth: this.depth(sub),
-					}
-					i += 1;
-				}
 			},
 		}
 	}

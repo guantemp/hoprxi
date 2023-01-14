@@ -1,5 +1,5 @@
 <template>
-	<view class="text-df">
+	<view class="text-df" ref="catalog1">
 		<hoprxi-navigation title="商品目录" :backgroundColor="[1, ['#6B73FF', '#000DFF', 135]]"
 			:titleFont="['#FFF','left',1200]" id="navBar" :surplusHeight="46">
 			<template slot="extendSlot" class="cu-bar search">
@@ -135,11 +135,13 @@
 	import {
 		reactive,
 		ref,
-		onMounted
+		onBeforeMount,
+		watch
 	} from 'vue';
+	import ajax from '@/uni_modules/u-ajax'
 	import catalog_test from '@/data/catalog_test_data.js'; //用例
 	export default {
-		setup() {
+		setup(props, content) {
 			const buttons = [{
 				name: '分享',
 				width: 100,
@@ -184,34 +186,74 @@
 				selectedIconPath: '/static/workflow_icon/count.png',
 				text: '商品类目',
 				event: 'editCategories'
+			}, {
+				iconPath: '/static/workflow_icon/count.png',
+				selectedIconPath: '/static/workflow_icon/count.png',
+				text: '回收站',
+				event: 'rcyle'
 			}];
 			const catalog = reactive([]);
 			const sorts = ['条码', '品名', '零售价', '毛利率', '规格', '新品', '新品待审', '会员价', 'VIP价', '异常'];
 			const brands = reactive([]);
+			const categories = reactive([]);
 			let filterWindows = ref(false);
 			let showPrice = ref(false);
-			let sortExchange = ref('asc')
+			let sortExchange = ref('asc');
 			let navigatorHeight = ref(0);
 			let scanResult = ref('');
-			let delGoodDialog=ref(false);
-			const categories = reactive([]);
-			onMounted(() => {
-				for (const item of catalog_test.category) categories.push(item);
+			let delGoodDialog = ref(false);
+			onBeforeMount(() => {
+				//categoryies
+				ajax({
+					url: 'https://hoprxi.tooo.top/catalog/core/v1/categories',
+				}).then(res => {
+					for (const category of res.data.categories) {
+						if (category.id === "-1") {
+							categories.splice(0, 0, {
+								id: category.id,
+								name: category.name.name
+							})
+						} else if (Array.isArray(category.children)) {
+							for (const child of category.children) {
+								let temp = {
+									id: child.id,
+									name: child.name.name
+								};
+								if (child.children) {
+									temp = {
+										...temp,
+										children: child.children
+									}
+								}
+								categories.push(temp);
+							}
+						}
+					}
+					categories.splice(0, 0, {
+						id: "-9999",
+						name: "全部"
+					});
+				}).catch(err => {
+					console.log(err)
+				});
+				/*
+				this.categories = catalog_test.category.map((x) => x);
+				for (const c of catalog_test.category) categories.push(c)
 				categories.splice(0, 0, {
 					id: "-9999",
 					name: "全部",
 				});
+				*/
+				//item
 				for (const item of catalog_test.catalog) catalog.push(item);
-				brands.push("华为");
-				brands.push("海康威视");
-				brands.push("大华");
-				brands.push("宇视");
-				brands.push("H3C");
-				brands.push("华硕");
-				brands.push("技嘉");
-				brands.push("杰士邦");
-				brands.push("七千猫");
-				brands.push("力士");
+				//brand
+				ajax({
+					url: 'https://hoprxi.tooo.top/catalog/core/v1/brands',
+				}).then(res => {
+					for (const brand of res.data.brands) {
+						brands.push(brand.name.name)
+					}
+				});
 			});
 			return {
 				buttons,
@@ -227,31 +269,25 @@
 				scanResult,
 				delGoodDialog
 			}
-		},	
+		},
 		onLoad() {
 			uni.showLoading({
 				title: '加载中...',
 				mask: true
 			});
 		},
-		created() {
-			this.categories = catalog_test.category.map((x) => x);
-			this.categories.splice(0, 0, {
-				id: "-9999",
-				name: "全部",
-			});
-			console.log(this.categories)
-		},
-		onReady() {
-			let query = uni.createSelectorQuery().in(this);
-			query.select('#navBar').boundingClientRect().exec(rect => {
-				this.navigatorHeight = rect[0].height;
-			});
-			//复用query得到单位是rpx,似乎不太准确
-			query = uni.createSelectorQuery().in(this); //再一次单位是px,
-			query.select('#dropdown').boundingClientRect().exec(rect => {
-				this.navigatorHeight = this.navigatorHeight + rect[0].height;
-			});
+		mounted() {
+			this.$nextTick(() => {
+				let query = uni.createSelectorQuery().in(this);
+				query.select('#navBar').boundingClientRect().exec(rect => {
+					this.navigatorHeight = rect[0].height;
+				});
+				//复用query得到单位是rpx,似乎不太准确
+				query = uni.createSelectorQuery().in(this); //再一次单位是px,
+				query.select('#dropdown').boundingClientRect().exec(rect => {
+					this.navigatorHeight = this.navigatorHeight + rect[0].height;
+				});
+			})
 			uni.hideLoading();
 		},
 		methods: {

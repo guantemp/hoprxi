@@ -30,8 +30,9 @@
 
 <script>
 	/*
-	 * 1、自己引用自己是递归组件的关键,必须在components中声明
-	 * 2、需要去pages.json中的globalStyle项使用usingComponents添加此组件，否则小程序中将不会显示
+	 *小程序中将不显示递归组件
+	 * 1、方法一：自己引用自己是递归组件的关键,必须在components中声明
+	 * 2、方法二、去pages.json中的globalStyle项使用usingComponents添加此组件
 	 */
 	import {
 		inject,
