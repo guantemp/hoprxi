@@ -35,6 +35,12 @@
 				"navigationBarTitleText": "未实现",
 				"navigationStyle": "custom"
 			}
+		}, {
+			"path": "pages/public/recovery",
+			"style": {
+				"navigationBarTitleText": "回收站",
+				"navigationStyle": "custom"
+			}
 		}
 	],
 	"subPackages": [{

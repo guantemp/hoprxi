@@ -17,7 +17,7 @@
 		<hoprxi-dropdown :menus="categories" id="dropdown"></hoprxi-dropdown>
 		<scroll-view scroll-y :scroll-with-animation="true" :enable-back-to-top="true"
 			:style="{height:'calc(100vh - ' + (navigatorHeight + dropdownHeight) + 'px)'}">
-			<hoprxi-slider :buttons="buttons" :items="catalog" @del="del" @history="history"
+			<hoprxi-slider :buttons="buttons" :items="catalog" @del="del" @history="history" @favor="favor" @share="share"
 				@click="navigationToDetail">
 				<template v-slot="{item}">
 					<view class="flex padding-lr-sm padding-tb-xs align-center solid-top" @longpress="onLongPress"
@@ -53,7 +53,7 @@
 		</view>
 		<hoprxi-drag-fab :menus="menus" @appendGood="$util.navTo('/pages/workflow/catalog/good?sign=good')"
 			@appendScale="$util.navTo('/pages/workflow/catalog/good?sign=scale')"
-			@editCategories="$util.navTo('/pages/workflow/catalog/category')">
+			@editCategories="$util.navTo('/pages/workflow/catalog/category')" @recovery="$util.navTo('/pages/public/recovery')">
 		</hoprxi-drag-fab>
 		<!-- 遮罩层-->
 		<view :class="['mask',{'show':filterWindows}]" @tap="filterWindows = false"></view>
@@ -241,14 +241,6 @@
 				}).catch(err => {
 					console.log(err)
 				});
-				/*
-				this.categories = catalog_test.category.map((x) => x);
-				for (const c of catalog_test.category) categories.push(c)
-				categories.splice(0, 0, {
-					id: "-9999",
-					name: "全部",
-				});
-				*/
 				//item
 				for (const item of catalog_test.catalog) catalog.push(item);
 				//brand
@@ -311,9 +303,10 @@
 				});
 			},
 			restFilter() {
-				this.selected[0] = this.sorts[0];
-				this.selected[1] = {};
-				this.selected[2] = []
+				this.selected = [this.sorts[0],
+					[],
+					[]
+				]
 			},
 			navigationToDetail(data) {
 				if (data.id) this.$util.navTo('/pages/workflow/catalog/good?id=' + data.id);
@@ -323,6 +316,9 @@
 				console.log(e.currentTarget);
 				console.log(e.target);
 			},
+			share(data){
+				this.$util.toast('分享：' + (data.id || data.plu));
+			},
 			del(data) {
 				console.log(data);
 				this.$util.toast('删除：' + (data.id || data.plu));
@@ -330,6 +326,9 @@
 			history(data) {
 				this.$util.toast('历史：' + (data.id || data.plu));
 				console.log(data);
+			},
+			favor(data){
+				this.$util.toast('收藏：' + (data.id || data.plu));
 			},
 			sortChecked(sort) {
 				this.selected[0] = sort

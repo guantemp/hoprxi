@@ -11,6 +11,10 @@
 		</view>
 	</hoprxi-navigation>
 	<hoprxi-dropdown :menus="categories" :props="defaultProps"></hoprxi-dropdown>
+	<hoprxi-drag-fab :menus="menus" @appendGood="$util.navTo('/pages/workflow/catalog/good?sign=good')"
+		@appendScale="$util.navTo('/pages/workflow/catalog/good?sign=scale')"
+		@editCategories="$util.navTo('/pages/workflow/catalog/category')" @recovery="$util.navTo('/pages/public/recovery')">
+	</hoprxi-drag-fab>
 	<!--
 	<hoprxi-tree :trees="categories" checkType="checkbox" :disabledIds="disabledIds" :expandedIds="expandedIds"
 		:expendAll="false" :checkedIds="checkedIds" class="margin-left-sm" @check="check">
@@ -28,6 +32,27 @@
 	import catalog_test from '@/data/catalog_test_data.js'; //用例
 	export default {
 		setup(props, content) {
+			const menus = [{
+				iconPath: '/static/workflow_icon/new.png',
+				selectedIconPath: '/static/workflow_icon/new.png',
+				text: '新增商品',
+				event: 'appendGood'
+			}, {
+				iconPath: '/static/workflow_icon/new_kg.png',
+				selectedIconPath: '/static/workflow_icon/new_kg.png',
+				text: '新增散秤',
+				event: 'appendScale'
+			}, {
+				iconPath: '/static/workflow_icon/count.png',
+				selectedIconPath: '/static/workflow_icon/count.png',
+				text: '商品类目',
+				event: 'editCategories'
+			}, {
+				iconPath: '/static/workflow_icon/count.png',
+				selectedIconPath: '/static/workflow_icon/count.png',
+				text: '回收站',
+				event: 'recovery'
+			}];
 			const categories = reactive([]);
 			onBeforeMount(() => {
 				for (const c of catalog_test.category) categories.push(c)
@@ -38,6 +63,7 @@
 			});
 			return {
 				categories,
+				menus
 			}
 		},
 		data() {

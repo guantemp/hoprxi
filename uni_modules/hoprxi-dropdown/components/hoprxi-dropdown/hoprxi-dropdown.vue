@@ -21,7 +21,7 @@
 				</view>
 			</block>
 		</scroll-view>
-		<scroll-view class="right" :scroll-y="true" scroll-with-animation
+		<scroll-view class="right" :scroll-y="true" 
 			:scroll-into-view="select[selected]&&'label_'+ (select[selected].level4_id||select[selected].level3_id)">
 			<block v-for="(two,index) in children()" :key="two.id">
 				<view class="label" :class="{'text-orange':select[selected]&&select[selected].level3_id === two.id}"
@@ -116,6 +116,7 @@
 			const tabs = reactive([{
 				depth: 1
 			}]);
+			let popupShow = ref(false);
 			let tab_scroll = ref(0);
 			let selected = ref(0);
 			watch(props.menus, (n, o) => { //使用()=>tabs.depth监视内部的,props的不使用
@@ -188,11 +189,11 @@
 				tabs,
 				tab_scroll,
 				selected,
+				popupShow
 			}
 		},
 		data() {
 			return {
-				popupShow: false,
 				select: [],
 			}
 		},
@@ -310,7 +311,7 @@
 	.navigation {
 		position: relative;
 		z-index: 7;
-		white-space: nowrap;
+		white-space: nowrap; //使用横向滚动时，需要给<scroll-view>添加white-space: nowrap;样式
 		text-align: center;
 		border-bottom: solid 1rpx #eee;
 	}

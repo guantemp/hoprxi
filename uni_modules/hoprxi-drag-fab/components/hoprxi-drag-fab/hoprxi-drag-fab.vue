@@ -38,7 +38,13 @@
 		props: {
 			menus: {
 				Type: Array,
-				default: []
+				default: [{
+					iconPath: '/static/workflow_icon/new.png',
+					iconFont:'cuIcon-new'
+					selectedIconPath: '/static/workflow_icon/new.png',
+					text: '新增商品',
+					event: 'appendGood'
+				}]
 			},
 			size: {
 				type: Number,
@@ -60,6 +66,7 @@
 				}
 			}
 		},
+		setup(props, content) {},
 		data() {
 			return {
 				top: 0,
@@ -313,8 +320,8 @@
 				font-size: 12px;
 				text-shadow: 2rpx 0rpx 2rpx rgba(0, 0, 0, .3);
 			}
+
 			//>text {...}
 		}
 	}
 </style>
-
