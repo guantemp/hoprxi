@@ -7,6 +7,7 @@ import {
 } from '@/js_sdk/util.js';
 import Request from '@/js_sdk/luch-request/luch-request/index.js'
 import store from "./store";
+import pinia from "./pinia";
 // #ifdef VUE3
 import {
 	createSSRApp
@@ -14,6 +15,7 @@ import {
 export function createApp() {
 	const app = createSSRApp(App);
 	app.use(store);
+	app.use(pinia);
 	app.config.globalProperties.$util = {
 		toast,
 		navTo,

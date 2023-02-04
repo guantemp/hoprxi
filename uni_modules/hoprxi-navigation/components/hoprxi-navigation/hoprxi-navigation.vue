@@ -30,7 +30,7 @@
 						<text>{{title}}</text>
 					</view>
 					<view v-else class="searchBtn" @click="searchClick">
-						<text class="iconfont icon-lookup searchIcon"></text>
+						<text class="icon-lookup searchIcon"></text>
 						<input type="text" class="input" placeholder-style="color:#dbdbdb;" confirm-type="search"
 							:placeholder="placeholder" @confirm="searchConfirm"
 							:style="{'height':menuButtonBounding.height +'px'}" />
@@ -84,6 +84,9 @@
 				type: String,
 				default: '请输入搜索的关键字'
 			}
+		},
+		setup(props,content){
+			
 		},
 		data() {
 			return {
@@ -282,7 +285,7 @@
 
 			.surplus {
 				width: 100%;
-				padding-left: 16rpx;
+				padding-left: 12rpx;
 
 				.title {
 					white-space: nowrap;
@@ -303,7 +306,7 @@
 					}
 
 					.input {
-						width: 88%;
+						width: 98%;
 						border-radius: 24rpx;
 						background-color: rgba(32, 32, 32, .35);
 						padding: 0 26rpx 0 60rpx;

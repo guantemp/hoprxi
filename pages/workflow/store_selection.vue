@@ -1,41 +1,36 @@
 <template>
-	<view class="store">
-		<!-- :backgroundColor="[1, ['#24bdab', '#80c54c', 45]]"  or :backgroundColor="['#80c54c']  btnType="tower" tabPage="/pages/index/index"-->
-		<hoprxi-navigation :backgroundColor="[1, ['#9000ff', '#5e00ff', 45]]" :titleFont="['#FFF','center']"
-			placeholder="请输入门店名称/全拼/首字母">
-		</hoprxi-navigation>
-		<view class="indexes" >
-			<view class="current text-df">
-				<hop-list-cell title="当前门店" titleColor="#ff9700" :arrow="false" borderStyle="dashed" />
-				<view class="currentShop text-lg">
-					<text>{{currentShop}}</text>
-					<view @click="authorizedPositioningPromise">
-						<text class='cuIcon-locationfill text-orange margin-right-xs'></text>
-						<text class="text-olive">重新定位</text>
-					</view>
-				</view>
-			</view>
-			<view class="footprint">
-				<hoprxi-cell decorateIconClass="cuIcon-footprint" title="历史足迹" borderStyle="dashed">
-				</hoprxi-cell>
-				<view class="footprintShops">
-					<block v-for="(item, index) in shops" :key="index">
-						<view class="item" @click="selectShop(item.value)" :data-id="item.value">
-							<text>{{item.name}}</text>
-						</view>
-					</block>
-				</view>
-			</view>
-			<view class="bg-white nav margin-top-xs">
-				<view class="flex text-center">
-					<view class="cu-item flex-sub" :class="index===TabCur?'text-orange cur':''"
-						v-for="(item,index) in tabList" :key="index" @tap="tabSelect" :data-id="index">
-						{{item}}
-					</view>
-				</view>
+	<!-- :backgroundColor="[1, ['#24bdab', '#80c54c', 45]]"  or :backgroundColor="['#80c54c']  btnType="tower" tabPage="/pages/index/index"-->
+	<hoprxi-navigation id="navigation" :backgroundColor="[1, ['#9000ff', '#5e00ff', 45]]" :titleFont="['#FFF','center']"
+		placeholder="请输入门店拼音首字/名称" @searchConfirm="serach">
+	</hoprxi-navigation>
+	<view id="currentShop" class="flex flex-direction padding-tb">
+		<hoprxi-tip :title="{name:'当前门店',weight:300}" :line="{pattern:'dashed',color:'#d4e7ed'}" />
+		<view class="flex justify-between margin-top-sm padding-lr-sm">
+			<text>{{currentShop.name}}</text>
+			<view @click="authorizedPositioningPromise">
+				<text class='cuIcon-locationfill text-orange margin-right-xs'></text>
+				<text class="text-olive">重新定位</text>
 			</view>
 		</view>
-		<!--
+	</view>
+	<view class="footprint">
+		<hoprxi-tip iconFont="cuIcon-footprint" :title="{name:'足迹',weight:280}"
+			:line="{pattern:'dashed',color:'#d4e7ed'}" />
+		<view class="shops">
+			<block v-for="(shop, index) in historyShops" :key="index">
+				<view class="item" @click="selectShop(shop.id)" :data-id="shop.id">
+					<text>{{shop.name}}</text>
+				</view>
+			</block>
+		</view>
+	</view>
+	<view class="nav flex text-center">
+		<view class="cu-item flex-sub" :class="{'text-orange cur':index === tabCur}" v-for="(tab,index) in tabList"
+			:key="tab" @tap="tabSelect" :data-id="index">
+			{{tab}}
+		</view>
+	</view>
+	<!--
 			<swiper :current="TabCur3" class="swiper" duration="300" :circular="true"
 				indicator-color="rgba(255,255,255,0)" indicator-active-color="rgba(255,255,255,0)"
 				@change="swiperChange3">
@@ -44,207 +39,271 @@
 				</swiper-item>
 			</swiper>
 			-->
-		<scroll-view scroll-y>
-			<view>
-				<block v-for="(item,index) in list" :key="index">
-					<view :class="'indexItem-' + item.name" :id="'indexes-' + item.name" :data-index="item.index">
-						<view class="padding-xs">{{item.name}}</view>
-						<view class="cu-list menu-avatar no-padding">
-							<view class="cu-item" v-for="(shop,sub) in item.shops" :key="sub">
-								<view class="cu-avatar round lg">{{item.index}}</view>
-								<view class="content">
-									<view class="text-grey">{{shop.name}}
-									</view>
-									<view class="text-gray text-sm">
-										{{shop.address}}
-									</view>
-								</view>
+	<scroll-view scroll-y :style="{height:'calc(100vh - ' + excludeListHeight + 'px)'}">
+		<block v-for="(item,index) in list" :key="index">
+			<view :class="'indexItem-' + item.name" :id="'indexes-' + item.name" :data-index="item.index">
+				<view class="padding-xs">{{item.name}}</view>
+				<view class="cu-list menu-avatar no-padding">
+					<view class="cu-item" v-for="(shop,sub) in item.shops" :key="sub" @click="selectShop(shop.id)">
+						<view class="cu-avatar round lg">{{item.index}}</view>
+						<view class="content">
+							<view class="text-grey">{{shop.name}}
+							</view>
+							<view class="text-gray text-sm">
+								{{shop.address}}
 							</view>
 						</view>
 					</view>
-				</block>
-			</view>
-		</scroll-view>
-		<view class="indexBar" :style="[{height:'calc(100vh - ' + navBar + 'px - 50px)'}]">
-			<view class="indexBar-box" @touchstart="tStart" @touchend="tEnd" @touchmove.stop="tMove">
-				<view class="indexBar-item" v-for="(item,index) in list" :key="index" :id="item.index"
-					@touchstart="getCur" @touchend="setCur">
-					{{item.index}}
 				</view>
 			</view>
+		</block>
+	</scroll-view>
+	<view class="indexBar" :style="[{top:'calc(100vh - ' + excludeListHeight + 'px + 24px)'}]">
+		<view class="indexBar-box" @touchstart="tStart" @touchend="tEnd" @touchmove.stop="tMove">
+			<view class="indexBar-item" v-for="(item,index) in list" :key="index" :id="item.index" @touchstart="getCur"
+				@touchend="setCur">
+				{{item.index}}
+			</view>
 		</view>
-		<!--选择显示-->
-		<view v-show="!hidden" class="indexToast">
-			{{listCur}}
+	</view>
+	<!--选择显示-->
+	<view v-show="!hidden" class="indexToast">
+		{{listCur}}
+	</view>
+	<!--最近店铺对话框-->
+	<view class="cu-modal" :class="{'show':shopModalDialog}" @tap="shopModalDialog = false;">
+		<view class="cu-dialog" @tap.stop="">
+			<view class="solid-bottom line-blue padding text-left text-lg align-center">
+				<text class="cuIcon-message margin-right-sm "></text>附近门店
+			</view>
+			<block v-for="(shop,index) in closestDistanceShops" :key="shop.id">
+				<view class="flex justify-between padding-lr-sm padding-tb-xs text-left dashed-bottom bg-white"
+					:class="{'text-green text-bold': checkedShop === shop.id}" @tap="check(shop.id)">
+					<view>{{shop.name}}<br />
+					<text class="text-gray text-sm"
+						v-if="shop.distance < 0.001">距离{{Math.round(shop.distance*1000)/1000}}米</text>
+						<text class="text-gray text-sm"
+							v-else-if="shop.distance > 1">距离{{Math.round(shop.distance*100)/100}}千米</text>
+						<text v-else class="text-gray text-sm">距离{{Math.round(shop.distance*1000)}}米</text>
+					</view>
+					<text class="cuIcon-check text-xl" v-if="checkedShop === shop.id"></text>
+				</view>
+			</block>
+			<view class="cu-bar line-orange solid-top">
+				<view class="action margin-0 flex-sub text-green align-center" @tap="hidePrintRadioModalDialog">
+					<text class="icon-print-setting margin-right-sm"></text>添加新店
+				</view>
+				<view class="action margin-0 flex-sub  solid-left" @tap="hidePrintRadioModalDialog">确认选择</view>
+			</view>
 		</view>
 	</view>
 </template>
 
 <script>
+	import {
+		ref,
+		reactive,
+		onBeforeMount,
+		watchEffect
+	} from 'vue';
+	import ajax from '@/uni_modules/u-ajax'
 	export default {
-		data() {
-			return {
-				currentShop: '旺客隆关口店',
-				shops: [{
-					name: '旺客隆国美绿洲店我能不知道',
-					address: '龙马潭区龙马大道一段25号',
-					id: 1
-				}, {
-					name: '嘉诚超市',
-					address: '龙马潭区龙马大道三段9号',
-					id: 2
-				}, {
-					name: '旺客隆纳溪店',
-					address: '纳溪区云溪西路23号',
-					id: 3
-				}, {
-					name: '盛源超市',
-					address: '福集镇明星路76号',
-					id: 4
-				}, {
-					name: '旺客隆环城中心店',
-					address: '江阳区一品天下大街65号',
-					id: 5
-				}, {
-					name: '安心良品',
-					address: '向阳花香小区负一楼',
-					id: 6
-				}, {
-					name: '汇通龙南路店',
-					id: 7,
-					address: '龙马潭区陇南路44号',
-				}, {
-					name: '喜佳佳超市',
-					address: '福集镇龙老路36号',
-					id: 8
-				}, {
-					name: '家乐购超市',
-					address: '福集镇花园干道336号',
-					id: 9
-				}],
-				tabList: ['区域检索', '拼音检索'],
-				pinyin: [{
-					index: 'W',
-					name: 'W',
-					include: [1, 3, 5]
-				}, {
-					index: 'H',
-					name: 'H',
-					include: [10034, 1546]
-				}],
-				area: [{
-					index: '江',
-					name: '江阳区',
-					include: [1, 3, 5]
-				}, {
-					index: '龙',
-					name: '龙马潭区',
-					include: [10034, 1546]
-				}, {
-					index: '泸',
-					name: '泸县',
-					include: [10034, 1546]
-				}, {
-					index: '纳',
-					name: '纳溪区',
-					include: [10034, 1546]
-				}, {
-					index: '合',
-					name: '合江县',
-					include: [10034, 1546]
-				}, {
-					index: '叙',
-					name: '叙永县',
-					include: [10034, 1546]
-				}, {
-					index: '古',
-					name: '古蔺县',
-					include: [10034, 1546]
-				}],
-				TabCur: 0,
-				navBar: 60,
-				hidden: true,
-				listCurID: '',
-				list: ['B', 'C', 'D', 'F', 'G', 'H', 'J', 'L', 'M', 'N', 'P', 'S', 'W', 'X', 'Y', 'Z'],
-				listCur: '',
-			};
-		},
-		onLoad() {
-			let list = [{
+		setup(props, content) {
+			const shops = [{
+				name: '旺客隆国美绿洲店',
+				address: '龙马潭区龙马大道一段25号',
+				location: {
+					longitude: 105.44049805527185,
+					latitude: 28.91422689723395
+				},
+				id: 1
+			}, {
+				name: '嘉诚超市',
+				address: '龙马潭区龙马大道三段9号',
+				location: {
+					longitude: 105.44781307580288,
+					latitude: 28.919657840300605
+				},
+				id: 2
+			}, {
+				name: '旺客隆纳溪店',
+				address: '纳溪区云溪西路23号',
+				id: 3
+			}, {
+				name: '盛源超市',
+				address: '福集镇明星路76号',
+				location: {
+					longitude: 105.37603713392744,
+					latitude: 29.155733003496554
+				},
+				id: 4
+			}, {
+				name: '旺客隆环城中心店',
+				address: '江阳区一品天下大街65号',
+				id: 5
+			}, {
+				name: '安心良品',
+				address: '向阳花香小区负一楼',
+				id: 6
+			}, {
+				name: '汇通龙南路店',
+				id: 7,
+				address: '龙马潭区陇南路44号',
+				location: {
+					longitude: 103.73140693135235,
+					latitude: 29.564598170984794
+				},
+			}, {
+				name: '喜佳佳超市',
+				address: '福集镇龙老路36号',
+				location: {
+					longitude: 105.45450921695932,
+					latitude: 28.90826231833892
+				},
+				id: 8
+			}, {
+				name: '家乐购超市',
+				address: '福集镇花园干道336号',
+				location: {
+					longitude: 105.37603713392744,
+					latitude: 29.156783003496554
+				},
+				id: 9
+			}];
+			const historyShops = reactive([{
+				name: '旺客隆国美绿洲店',
+				address: '龙马潭区龙马大道一段25号',
+				id: 1
+			}, {
+				name: '嘉诚超市',
+				address: '龙马潭区龙马大道三段9号',
+				id: 2
+			}, {
+				name: '旺客隆纳溪店',
+				address: '纳溪区云溪西路23号',
+				id: 3
+			}, {
+				name: '盛源超市',
+				address: '福集镇明星路76号',
+				id: 4
+			}, {
+				name: '旺客隆环城中心店',
+				address: '江阳区一品天下大街65号',
+				id: 5
+			}]);
+			/*
+			onBeforeMount(() => {
+				ajax({
+					url: 'https://hoprxi.tooo.top/hr/v1/shops',
+				}).then(res => {
+					console.log(res.data)
+				}).catch(error => {
+					console.log(error);
+					$util.toast(err);
+				})
+			});
+			*/
+			const currentShop = reactive({});
+			const closestDistanceShops = reactive([]);
+			let shopModalDialog = ref(false);
+			let excludeListHeight = ref(0);
+			const tabList = ['按区域检索', '按拼音检索'];
+			let tabCur = ref(0);
+			const pinyins = [{
+				index: 'J',
+				name: 'J',
+				include: [9, 2]
+			}, {
+				index: 'W',
+				name: 'W',
+				include: [1, 3, 5]
+			}];
+			const regions = [{
 				index: '江',
 				name: '江阳区',
-				shops: [{
-					name: '旺客隆环城中心店',
-					value: 10034
-				}, {
-					name: '步步高江阳公园店',
-					value: 1733
-				}, {
-					name: '安心良品',
-					value: 1546
-				}]
+				include: [5, 6]
 			}, {
 				index: '龙',
 				name: '龙马潭区',
-				shops: [{
-					name: '旺客隆国美绿洲店',
-					value: 10034,
-					address: '龙马潭区龙马大道一段25号'
-				}, {
-					name: '步步高国美绿洲店',
-					value: 1733,
-					address: '龙马潭区龙马大道一段25号'
-				}, {
-					name: '旺客隆关口店',
-					value: 1733
-				}, {
-					name: '嘉诚超市',
-					value: 1546
-				}, {
-					name: '汇通龙南路店',
-					value: 15246
-				}]
-			}, {
-				index: '纳',
-				name: '纳溪区',
-				shops: [{
-					name: '旺客隆纳溪店',
-					value: 10034
-				}, {
-					name: '汇通纳溪店',
-					value: 15246
-				}]
+				include: [1, 2, 7]
 			}, {
 				index: '泸',
 				name: '泸县',
-				shops: [{
-					name: '盛源超市',
-					value: 210034
-				}, ]
+				include: [8, 9, 4]
 			}, {
-				index: '合',
-				name: '合江县'
-			}, {
-				index: '叙',
-				name: '叙永县'
-			}, {
-				index: '古',
-				name: '古蔺县'
+				index: '纳',
+				name: '纳溪区',
+				include: [3]
 			}];
-			this.list = list;
-			this.listCur = this.list[0];
+			const list = reactive([]);
+			let listCur = ref(0);
+			watchEffect(() => {
+				let datas = [];
+				if (tabCur.value === 0)
+					datas = regions;
+				else if (tabCur.value === 1)
+					datas = pinyins;
+				list.length = 0;
+				for (const data of datas) {
+					let temp = {
+						index: data.index,
+						name: data.name
+					}
+					let sub = [];
+					for (const id of data.include) {
+						for (const shop of shops) {
+							if (id === shop.id) {
+								sub.push(shop);
+								break;
+							}
+						}
+					};
+					list.push({
+						...temp,
+						shops: sub
+					})
+				}
+			});
+			return {
+				shops,
+				currentShop,
+				closestDistanceShops,
+				historyShops,
+				tabList,
+				tabCur,
+				excludeListHeight,
+				list,
+				listCur,
+				shopModalDialog
+			}
+		},
+		data() {
+			return {
+				hidden: true,
+				listCurID: '',
+			};
 		},
 		onReady() {
-			let that = this;
-			uni.createSelectorQuery().select('.indexBar-box').boundingClientRect(function(res) {
-				that.boxTop = res.top
+			let query = uni.createSelectorQuery().in(this);
+			query.select('#navigation').boundingClientRect().exec(res => {
+				this.excludeListHeight = res[0].height;
+			});
+			uni.createSelectorQuery().select('#currentShop').boundingClientRect(res => {
+				this.excludeListHeight += res.height;
 			}).exec();
-			uni.createSelectorQuery().select('.indexes').boundingClientRect(function(res) {
-				that.barTop = res.top
-			}).exec()
+			uni.createSelectorQuery().select('.footprint').boundingClientRect(res => {
+				this.excludeListHeight += res.height;
+			}).exec();
+			uni.createSelectorQuery().select('.nav').boundingClientRect(res => {
+				this.excludeListHeight += res.height;
+			}).exec();
 		},
 		methods: {
+			serach(event) {
+				console.log(event)
+			},
 			authorizedPositioningPromise() {
+				/*
 				const promise = new Promise((resolve, reject) => {
 					let _that = this;
 					uni.getSystemInfo({
@@ -266,7 +325,8 @@
 												resolve(res);
 											},
 											fail: res => {
-												_that.$util.toast("获取位置失败，请手动选择。");
+												_that.$util.toast(
+													"获取位置失败，请在已登记门店中手动选择。");
 											},
 										});
 									},
@@ -279,11 +339,9 @@
 						fail(err) {
 							let reg = /request:fail/;
 							if (reg.test(err.errMsg)) {
-								// 无网络
-								reject("noNetWork");
+								reject("noNetWork"); // 无网络
 							} else {
-								// 请求超时'
-								reject("requestTimeOut");
+								reject("requestTimeOut"); // 请求超时'
 							}
 						}
 					})
@@ -291,26 +349,76 @@
 				promise.then((latitude, longitude) => {
 					this.$util.toast('当前位置的经度：' + longitude + '\n当前位置的纬度：' + latitude);
 				})
+				*/
+				let longitude = 103.72420901376067;
+				let latitude = 29.562548948220435;
+				this.closestDistanceShops.length = 0;
+				for (const shop of this.shops) {
+					if (shop.location) {
+						let distance = this.distance(longitude, latitude, shop.location.longitude, shop.location
+							.latitude);
+						this.closestDistanceShops.push({
+							id: shop.id,
+							name: shop.name,
+							distance: distance
+						})
+						this.closestDistanceShops.sort((a, b) => {
+							return a.distance - b.distance
+						})
+					}
+				}
+				let length = this.closestDistanceShops.length;
+				if (length >= 5)
+					this.closestDistanceShops.splice(5, this.closestDistanceShops.length)
+				if (length > 0 && this.closestDistanceShops[0].distance > 0.05) {
+					this.closestDistanceShops.splice(4, 1)
+				}
+				if (this.closestDistanceShops.length <= 4)
+					this.closestDistanceShops.splice(0, 0, {
+						id: -1,
+						name: '当前位置',
+						distance: 0.001
+					})
+				this.shopModalDialog = true;
 			},
-			//获取位置
-			location() {
-				uni.getLocation({
-					type: 'gcj02', //gcj02//wgs84
-					success: res => {
-						this.$util.toast('当前位置的经度：' + res.longitude + '\n当前位置的纬度：' + res.latitude);
-					},
-					fail: res => {
-						this.$util.toast("获取位置失败，请手动选择。");
-					},
-				});
-			},
-			tabSelect(e) {
-				this.TabCur = e.currentTarget.dataset.id;
-				this.scrollLeft = (e.currentTarget.dataset.id - 1) * 60
+			distance(la1, lo1, la2, lo2) { //longitude,latitude
+				var La1 = la1 * Math.PI / 180.0;
+				var La2 = la2 * Math.PI / 180.0;
+				var La3 = La1 - La2;
+				var Lb3 = lo1 * Math.PI / 180.0 - lo2 * Math.PI / 180.0;
+				var s = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(La3 / 2), 2), Math.cos(La1) * Math.cos(La2) * Math.pow(
+					Math.sin(Lb3 / 2), 2)));
+				s = s * 6378.137; //地球半径  
+				s = Math.round(s * 10000) / 10000;
+				return s;
 			},
 			selectShop(id) {
-				console.log(id);
+				for (const shop of this.shops) {
+					if (id === shop.id) {
+						this.currentShop.id = id;
+						this.currentShop.name = shop.name;
+						this.currentShop.location = shop.location
+						break;
+					}
+				}
+				let pages = getCurrentPages();
+				//let currPage = pages[pages.length - 1]; //当前页面
+				let prevPage = pages[pages.length - 2]; //上一个页面
+				// #ifdef H5
+				prevPage.$vm.shop = this.currentShop;
+				// #endif
+				// #ifdef MP-WEIXIN
+				prevPage.setData({
+					shop: this.currentShop
+				});
+				// #endif
+				//uni.navigateBack(); //返回上一个页面
 			},
+			tabSelect(e) {
+				this.tabCur = e.currentTarget.dataset.id;
+				this.scrollLeft = (e.currentTarget.dataset.id - 1) * 60
+			},
+
 			//获取文字信息
 			getCur(e) {
 				this.hidden = false;
@@ -355,51 +463,33 @@
 </script>
 
 <style lang='scss'>
-	.store {
-		width: 100vw;
-		background-color: #F8F8F8;
-	}
-
-	.current {
-		display: flex;
-		flex-direction: column;
-		border-radius: 20rpx;
-		padding: 16rpx;
-		background-color: #FFF;
-		margin: 0rpx 16rpx 8rpx 16rpx;
-
-		.currentShop {
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			padding: 20rpx 20rpx 4rpx 20rpx;
-		}
-	}
-
 	.footprint {
 		display: flex;
 		flex-direction: column;
 		border-radius: 20rpx;
-		padding: 12rpx 16rpx;
-		background-color: #FFF;
-		margin: 8rpx 16rpx 0rpx 16rpx;
+		padding: 12rpx;
+		background-color: #1cbbb4;
+		margin: 0 9rpx;
 
-		.footprintShops {
+		.shops {
 			display: flex;
-			padding: 16rpx 2rpx 10rpx 2rpx;
+			flex-wrap: wrap;
+			margin-top: 18rpx;
 
 			.item {
 				/*以下3项设置上下左右居中*/
 				display: flex;
 				justify-content: center;
 				text-align: center;
-				flex: 0 0 33%;
-				margin-right: calc(5rpx*3 /2);
+				flex: 0 0 32.2%;
+				padding: 2rpx;
+				margin-right: calc(5.2rpx*3 /2);
+				margin-bottom: 8rpx;
 				border: 2rpx solid #9b9b9b;
-				border-radius: 6rpx;
-				background-color: #8799a3;
+				border-radius: 12rpx;
+				background-color: #f37b1d;
 
-				/*设置上下左右居中*/
+				/*重要：设置上下左右居中，必须的*/
 				>text {
 					margin: auto;
 				}
@@ -407,16 +497,10 @@
 		}
 	}
 
-	.indexes {
-		position: relative;
-		margin-top: 20rpx;
-	}
-
 	.indexBar {
 		position: fixed;
-		right: 0px;
-		bottom: 0px;
-		padding: 20upx 20upx 20upx 60upx;
+		right: 2px;
+		padding: 20rpx 20rpx 20rpx 60rpx;
 		display: flex;
 		align-items: center;
 	}

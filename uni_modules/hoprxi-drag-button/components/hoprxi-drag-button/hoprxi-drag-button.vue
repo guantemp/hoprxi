@@ -1,68 +1,82 @@
 <template>
-	<view id="draggable" @touchmove.stop.prevent="touchmove" @touchend="touchend" @click.stop.prevent="click"
-		class="drag" :class="{'transition': isDock&!isMoved ,'border-radius':radius}"
-		:style="[{left:left + 'px', top:top + 'px',width:size + 'rpx',height:size+'rpx'},{styles}]">
-		<slot><text>哈师大</text></slot>
+	<view @touchmove.stop.prevent="touchmove" @touchend="touchend" @click.stop.prevent="click"
+		:class="['drag',{'transition': !isMoved ,'border-radius':radius}]"
+		:style="[{left:buttonLeft + 'px', top:buttonTop + 'px',width:size + 'rpx',height:size +'rpx'}]">
+		<slot><text class="text-bold cuIcon-add text-xsl"></text></slot>
 	</view>
 </template>
 
 <script>
+	import {
+		ref
+	} from "vue";
 	export default {
 		name: 'hoprxi-drag-button',
 		props: {
 			size: {
 				type: Number,
-				default: 99
+				default: 125
 			},
-			styles: {
-				type: String,
-				default: ''
+			radius: {
+				type: Boolean,
+				default: false
 			},
-			radius: Boolean,
-			isDock: {
+			dock: {
 				type: Boolean,
 				default: false
 			}
 		},
-		data() {
+		setup(props, content) {
+			let windowWidth = ref(0);
+			let windowHeight = ref(0);
+			let buttonWidth = ref(0);
+			let buttonHeight = ref(0);
+			let buttonLeft = ref(0);
+			let buttonTop = ref(0);
+			let isMoved = ref(false);
+			const edge = 9;
 			return {
-				top: 0,
-				left: 0,
-				width: 0,
-				height: 0,
-				offsetWidth: 0,
-				offsetHeight: 0,
-				windowWidth: 0,
-				windowHeight: 0,
-				isMoved: true,
-				edge: 15,
+				windowWidth,
+				windowHeight,
+				buttonWidth,
+				buttonHeight,
+				buttonLeft,
+				buttonTop,
+				isMoved,
+				edge
 			}
 		},
-		mounted() {
-			const sys = uni.getSystemInfoSync();
-			this.windowWidth = sys.windowWidth;
-			this.windowHeight = sys.windowHeight;
-			// #ifdef APP-PLUS
-			this.existTabBar && (this.windowHeight -= 50);
-			// #endif
-			if (sys.windowTop) {
-				this.windowHeight += sys.windowTop;
-			}
+		created() {
+			this.$nextTick(() => {
+				const sys = uni.getSystemInfoSync();
+				this.windowWidth = sys.windowWidth;
+				this.windowHeight = sys.windowHeight;
+				// #ifdef APP-PLUS
+				this.existTabBar && (this.windowHeight -= 50);
+				// #endif
+				if (sys.windowTop) {
+					this.windowHeight += sys.windowTop;
+				}
+				this.buttonLeft = this.windowWidth - this.size / 2 - this.edge * 3;
+				this.buttonTop = this.windowHeight - this.size / 2 - this.edge * 3;
+			});
+			/*
 			const query = uni.createSelectorQuery().in(this);
 			query.select('#draggable').boundingClientRect(res => {
-				this.width = res.width;
-				this.height = res.height;
-				this.offsetWidth = res.width / 2;
-				this.offsetHeight = res.height / 2;
-				this.left = this.windowWidth - this.width - this.edge * 3;
-				this.top = this.windowHeight - this.height - this.edge * 3;
+				this.buttonWidth = res.width;
+				this.buttonHeight = res.height;
+				console.log(this.buttonWidth)
+				let offsetButtonWidth = res.width / 2;
+				let offsetButtonHeight = res.height / 2;
+				this.buttonLeft = this.windowWidth - this.buttonWidth - this.edge * 3;
+				this.buttonTop = this.windowHeight - this.buttonHeight - this.edge * 3;
 			}).exec();
-			/*
 			query.select('#navBar').boundingClientRect().exec(res => {
 				this.setFixedHeight(res[0].height);
 			});
 			*/
 		},
+		
 		methods: {
 			click() {
 				this.$emit('click');
@@ -72,27 +86,27 @@
 					return false;
 				}
 				this.isMoved = true;
-				this.left = event.touches[0].clientX - this.offsetWidth;
-				let clientY = event.touches[0].clientY - this.offsetHeight;
+				this.buttonLeft = event.touches[0].clientX - this.size / 4;
+				let clientY = event.touches[0].clientY - this.size / 4;
 				// #ifdef H5
-				clientY += this.height;
+				clientY += this.size / 4;
 				// #endif
-				let edgeBottom = this.windowHeight - this.height - this.edge;
+				let edgeBottom = this.windowHeight - this.size / 4 - this.edge;
 				// 上下触及边界
 				if (clientY < this.edge) {
-					this.top = this.edge;
+					this.buttonTop = this.edge;
 				} else if (clientY > edgeBottom) {
-					this.top = edgeBottom;
+					this.buttonTop = edgeBottom;
 				} else {
-					this.top = clientY
+					this.buttonTop = clientY
 				}
 			},
 			touchend() {
-				if (this.isDock) {
-					if (this.left < this.windowWidth / 2 - this.offsetWidth) {
-						this.left = this.edge;
+				if (this.dock) {
+					if (this.buttonLeft < this.windowWidth / 2 - this.size / 4) {
+						this.buttonLeft = this.edge;
 					} else {
-						this.left = this.windowWidth - this.width - this.edge;;
+						this.buttonLeft = this.windowWidth - this.size / 2 - this.edge;;
 					}
 				}
 				this.isMove = false;
@@ -108,8 +122,7 @@
 		align-items: center;
 		overflow: hidden;
 		position: fixed;
-		background-color: rgba(0, 0, 0, 0.2);
-		z-index: 99;
+		z-index: 7;
 
 		&.border-radius {
 			border-radius: 100%;
@@ -120,4 +133,3 @@
 		}
 	}
 </style>
-

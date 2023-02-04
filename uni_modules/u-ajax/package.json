@@ -1,7 +1,7 @@
 {
   "id": "u-ajax",
   "displayName": "ajax request 请求",
-  "version": "2.4.6",
+  "version": "2.5.1",
   "description": "封装 uni.request，支持拦截器、接口根地址、默认配置、中断请求等功能",
   "keywords": [
     "ajax",
@@ -13,17 +13,14 @@
   "main": "./js_sdk/index.js",
   "types": "./js_sdk/index.d.ts",
   "repository": "https://github.com/ponjs/uni-ajax",
-"dcloudext": {
+  "dcloudext": {
+    "type": "sdk-js",
     "declaration": {
       "ads": "无",
       "data": "插件不采集任何数据",
       "permissions": "无"
     },
-    "npmurl": "https://www.npmjs.com/package/uni-ajax",
-    "type": "sdk-js",
-    "contact": {
-        "qq": ""
-    }
+    "npmurl": "https://www.npmjs.com/package/uni-ajax"
   },
   "uni_modules": {
     "platforms": {
@@ -54,7 +51,11 @@
           "阿里": "y",
           "百度": "y",
           "字节跳动": "y",
-          "QQ": "y"
+          "QQ": "y",
+          "钉钉": "y",
+          "快手": "y",
+          "飞书": "y",
+          "京东": "y"
         },
         "快应用": {
           "华为": "y",

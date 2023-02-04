@@ -194,11 +194,11 @@
 						<text v-else>商品条码：{{item.barcode||'--'}}</text>
 						<text>规格：{{item.specs||'--'}}</text>
 					</view>
-					<view class="grid col-3 padding-tb-sm margin-lr-sm radius margin-bottom-xs"
+					<view class="grid col-3 padding-tb-sm margin-lr-xs radius margin-bottom-xs"
 						style="background-color: #7918F2;color:#fff">
 						<view class='cu-item padding-left-sm flex flex-direction'>
 							<text class="cuIcon-vip"
-								@click.stop="this.$util.toast('普通用户定位到省，vip用户定位到周边3-5KM')">区域参考售价</text>
+								@click.stop="$util.toast('普通用户定位到省，vip用户定位到周边3-5KM')">区域参考售价</text>
 							<text
 								class="text-lg text-bold text-cyan text-price padding-tb-xs">{{item.vip&&item.vip.referenceSalePrice||'--'}}</text>
 						</view>
@@ -346,18 +346,30 @@
 	} from '@/js_sdk/util.js';
 	import {
 		ref,
-		reactive
+		reactive,
+		onBeforeMount
 	} from 'vue';
+	import ajax from '@/uni_modules/u-ajax'
 	import catalog from '@/data/catalog_test_data.js'; //用例数据库
 	let pattern = new RegExp(/\/?([\u4e00-\u9fa5]{1,2}|500g|kg|pcs)?$/);
 	export default {
 		setup() {
 			const items = reactive([]);
-			const units = catalog.units;
+			const units = reactive([]);
 			let item = {};
 			let shop = '泸州市龙马潭区嘉诚超市';
 			let navigationBarHeight = ref(0);
 			let isNavigationBarFold = ref(false);
+			onBeforeMount(() => {
+				ajax({
+					url: 'https://hoprxi.tooo.top/catalog/core/v1/units',
+				}).then(res => {
+					for (const u of res.data.units)
+						units.push(u)
+				}).catch(err => {
+					console.log(err)
+				});
+			})
 			return {
 				items,
 				item,

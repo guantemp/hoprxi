@@ -1,8 +1,14 @@
+## 2.5.1（2023-01-16）
+- 精简代码，体积更小，性能提升
+- 废弃封装请求任务方法和 xhr 属性 [详情](https://uniajax.ponjs.com/guide/usage#requesttask)
+- 新增 fetcher 属性获取请求任务 [详情](https://uniajax.ponjs.com/api/config#fetcher)
+- 移除回调函数属性 success / fail / complete [详情](https://uniajax.ponjs.com/guide/usage#发起请求)
 ## 2.4.6（2022-12-01）
 - 新增自定义响应内容类型 CustomResponse [详情](https://uniajax.ponjs.com/guide/typescript#定义类型)
 - 修改自定义请求配置类型 CustomConfig [详情](https://uniajax.ponjs.com/guide/typescript#定义类型)
 - 优化插件市场安装引入路径 [详情](https://uniajax.ponjs.com/guide/installation#插件市场)
 - 优化创建请求类工厂函数
+
 ## 2.4.5（2022-07-08）
 - 优化使用拦截器的 Typescript 类型 [详情](https://uniajax.ponjs.com/api#interceptors)
 

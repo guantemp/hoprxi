@@ -15,20 +15,13 @@
 </template>
 
 <script>
+	import {
+		onBeforeMount
+	} from 'vue';
+	import ajax from '@/uni_modules/u-ajax'
 	import areaData from "@/common/js/areadata/areadata.js"
 	export default {
 		name: 'hoprxi-region-picker',
-		data() {
-			return {
-				pickVal: [],
-				range: {
-					provinces: [],
-					citys: [],
-					areas: []
-				},
-				checkObj: {}
-			};
-		},
 		props: {
 			itemHeight: {
 				type: String,
@@ -46,6 +39,36 @@
 				type: Boolean,
 				default: false
 			}
+		},
+		setup(props, content) {
+			onBeforeMount(() => {
+				/*
+				ajax({
+					url: 'https://jisuarea.market.alicloudapi.com/area/query',
+					data: {
+						parentid: 8
+					},
+					header: {
+						Authorization: 'APPCODE f02999205b6a46e39d8b21325c3b530e'
+					}
+				}).then(res => {
+					console.log(res.data.result);
+				}).catch(err => {
+					console.log(err)
+				});
+				*/
+			})
+		},
+		data() {
+			return {
+				pickVal: [],
+				range: {
+					provinces: [],
+					citys: [],
+					areas: []
+				},
+				checkObj: {}
+			};
 		},
 		watch: {
 			value(val) {
@@ -189,7 +212,7 @@
 		height: 476rpx;
 		overflow: hidden;
 		background-color: rgba(255, 255, 255, 1);
-		z-index: 9;
+		z-index: 7;
 	}
 
 	.regionPickerView {

@@ -1,5 +1,5 @@
 <template>
-	<block v-for="(item,index) in items" :key="item.id||item.plu||index">
+	<block v-for="(item,index) in items" :key="index">
 		<view class="slider" :class="intervalClass">
 			<view class="item" :style="{transform:item.isTouchMove?'translateX(0)':`translateX(${offset}rpx)`,
 			                              marginLeft:`-${offset}rpx`}" @touchstart="touchstart" @touchmove="touchmove"

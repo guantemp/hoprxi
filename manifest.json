@@ -1,7 +1,7 @@
 {
     "name" : "hoprxi协助工具",
     "appid" : "__UNI__D5E6D65",
-    "description" : "适用科脉、思迅等商超收银软件调价、价签打印、传称、收货、盘存等内部管理",
+    "description" : "适用科脉、思迅、泰格等商超收银软件调价、价签打印、传称、收货、盘存等内部管理",
     "versionName" : "1.0.0",
     "versionCode" : "100",
     "transformPx" : false,

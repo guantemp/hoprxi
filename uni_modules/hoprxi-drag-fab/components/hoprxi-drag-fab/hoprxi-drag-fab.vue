@@ -1,19 +1,26 @@
 <template>
 	<view @touchmove.stop.prevent="touchmove" @touchend="touchend">
 		<view :class="[{'menus-pop':isPopMenu},'menus']"
-			:style="[{width: menuWidth, height: menuHeight,borderRadius:size + 'rpx'},menusStyle]">
+			:style="[{width: menuWidth, height: menuHeight,borderRadius:size/2 + 'rpx'},menusStyle]">
 			<block v-for="(menu, index) in menus" :key="index">
 				<view @click="_onMenuClick(menu.event, menu)" :class="['menu',{'menu-pop':isPopMenu}]"
-					:style="{width: size + 'rpx',height: size + 'rpx'}">
-					<slot :menu="menu">
-						<image :src="menu.iconPath" mode="aspectFit" class="menu-image"
-							:style="{width:size/2 + 'rpx',height:size/2 + 'rpx'}" />
-						<text class="text">{{ menu.text }}</text>
-					</slot>
+					:style="menuStyle">
+					<view v-if="menu.iconFont" :class="menu.iconFont" :style="{fontSize:size/2 + 'rpx'}">
+						<view v-if="menu.badge" class="badge">
+							<block>{{menu.badge>99?'99+':menu.badge}}</block>
+						</view>
+					</view>
+					<image v-if="menu.iconPath&&!(menu.iconFont)" :src="menu.iconPath" mode="aspectFit"
+						:style="{width:size/2 + 'rpx',height:size/2 +'rpx'}" style="margin-bottom: 7rpx;">
+						<view v-if="menu.badge" class="badge">
+							<block>{{menu.badge>99?'99+':menu.badge}}</block>
+						</view>
+					</image>
+					<text class="text">{{ menu.text }}</text>
 				</view>
 			</block>
 		</view>
-		<view class="ball bg-gradual-blue" @click.stop.prevent="_ballClick" :class="{'transition': !isMoved}"
+		<view class="ball bg-blue" @click.stop.prevent="_onBallClick" :class="{'transition': !isMoved}"
 			:style="{left:left + 'px', top:top + 'px',width:size + 'rpx',height:size + 'rpx'}">
 			<view :class="[{'ball-click': isPopMenu},'ball-circle-v']"></view>
 			<view class="ball-circle-h" :class="{'ball-click': isPopMenu}"></view>
@@ -29,10 +36,13 @@
 * @value vertical 垂直显示
 * @property {String} position= [rightBottom | leftBottom | leftTop | rightTop] 悬浮球初始位置
 * @property {Array} menus 展开菜单内容配置项
-* @event {Function} menu.event 展开菜单点击事件，返回点击信息
+* @event {Function} menus.event 展开菜单点击事件，返回点击信息
 * @event {Function} ballClick 悬浮球点击事件
 */
 <script>
+	import {
+		ref
+	} from "vue";
 	export default {
 		name: 'hoprxi-drag-fab',
 		props: {
@@ -40,15 +50,15 @@
 				Type: Array,
 				default: [{
 					iconPath: '/static/workflow_icon/new.png',
-					iconFont:'cuIcon-new'
-					selectedIconPath: '/static/workflow_icon/new.png',
-					text: '新增商品',
-					event: 'appendGood'
+					iconFont: 'cuIcon-new',
+					badge: 2,
+					text: '新增',
+					event: 'append'
 				}]
 			},
 			size: {
 				type: Number,
-				default: 116
+				default: 118
 			},
 			direction: {
 				type: String,
@@ -62,32 +72,35 @@
 				default: 'rightBottom',
 				validator(value) {
 					return value === 'leftBottom' || value === 'rightBottom' || value === 'rightTop' || value ===
-					'leftTop';
+						'leftTop';
 				}
 			}
 		},
-		setup(props, content) {},
-		data() {
+		setup(props, content) {
+			let windowWidth = ref(0);
+			let windowHeight = ref(0);
+			let left = ref(0);
+			let top = ref(0);
+			let ballWidth = ref(0);
+			let ballHeight = ref(0);
+			let isPopMenu = ref(false);
+			let isMoved = ref(true);
+			const edge = 9
 			return {
-				top: 0,
-				left: 0,
-				width: 0,
-				height: 0,
-				offsetWidth: 0,
-				offsetHeight: 0,
-				windowWidth: 0,
-				halfWindowWidth: 0,
-				windowHeight: 0,
-				halfWindowHeight: 0,
-				isMoved: true,
-				edge: 15,
-				isPopMenu: false,
+				windowWidth,
+				windowHeight,
+				left,
+				top,
+				ballWidth,
+				ballHeight,
+				isPopMenu,
+				isMoved,
+				edge
 			}
 		},
 		created() {
-			if (Array.isArray(this.menus) && (this.menus.length === 0 || this.menus.length > 4)) throw new Error(
-				'menus must be of Array type and lenght rang is 1-4.');
-			this.$nextTick(() => {
+			if (Array.isArray(this.menus) && (this.menus.length === 0 || this.menus.length > 5)) throw new Error(
+				'menus must be of Array type and lenght rang is 1-5.');
 				const sys = uni.getSystemInfoSync();
 				this.windowWidth = sys.windowWidth;
 				this.windowHeight = sys.windowHeight;
@@ -97,77 +110,67 @@
 				if (sys.windowTop) {
 					this.windowHeight += sys.windowTop;
 				}
-				this.halfWindowWidth = this.windowWidth / 2;
-				this.halfWindowHeight = this.windowHeight / 2;
-			})
-		},
-		mounted() {
-			const query = uni.createSelectorQuery().in(this);
-			query.select('.ball').boundingClientRect(res => {
-				this.width = res.width;
-				this.height = res.height;
-				this.offsetWidth = res.width / 2;
-				this.offsetHeight = res.height / 2;
-				switch (this.position) {
-					case 'rightBottom':
-						this.left = this.windowWidth - this.width - this.edge;
-						this.top = this.windowHeight - this.height - this.edge * 3;
-						break;
-					case 'leftBottom':
-						this.left = this.edge;
-						this.top = this.windowHeight - this.height - this.edge * 3;
-						break;
-					case 'leftTop':
-						this.left = this.edge;
-						this.top = this.height + this.edge * 3;
-						break;
-					case 'rightTop':
-						this.left = this.windowWidth - this.width - this.edge;
-						this.top = this.height + this.edge * 3;
-						break;
-				}
-			}).exec();
-			/*
-			query.select('#navBar').boundingClientRect().exec(res => {
-				this.setFixedHeight(res[0].height);
-			});
-			*/
+				const query = uni.createSelectorQuery().in(this);
+				query.select('.ball').boundingClientRect(res => {
+					this.ballWidth = res.width;
+					this.ballHeight = res.height;
+					switch (this.position) {
+						case 'rightBottom':
+							this.left = this.windowWidth - this.ballWidth - this.edge;
+							this.top = this.windowHeight - this.ballHeight - this.edge * 4;
+							break;
+						case 'leftBottom':
+							this.left = this.edge;
+							this.top = this.windowHeight - this.ballHeight - this.edge * 4;
+							break;
+						case 'leftTop':
+							this.left = this.edge;
+							this.top = this.ballHeight + this.edge * 4;
+							break;
+						case 'rightTop':
+							this.left = this.windowWidth - this.ballWidth - this.edge;
+							this.top = this.ballHeight + this.edge * 4;
+							break;
+					}
+				}).exec();					
 		},
 		computed: {
 			menuWidth() {
-				if (this.isPopMenu && this.direction === 'horizontal') return (this.menus.length + 1) * this.size + 22 +
+				if (this.isPopMenu && this.direction === 'horizontal') return (this.menus.length + 1) * this.size +
 					'rpx';
 				return this.size + "rpx";
 			},
 			menuHeight() {
-				if (this.isPopMenu && this.direction === 'vertical') return (this.menus.length + 1) * this.size + 22 +
+				if (this.isPopMenu && this.direction === 'vertical') return (this.menus.length + 1) * this.size +
 					'rpx';
 				return this.size + "rpx";
 			},
 			menusStyle() {
 				let style = {};
 				let posi = "rightBottom";
-				if (this.left <= this.halfWindowWidth && this.top <= this.halfWindowHeight) posi = "leftTop";
-				else if (this.left <= this.halfWindowWidth && this.top > this.halfWindowHeight) posi = "leftBottom";
-				else if (this.left > this.halfWindowWidth && this.top <= this.halfWindowHeight) posi = "rightTop";
+				let halfWindowWidth = this.windowWidth / 2;
+				let halfWindowHeight = this.windowHeight / 2;
+				if (this.left <= halfWindowWidth && this.top <= halfWindowHeight) posi = "leftTop";
+				else if (this.left <= halfWindowWidth && this.top > halfWindowHeight) posi = "leftBottom";
+				else if (this.left > halfWindowWidth && this.top <= halfWindowHeight) posi = "rightTop";
 				switch (posi) {
 					case 'leftTop':
 						style.left = this.left + 'px';
 						style.top = this.top + 'px'
 						if (this.direction === 'horizontal') {
 							style.flexDirection = "row"
-							style.paddingLeft = this.size + 'rpx';
+							style.paddingLeft = this.size / 1.07 + 'rpx';
 						} else { // 'vertical' 
 							style.flexDirection = "column"
 							style.paddingTop = this.size + 'rpx';
 						}
 						break;
 					case 'rightTop':
-						style.right = this.windowWidth - this.left - this.width + 'px';
+						style.right = this.windowWidth - this.left - this.ballWidth + 'px';
 						style.top = this.top + 'px'
 						if (this.direction === 'horizontal') {
 							style.flexDirection = "row"
-							style.paddingLeft = this.size / 4 + 'rpx'
+							style.paddingLeft = this.size / 3.5 + 'rpx'
 						} else if (this.direction === 'vertical') {
 							style.flexDirection = "column"
 							style.paddingTop = this.size + 'rpx';
@@ -175,21 +178,21 @@
 						break;
 					case 'leftBottom':
 						style.left = this.left + 'px';
-						style.bottom = this.windowHeight - this.top - this.height + 'px';
+						style.bottom = this.windowHeight - this.top - this.ballHeight + 'px';
 						if (this.direction === 'horizontal') {
 							style.flexDirection = "row"
-							style.paddingLeft = this.size + 'rpx'
+							style.paddingLeft = this.size / 1.07 + 'rpx'
 						} else if (this.direction === 'vertical') {
 							style.flexDirection = "column-reverse"
 							style.paddingBottom = this.size + 'rpx';
 						}
 						break;
 					case 'rightBottom':
-						style.right = this.windowWidth - this.left - this.width + 'px';
-						style.bottom = this.windowHeight - this.top - this.height + 'px';
+						style.right = this.windowWidth - this.left - this.ballWidth + 'px';
+						style.bottom = this.windowHeight - this.top - this.ballHeight + 'px';
 						if (this.direction === 'horizontal') {
 							style.flexDirection = "row"
-							style.paddingLeft = this.size / 4 + 'rpx'
+							style.paddingLeft = this.size / 3.5 + 'rpx'
 						} else if (this.direction === 'vertical') {
 							style.flexDirection = "column-reverse"
 							style.paddingBottom = this.size + 'rpx';
@@ -197,11 +200,22 @@
 						break;
 				}
 				return style;
+			},
+			menuStyle() {
+				let style = {};
+				if (this.direction === 'horizontal') {
+					style.width = this.size - 5 + 'rpx';
+					style.height = this.size + 'rpx';
+				} else {
+					style.width = this.size + 'rpx';
+					style.height = this.size - 6 + 'rpx';
+				}
+				return style;
 			}
 		},
 		methods: {
 			//球点击事件
-			_ballClick() {
+			_onBallClick() {
 				this.isPopMenu = !this.isPopMenu;
 				this.$emit('ballClick')
 			},
@@ -215,13 +229,13 @@
 					return false;
 				}
 				this.isMoved = true;
-				this.left = event.touches[0].clientX - this.offsetWidth;
+				this.left = event.touches[0].clientX - this.ballWidth / 2;
 				//this.top =event.touches[0].clientY - this.offsetHeight;
-				let clientY = event.touches[0].clientY - this.offsetHeight;
+				let clientY = event.touches[0].clientY - this.ballHeight / 2;
 				// #ifdef H5
-				clientY += this.height;
+				clientY += this.ballHeight;
 				// #endif
-				let edgeBottom = this.windowHeight - this.height - this.edge;
+				let edgeBottom = this.windowHeight - this.ballHeight - this.edge;
 				// 上下触及边界
 				if (clientY < this.edge) {
 					this.top = this.edge;
@@ -232,10 +246,10 @@
 				}
 			},
 			touchend() {
-				if (this.left < this.windowWidth / 2 - this.offsetWidth) {
+				if (this.left < this.windowWidth / 2 - this.ballWidth / 2) {
 					this.left = this.edge;
 				} else {
-					this.left = this.windowWidth - this.width - this.edge;
+					this.left = this.windowWidth - this.ballWidth - this.edge;
 				}
 				this.isMoved = false;
 			},
@@ -259,9 +273,9 @@
 		.ball-circle-v {
 			position: absolute;
 			width: 8rpx;
-			height: 64rpx;
-			left: 53rpx;
-			top: 26rpx;
+			height: calc(75% - 4rpx);
+			left: calc(50% - 4rpx);
+			top: 15%;
 			background-color: white;
 			transform: rotate(0deg);
 			transition: transform .3s;
@@ -269,10 +283,10 @@
 
 		.ball-circle-h {
 			position: absolute;
-			width: 64rpx;
+			width: calc(75% - 4rpx);
 			height: 8rpx;
-			left: 24rpx;
-			top: 54rpx;
+			left: 15%;
+			top: calc(50% - 4rpx);
 			background-color: white;
 			transform: rotate(0deg);
 			transition: transform .3s;
@@ -301,23 +315,50 @@
 		}
 
 		.menu {
-			display: flex;
+			position: relative; //非常重要是badge显示必要
+			display: inline-flex; //非常重要是badge显示必要
 			flex-direction: column;
 			justify-content: center;
 			align-items: center;
 			opacity: 0;
 			transition: opacity 0.2s;
+			white-space: nowrap;
 
+			.badge {
+				position: absolute;
+				top: 4rpx;
+				right: 4rpx;
+				height: 28rpx;
+				line-height: 28rpx;
+				border-radius: 200rpx;
+				background: #dd524d;
+				color: #fff;
+				text-align: center;
+				padding: 0 10rpx;
+				font-size: 20rpx;
+				box-shadow: 0 0 0 2rpx #fff;
+				box-sizing: border-box;
+			}
+
+			/*
+			badge-dot {
+			  position: absolute;
+			  transform: translateX(-50%);
+			  top: -8rpx;
+			  right: -16rpx;
+			  height: 16rpx;
+			  width: 16rpx;
+			  border-radius: 100%;
+			  background: #dd524d;
+			  box-shadow: 0 0 0 1rpx #fff;
+			}
+*/
 			&.menu-pop {
 				opacity: 1;
 			}
 
-			.menu-image {
-				margin-bottom: 5rpx;
-			}
-
 			.text {
-				font-size: 12px;
+				font-size: 24rpx;
 				text-shadow: 2rpx 0rpx 2rpx rgba(0, 0, 0, .3);
 			}
 

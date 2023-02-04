@@ -135,8 +135,8 @@
 			<view class="bg-orange submit" @click.stop="showAddItemModalDialog" data-target="DialogModalAdd">添加商品</view>
 			<view class="bg-red submit">保存</view>
 		</view>
-		<hoprxi-drag-button @click="this.$util.toast('测试')" class="text-xxl" radius>
-			<text class="text-grey icon-print"></text>
+		<hoprxi-drag-button @click="$util.toast('测试')" radius class="text-sl bg-blue">
+			<text class="text-grey text-white icon-print"></text>
 		</hoprxi-drag-button>
 		<!-- 清空商品对话框 -->
 		<view class="cu-modal" :class="clearModalDialog?'show':''">

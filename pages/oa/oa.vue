@@ -4,28 +4,31 @@
 			id="navBar" :surplusHeight="12">
 		</hoprxi-navigation>
 		<view class="work">
-			<hoprxi-cell decorateIcon="/static/oa_icon/affair.png" title="事务" />
+			<hoprxi-tip icon="/static/oa_icon/affair.png" :title="{name:'事务',weight:260}"
+				:line="{pattern:'dashed',color:'#d4e7ed'}" />
 			<view class="cu-list grid col-4 no-border item_grid_list">
-				<view class="cu-item" v-for="(item, index) in affair" :key="index"
-					@tap.stop="this.$util.navTo('/pages/public/not_implemented')">
-					<view class="text-red">
-						<image class="img" :src="item.icon" />
-						<view class="cu-tag badge" v-if="item.new && item.new >0">
-							<block>{{item.new}}</block>
+				<block v-for="(item, index) in affair" :key="index">
+					<view class="cu-item" @tap.stop="$util.navTo('/pages/public/not_implemented')">
+						<view>
+							<image class="img" :src="item.icon"></image>
+							<view class="cu-tag badge" v-if="item.new && item.new >0">
+								<block>{{item.new}}</block>
+							</view>
 						</view>
+						<text>{{ item.title }}</text>
 					</view>
-					<text>{{ item.title }}</text>
-				</view>
+				</block>
 			</view>
 		</view>
 		<view class="work">
-			<hoprxi-cell decorateIcon="/static/oa_icon/logistics.png" title="后勤" :line="['dashed','#e4e7ed','bootom']"/>
+			<hoprxi-tip icon="/static/oa_icon/logistics.png" :title="{name:'后勤',weight:260}"
+				:line="{pattern:'dashed',color:'#d4e7ed'}" />
 			<view class="cu-list grid col-4 no-border item_grid_list">
 				<view class="cu-item" v-for="(item, index) in logistics" :key="index"
-					@tap.stop="this.$util.navTo('/pages/public/not_implemented')">
+					@tap.stop="$util.navTo('/pages/public/not_implemented')">
 					<view class="text-red">
 						<image class="img" :src="item.icon" />
-						<view class="cu-tag badge" v-if="item.new && item.new >0">
+						<view class="cu-tag badge" v-if="item.new && item.new > 0">
 							<block>{{item.new}}</block>
 						</view>
 					</view>
@@ -34,13 +37,14 @@
 			</view>
 		</view>
 		<view class="work">
-			<hoprxi-cell decorateIcon="/static/oa_icon/finance.png" title="财务" />
+			<hoprxi-tip icon="/static/oa_icon/finance.png" :title="{name:'财务',weight:260}"
+				:line="{pattern:'dashed',color:'#d4e7ed'}" />
 			<view class="cu-list grid col-4 no-border item_grid_list">
 				<view class="cu-item" v-for="(item, index) in finance" :key="index"
 					@tap.stop="this.$util.navTo('/pages/public/not_implemented')">
 					<view class="text-red">
 						<image class="img" :src="item.icon" />
-						<view class="cu-tag badge" v-if="item.new && item.new >0">
+						<view class="cu-tag badge" v-if="item.new && item.new > 0">
 							<block>{{item.new}}</block>
 						</view>
 					</view>
@@ -48,7 +52,6 @@
 				</view>
 			</view>
 		</view>
-		<hoprxi-drag-fab :menus="menus" direction="vertical"></hoprxi-drag-fab>
 	</view>
 </template>
 
@@ -128,27 +131,6 @@
 		data() {
 			return {
 				dataList: [],
-				menus: [{
-					iconPath: '/static/workflow_icon/new.png',
-					selectedIconPath: '/static/workflow_icon/new.png',
-					text: '新增商品',
-					event: 'addGood'
-				}, {
-					iconPath: '/static/workflow_icon/new_kg.png',
-					selectedIconPath: '/static/workflow_icon/new_kg.png',
-					text: '新增散秤',
-					event: 'addScale'
-				}, {
-					iconPath: '/static/workflow_icon/count.png',
-					selectedIconPath: '/static/workflow_icon/count.png',
-					text: '商品类目',
-					event: 'category'
-				}, {
-					iconPath: '/static/workflow_icon/new.png',
-					selectedIconPath: '/static/workflow_icon/new.png',
-					text: '新增服装',
-					event: 'addGood'
-				}, ],
 				menus_filter: [],
 				scanResult: '',
 			}
@@ -164,16 +146,6 @@
 					})
 				}
 			})
-			this.$nextTick(() => {
-				//this.$refs.slide.assignment(this.dataList)
-			})
-			//拷贝：catalog_test.category.map((x) => x)
-			this.menus_filter = catalog_test.category.map((x) => x);
-			this.menus_filter.splice(0, 0, {
-				id: "-9999",
-				name: "全部",
-			});
-			//console.log(this.menus_filter);
 		},
 		methods: {
 			//点击单行

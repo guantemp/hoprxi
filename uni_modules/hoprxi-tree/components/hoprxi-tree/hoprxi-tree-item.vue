@@ -68,6 +68,7 @@
 			let content = inject("content");
 			const check = () => {
 				treeList[props.position].checked(props.node, !props.node.checked);
+				//重要：穿透到父组件hoprxi-tree中丢出check事件
 				content.emit('check', {
 					node: props.node,
 					selected: treeList[props.position].selected

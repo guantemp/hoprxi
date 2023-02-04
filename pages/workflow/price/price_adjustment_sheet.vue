@@ -21,18 +21,18 @@
 		</view>
 		<scroll-view scroll-y :scroll-with-animation="true" :enable-back-to-top="true"
 			:style="{height:dateShow?'calc(98.5vh - '+(fixedHeight+dateShowHeight)+'px - 10rpx)':'calc(98.5vh - '+ fixedHeight +'px - 10rpx)'}">
-			<view class="bg-white nav">
-				<view class="flex text-center">
-					<view class="cu-item flex-sub" :class="{'text-orange cur':index===tabCur}"
-						v-for="(item,index) in tabList" :key="index" @tap="tabSelect" :data-id="index">
-						{{item}}
-					</view>
+
+			<view class="flex text-center bg-white nav">
+				<view class="cu-item flex-sub" :class="{'text-orange cur':index === tabCur}"
+					v-for="(item,index) in tabList" :key="index" @tap="tabSelect" :data-id="index">
+					{{item}}
 				</view>
 			</view>
+
 			<block v-for="(sheet,index) in priceAdjustmentSheet" :key="index">
 				<view class="sheet">
 					<hoprxi-cell :title="'单据号: ' + sheet.sheetNumber" :titleFont="['#8799a3',28,700]"
-						:line="['dashed','#e4e7ed']" decorateIconClass="cuIcon-comment">
+						:line="['dashed','#e4e7ed']" :decorateIconClass="'cuIcon-comment'">
 						<template #executableSlot>
 							<text v-if="sheet.approval==='normal' || sheet.approval==='denied'"
 								class="cuIcon-delete text-blue"
@@ -47,6 +47,7 @@
 							<text>申请日期：{{sheet.applyDate}}</text>
 							<text class="text-cut">适配门店：{{sheet.store}}</text>
 							<text class="margin-bottom-xs">生效日期：{{sheet.effectDate}}</text>
+							<hoprxi-tip :title="{name:'申请人：',weight:100,size:28}" :line="{pattern:'dashed',color:'#d4e7ed',position:'top'}" />
 							<hoprxi-cell :title="'申请人：' + sheet.proposer" :line="['dashed','#e4e7ed','top']">
 							</hoprxi-cell>
 						</view>
@@ -96,7 +97,7 @@
 <script>
 	import {
 		formatDate,
-	} from '@/js_sdk/util.js';
+	} from '@/uni_modules/hoprxi-common/js_sdk/util.js';
 	import priceAdjustmentSheetTestData from '@/data/price_adjustment_sheet_test_data.js'; //测试数据
 	export default {
 		data() {
@@ -161,16 +162,14 @@
 					setTimeout(() => {
 						let query = uni.createSelectorQuery().in(this);
 						query.select('.flex.justify-around.align-center.bg-white').boundingClientRect().exec(
-						res => {
-							this.dateShowHeight = res[0].height;
-						});
+							res => {
+								this.dateShowHeight = res[0].height;
+							});
 					}, 1);
 				}
 			},
 			tabSelect(e) {
 				this.tabCur = e.currentTarget.dataset.id;
-				this.scrollLeft = (e.currentTarget.dataset.id - 1) * 60;
-				let er = e.currentTarget.dataset.id;
 				let _this = this;
 				this.tabList.forEach(function(item, index, arr) {
 					if (index === _this.tabCur) {

@@ -1,78 +1,59 @@
 <template>
 	<view class="workflow">
-		<hoprxi-navigation title="业务" :backgroundColor="[1, ['#65FDF0', '#1D6FA3',45]]" :surplusHeight="28"
+		<hoprxi-navigation title="中台" :backgroundColor="[1, ['#1D6FA3', '#1D6FA3',45]]" :surplusHeight="28"
 			:titleFont="['#FFF','center',700]">
-			<view slot="extendSlot" class="store" @click="this.$util.navTo('/pages/workflow/store_selection')">
-				<text class="cuIcon-location txt"></text>
-				<text class="txt">{{store.name}}</text>
+			<view slot="extendSlot" class="text-xl padding-left-sm cuIcon-location text-red"
+				@click="$util.navTo('/pages/workflow/store_selection')">
+				<text class="padding-left-xs text-white text-lg">{{shop.name}}</text>
 			</view>
 		</hoprxi-navigation>
 		<view class="item">
-			<hoprxi-cell decorateIcon="/static/workflow_icon/item.png" title="商品" />
-			<view class="cu-list grid col-4 no-border item_grid_list">
-				<view class="cu-item " @tap.stop="this.$util.navTo('/pages/workflow/catalog/catalog')">
-					<view class="icon-goods text-blue" style="font-size: 76rpx;">
-						<view class="cu-tag badge">
-							<block>1</block>
+			<hoprxi-tip icon="/static/workflow_icon/item.png" :title="{name:'商品',weight:280}"
+				:line="{pattern:'dashed',color:'#d4e7ed'}" />
+			<view class="cu-list grid col-4 no-border">
+				<block v-for="(good,index) in goods" :key="index">
+					<view class="cu-item" @tap.stop="$util.navTo(good.url)">
+						<view v-if="good.iconFont" :class="[good.iconFont,good.color]" style="font-size: 87rpx;">
+							<view class="cu-tag badge" v-if="good.new && good.new > 0">
+								<block>{{good.new}}</block>
+							</view>
 						</view>
+						<text class="text-xl">{{good.title}}</text>
 					</view>
-					<text>商品档案</text>
-				</view>
-				<view class="cu-item" @tap.stop="this.$util.navTo('/pages/workflow/price/price_adjustment_sheet')">
-					<view class="icon-price-adjustment text-olive" style="font-size: 76rpx;">
-						<view class="cu-tag badge">
-							<block>3</block>
-						</view>
-					</view>
-					<text>调价</text>
-				</view>
-				<view class="cu-item" @tap.stop="this.$util.navTo('/pages/workflow/label/label')">
-					<view class="icon-label-print text-brown" style="font-size: 76rpx;">
-					</view>
-					<text>价签打印</text>
-				</view>
-				<view class="cu-item" @tap.stop="this.$util.navTo('/pages/workflow/price/promotion')">
-					<view class="text-red icon-promotion" style="font-size: 76rpx;">
-						<view class="cu-tag badge">
-							<block>12</block>
-						</view>
-					</view>
-					<text>促销</text>
-				</view>
+				</block>
 			</view>
 		</view>
-		<view class="order">
-			<hoprxi-cell decorateIcon="/static/workflow_icon/order.png" title="采购"
-				:line="['dashed','#e4e7ed','bootom']" />
-			<view class="cu-list grid col-4 no-border item_grid_list">
-				<view class="cu-item " @tap.stop="this.$util.navTo('/pages/workflow/purchase/order')">
-					<view class="text-cyan icon-contract" style="font-size: 76rpx;">
-						<view class="cu-tag badge">
-							<block>2</block>
+		<view class="purchase">
+			<hoprxi-tip icon="/static/workflow_icon/order.png" :title="{name:'采购',weight:320}"
+				:line="{pattern:'dashed',color:'#d4e7ed'}" />
+			<view class="cu-list grid col-4 no-border">
+				<block v-for="(item,index) in purchase" :key="index">
+					<view class="cu-item " @tap.stop="$util.navTo(item.url)">
+						<view v-if="item.iconFont" :class="[item.iconFont,item.color]" style="font-size: 87rpx;">
+							<view class="cu-tag badge" v-if="item.new && item.new > 0">
+								<block>{{item.new}}</block>
+							</view>
 						</view>
+						<text class="text-xl">{{item.title}}</text>
 					</view>
-					<text>合同</text>
-				</view>
-				<view class="cu-item " @tap.stop="this.$util.navTo('/pages/workflow/purchase/order')">
-					<view class="text-grey icon-purchase-order" style="font-size: 76rpx;"></view>
-					<text>下订单</text>
-				</view>
-				<view class="cu-item" @tap.stop="this.$util.navTo('/pages/public/not_implemented')">
-					<view class="text-blue icon-purchase-receipt" style="font-size: 76rpx;">
-						<view class="cu-tag badge">
-							<block>10</block>
-						</view>
-					</view>
-					<text>入库验收</text>
-				</view>
-				<view class="cu-item" @tap.stop="this.$util.navTo('/pages/public/not_implemented')">
-					<view class="text-olive icon-return-goods" style="font-size: 76rpx;"></view>
-					<text>退单</text>
-				</view>
+				</block>
 			</view>
 		</view>
 		<view class="warehouse">
-			<hoprxi-cell decorateIcon="/static/workflow_icon/order.png" title="库管" />
+			<hoprxi-tip icon="/static/workflow_icon/order.png" :title="{name:'库管',weight:320}"
+				:line="{pattern:'dashed',color:'#d4e7ed'}" />
+			<view class="cu-list grid col-4 no-border">
+				<block v-for="(item,index) in warehouses" :key="index">
+					<view class="cu-item " @tap.stop="$util.navTo(item.url)">
+						<view v-if="item.iconFont" :class="[item.iconFont,item.color]" style="font-size: 87rpx;">
+							<view class="cu-tag badge" v-if="item.new && item.new > 0">
+								<block>{{item.new}}</block>
+							</view>
+						</view>
+						<text class="text-xl">{{item.title}}</text>
+					</view>
+				</block>
+			</view>
 		</view>
 	</view>
 </template>
@@ -81,23 +62,103 @@
 	import {
 		reactive
 	} from "vue";
+	import ajax from '@/uni_modules/u-ajax'
 	export default {
 		setup() {
-			const store = reactive({
-				name: "旺客隆超市国美绿洲店",
+			const shop = reactive({
+				name: '盛源超市',
+				address: '福集镇明星路76号',
 				location: {
-					longitude: 79.1256,
-					latitude: 115.234
-				}
+					longitude: 105.37603713392744,
+					latitude: 29.155733003496554
+				},
+				id: 4
 			});
+			const goods = [{
+					iconFont: 'icon-goods',
+					color: "text-blue",
+					url: '/pages/workflow/catalog/catalog',
+					title: '商品档案',
+					new: 15,
+				}, {
+					iconFont: 'icon-price-adjustment',
+					color: "text-olive",
+					url: '/pages/workflow/price/price_adjustment_sheet',
+					new: 2,
+					title: '调价单',
+				}, {
+					iconFont: 'icon-label-print',
+					color: "text-brown",
+					url: '/pages/workflow/label/label',
+					title: '标签打印',
+				},
+				{
+					iconFont: 'icon-promotion',
+					color: "text-red",
+					url: '/pages/workflow/price/promotion',
+					title: '促销',
+				}
+			];
+			const purchase = [{
+					iconFont: 'icon-contract',
+					color: "text-cyan",
+					url: '/pages/workflow/purchase/order',
+					title: '合同',
+
+				}, {
+					iconFont: 'icon-purchase-order',
+					color: "text-grey",
+					url: '/pages/workflow/purchase/order',
+					new: 12,
+					title: '订单',
+				}, {
+					iconFont: 'icon-purchase-receipt',
+					color: "text-blue",
+					url: '/pages/public/not_implemented',
+					title: '验收入库',
+				},
+				{
+					iconFont: 'icon-return-goods',
+					color: "text-olive",
+					url: '/pages/public/not_implemented',
+					title: '退货',
+				}
+			];
+			const warehouses =  [{
+					iconFont: 'icon-contract',
+					color: "text-cyan",
+					url: '/pages/workflow/purchase/order',
+					title: '库存查询',
+
+				}, {
+					iconFont: 'icon-purchase-order',
+					color: "text-grey",
+					url: '/pages/workflow/purchase/order',
+					new: 1,
+					title: '预盘单',
+				}, {
+					iconFont: 'icon-purchase-receipt',
+					color: "text-blue",
+					url: '/pages/public/not_implemented',
+					title: '出入库',
+				}
+			];
 			return {
-				store,
+				shop,
+				goods,
+				purchase,
+				warehouses
 			}
 		},
-		data() {
-			return {}
+		onShow() {
+			let pages = getCurrentPages();
+			let currPage = pages[pages.length - 1];
+			if (currPage.data.shop !== undefined) { //接收的数据
+				this.shop.id = currPage.data.shop.id;
+				this.shop.name = currPage.data.shop.name;
+				this.shop.location = currPage.data.shop.location;
+			}
 		},
-		onLoad: function() {},
 		methods: {
 			navBack() {
 				uni.navigateBack();
@@ -108,23 +169,9 @@
 
 <style lang='scss'>
 	.workflow {
-		width: 100vw;
+		background-color: #8799a3;
 		height: 100vh;
-		background-color: #F8F8F8;
 	}
-
-	.store {
-		font-size: 16rpx;
-		color: #FFF;
-		padding: 10rpx 20rpx;
-		align-items: center;
-
-		.txt {
-			margin: 0rpx 10rpx;
-			font-size: 30rpx;
-		}
-	}
-
 
 	.item {
 		display: flex;
@@ -133,33 +180,15 @@
 		padding: 20rpx 20rpx 0rpx 20rpx;
 		background-color: #FFFFFF;
 		margin: 20rpx 20rpx 0rpx 20rpx;
-
-		.item_img {
-			width: 76rpx;
-			height: 76rpx;
-		}
-
-		.item_grid_list {
-			padding: 20rpx 0rpx 0rpx 0rpx;
-		}
 	}
 
-	.order {
+	.purchase {
 		display: flex;
 		flex-direction: column;
 		border-radius: 20rpx;
 		padding: 20rpx 20rpx 0rpx 20rpx;
 		background-color: #FFFFFF;
 		margin: 20rpx 20rpx 0rpx 20rpx;
-
-		.order_img {
-			width: 76rpx;
-			height: 76rpx;
-		}
-
-		.order_grid_list {
-			padding: 20rpx 0rpx 0rpx 0rpx;
-		}
 	}
 
 	.warehouse {

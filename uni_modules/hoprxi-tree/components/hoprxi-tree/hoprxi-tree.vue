@@ -11,6 +11,7 @@
 	 * @property {Number} indent,层级间的缩进
 	 * @property {Array} checkedIds,选中id集
 	 * @property {Array} expandedIds,展开的id集
+	 *  @event {Function} check 选中一个节点事件，返回包含选中节点和所有选中节点的一个对象
 	 */
 	import {
 		reactive,

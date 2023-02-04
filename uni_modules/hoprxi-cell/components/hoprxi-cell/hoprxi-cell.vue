@@ -26,6 +26,46 @@
 	} from "vue";
 	export default {
 		name: 'hoprxi-cell',
+		props: {
+			decorateIcon: {
+				type: String,
+				default: ''
+			},
+			icon: {
+				type: String,
+				default: ''
+			},
+			iconFont: {
+				type: String,
+				default: ''
+			},
+			decorateIconClass: {
+				type: String,
+				default: ''
+			},
+			title: {
+				type: String,
+				default: '标题'
+			},
+			titleFont: {
+				type: Array,
+				//字体选项：颜色，大小,粗细
+				//比如：['#000', 28, 400]
+				default: []
+			},
+			arrow: {
+				type: Boolean,
+				default: false
+			},
+			line: {
+				type: Array,
+				//['solid', '#e4e7ed', "bottom"]
+				// 线条的类型，solid-实线，dashed-方形虚线，dotted-圆点虚线
+				// 颜色
+				// 位置：bottom-底，top-顶
+				default: []
+			}
+		},
 		setup(props, content) {
 			let isTop = false;
 			let textDecorate = {
@@ -71,38 +111,7 @@
 				lineDecorate
 			}
 		},
-		props: {
-			decorateIcon: {
-				type: String,
-				default: ''
-			},
-			decorateIconClass: {
-				type: String,
-				default: ''
-			},
-			title: {
-				type: String,
-				default: '标题'
-			},
-			titleFont: {
-				type: Array,
-				//字体选项：颜色，大小,粗细
-				//比如：['#000', 28, 400]
-				default: []
-			},
-			arrow: {
-				type: Boolean,
-				default: false
-			},
-			line: {
-				type: Array,
-				//['solid', '#e4e7ed', "bottom"]
-				// 线条的类型，solid-实线，dashed-方形虚线，dotted-圆点虚线
-				// 颜色
-				// 位置：bottom-底，top-顶
-				default: []
-			},
-		},
+	
 		methods: {
 			executable(event) {
 				this.$emit('executable');

@@ -8,9 +8,6 @@
 					confirm-type="search">
 				<text class="cuIcon-scan text-blue text-bold" @tap="scan"></text>
 			</view>
-			<view class="action text-white" @tap="filterWindows = !filterWindows">
-				<text class="cuIcon-filter"></text>
-			</view>
 		</template>
 	</hoprxi-navigation>
 	<view class="charts-box">
