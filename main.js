@@ -4,7 +4,7 @@ import {
 	navTo,
 	throttle,
 	debounce
-} from '@/js_sdk/util.js';
+} from '@/uni_modules/hoprxi-common/js_sdk/util.js';
 import Request from '@/js_sdk/luch-request/luch-request/index.js'
 import store from "./store";
 import pinia from "./pinia";
