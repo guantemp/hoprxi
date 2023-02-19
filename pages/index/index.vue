@@ -8,7 +8,7 @@
 	} from "vue";
 	export default {
 		setup(props, content) {
-			const isLaunched = false;
+			let isLaunched = false;
 			const elements = [
 				[{
 					label: 'HOPRXI协助工具，帮助改善应用',
@@ -125,8 +125,8 @@
 			];
 			const experience = (data) => {
 				uni.setStorage({
-					key: "launchflag",
-					data: true,
+					key: "launched",
+					data: new Date().getTime() + 7200000,
 					complete() {
 						setTimeout(() => {
 							uni.switchTab({
@@ -143,14 +143,14 @@
 			}
 		},
 		onLoad() {
-			if (this.isLaunched) {
-				setTimeout(() => {
-					uni.switchTab({
-						url: '/pages/tabBar/workflow'
-					})
-				}, 50);
+			let expire = uni.getStorageSync("launched") || 0;
+			if (new Date().getTime() <= expire) {
+				this.isLaunched = true;
+				uni.switchTab({
+					url: '/pages/tabBar/workflow'
+				})
+				//console.log(this.isLaunched);
 			}
-				console.log(uni.getStorageSync("launchflag"));
 			/*
 			const res = uni.getStorageInfoSync();
 			console.log(res.keys);

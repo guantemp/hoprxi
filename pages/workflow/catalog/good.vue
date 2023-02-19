@@ -75,13 +75,12 @@
 		</view>
 		<view class="cu-form-group">
 			<view class="title">商品等级<text class="text-red margin-left-xs">*</text></view>
-			<input v-model="grade" :placeholder="item.grade||'合格品'" disabled>
-			<text class="cuIcon-right" @tap.stop="gradeDialog = true"></text>
+			<input v-model="grade" :placeholder="item.grade||'合格品'" disabled @click="gradeDialog = true">		
 		</view>
 		<view class="cu-form-group">
-			<view class="title" @tap.stop="$util.toast('层级要求到市，本市要求到区县！')">
+			<view class="title" @tap.stop="$util.toast('要求精确到到市级！')">
 				商品产地<text class="text-red margin-left-xs">*</text></view>
-			<input v-model="madeIn" :placeholder="item.madeIn||''" disabled>
+			<input v-model="madeIn.name" :placeholder="item.madeIn||''" @change="madeInChange">
 			<text class="cuIcon-right" @tap.stop="showMadeInDialog"></text>
 		</view>
 		<view class="flex justify-around padding-tb-sm bg-grey">
@@ -142,10 +141,10 @@
 		<view class="cu-dialog">
 			<view class="flex align-center solid-bottom padding text-left bg-white">
 				商品别名：
-				<input type="text" :placeholder="(item.name&&item.name.alias)||'请输入商品的另外一个名称'" v-model="name.alias">
+				<input type="text" :placeholder="(item.name&&item.name.alias)||'请输入商品的另外一个名称'" v-model="name.alias" class="text-green">
 			</view>
 			<view class="cu-bar" @tap="aliasModalDialog = false">
-				<text class="action margin-0 flex-sub">好</text>
+				<text class="action flex-sub">好</text>
 			</view>
 		</view>
 	</view>
@@ -161,7 +160,7 @@
 			</block>
 		</view>
 	</view>
-	<!-- 产地选择对话框 -->
+	<!-- 产地选择对话框1 -->
 	<view class="cu-modal bottom-modal" :class="{'show':madeInDialog}" @tap="madeInDialog=false">
 		<view class="cu-dialog">
 			<view class="flex align-center justify-between padding-lr-lg padding-tb-sm bg-white solid-bottom text-lg">
@@ -170,6 +169,22 @@
 			</view>
 			<hoprxi-region-picker @change="handlerChange" :value="initPlaceOfOrigin" hideArea>
 			</hoprxi-region-picker>
+		</view>
+	</view>
+	<!--产地选择对话框2-->
+	<view :class="['cu-modal',{'show':areaDialog}]" @tap="areaDialog = false">
+		<view class="cu-dialog padding-lr-sm">
+			<view class="solid-bottom line-blue padding-tb-sm text-left text-lg align-center">
+				<text class="cuIcon-list margin-right-sm "></text>当前有多个可选地址
+			</view>
+			<block v-for="(area,index) in areas" :key="index">
+				<view class="flex justify-between solid-bottom align-center padding-tb-sm padding-lr-sm"
+					@tap="areaSelect(area)">
+					<view><text>{{area.name}}</text>
+						<text class="text-sm margin-left-xs text-gray">{{area.parentName}}</text>
+					</view>
+				</view>
+			</block>
 		</view>
 	</view>
 	<!-- 定价策略对话框 -->
@@ -276,31 +291,69 @@
 			const aliasModalDialog = ref(false);
 			let spec = null;
 			let category = null;
-			let grade = '合格品';
+			let grade = ref('合格品');
 			let gradeDialog = ref(false);
-			let madeIn = null;
+			let madeIn = {};
 			let madeInDialog = ref(false);
-
+			let areaDialog = ref(false);
+			const areas = reactive([]);
 			const pricingStrategyModalDialog = ref(false);
 			const timeTab = ['30天', '60天', '180天', '360天'];
 			let timeTabCur = ref(0);
 			let retailPrice = ref(0);
-
 			const unitDrawerDialog = ref(false);
-			const grades = [];
+			const grades = ['优等品', '一等品', '合格品', '不合格品'];
 			const units = [];
 			onBeforeMount(() => {
-				for (const g of catalog.grades)
-					grades.push(g);
 				ajax({
 					url: 'https://hoprxi.tooo.top/catalog/core/v1/units',
 				}).then(res => {
-					for (const u of res.data.units)
-						units.push(u)
+					for (const u of res.data.units) units.push(u)
 				}).catch(err => {
 					console.log(err)
 				});
-			})
+			});
+			const madeInChange = () => {
+				ajax({
+					url: 'https://hoprxi.tooo.top/area/v1/areas',
+					data: {
+						search: '^' + madeIn.name,
+						filters: 'city,country'
+					}
+				}).then(res => {
+					areas.length = 0;
+					for (const a of res.data.areas) {
+						areas.push({
+							code: a.code,
+							name: a.name.name,
+							parentName: a.parent.name
+						})
+					};
+					if (areas.length === 1) {
+						madeIn.name = areas[0].name;
+						madeIn.code = areas[0].code;
+						madeIn.parentName = areas[0].parentName;
+					}
+					if (areas.length > 1) {
+						areaDialog.value = true;
+						//madeIn.value = areas[1].name;
+					}
+					console.log(areas);
+				}).catch(err => {
+					console.log(err)
+				});
+			};
+			const areaSelect = (a) => {
+				madeIn.name = a.name;
+				madeIn.code = a.code;
+				madeIn.parentName = a.parentName;
+				console.log(madeIn);
+				areaDialog.value = false;
+			};
+			const grade_selected = (g) => {
+				grade.value = g;
+				gradeDialog = false;
+			};
 			return {
 				previous,
 				next,
@@ -315,8 +368,13 @@
 				category,
 				grade,
 				gradeDialog,
+				grade_selected,
 				madeIn,
 				madeInDialog,
+				madeInChange,
+				areaDialog,
+				areas,
+				areaSelect,
 				pricingStrategyModalDialog,
 				timeTab,
 				timeTabCur,
@@ -383,30 +441,24 @@
 					return;
 				}
 				if (this.good && this.good.retailPrice) {
-					this.good.retailPrice = this.good.retailPrice.replace(unitPattern, '') + "/" + this
-						.unit;
+					this.good.retailPrice = this.good.retailPrice.replace(unitPattern, '') + "/" + this.unit;
 				}
 			}
 		},
 		computed: {
 			retailGrossProfitRate() {
-				let cost = this.purchasePrice ? this.purchasePrice.replace(unitPattern, '') : this.good ?
-					this.good.storage
+				let cost = this.purchasePrice ? this.purchasePrice.replace(unitPattern, '') : this.good ? this.good.storage
 					.lastPurchasePrice.replace(unitPattern, '') : 0;
-				if (this.retailPrice) return this.computedGrossProfitRate(cost, this.retailPrice.replace(
-					unitPattern,
+				if (this.retailPrice) return this.computedGrossProfitRate(cost, this.retailPrice.replace(unitPattern,
 					'')) + '%';
 				if (this.purchasePrice) {
-					if (this.good && !this.retailPrice) return this.computedGrossProfitRate(cost, this.good
-						.retailPrice
+					if (this.good && !this.retailPrice) return this.computedGrossProfitRate(cost, this.good.retailPrice
 						.replace(unitPattern, '')) + '%';
-					if (this.retailPrice) return this.computedGrossProfitRate(cost, this.retailPrice
-						.replace(unitPattern,
-							'')) + '%';
+					if (this.retailPrice) return this.computedGrossProfitRate(cost, this.retailPrice.replace(unitPattern,
+						'')) + '%';
 					return '0%';
 				}
-				if (this.good) return this.computedGrossProfitRate(cost, this.good.retailPrice.replace(
-						unitPattern, '')) +
+				if (this.good) return this.computedGrossProfitRate(cost, this.good.retailPrice.replace(unitPattern, '')) +
 					'%';
 			},
 			scrollContentStyle() {
@@ -448,20 +500,14 @@
 			scanResultBlur(sign) {
 				switch (sign) {
 					case 'plu':
-						if (scanResult <= 0 || scanResult > 999999)
-							this.$util.toast('Plu码仅支持整数，范围在1-999999之间！')
+						if (scanResult <= 0 || scanResult > 999999) this.$util.toast('Plu码仅支持整数，范围在1-999999之间！')
 						break;
 					case 'barcode':
 						break;
 				}
 			},
-			grade_selected(grade) {
-				this.grade = grade;
-				this.gradeDialog = false;
-			},
 			showMadeInDialog() {
-				let pattern = new RegExp(
-					/^([\u4e00-\u9fa5]{1,}[省|市|自治区]?)\.([\u4e00-\u9fa5]{1,}[市|区|县|州|盟|地区]?)$/i);
+				let pattern = new RegExp(/^([\u4e00-\u9fa5]{1,}[省|市|自治区]?)\.([\u4e00-\u9fa5]{1,}[市|区|县|州|盟|地区]?)$/i);
 				let result = pattern.exec(this.item.madeIn);
 				if (this.madeIn) result = pattern.exec(this.madeIn);
 				if (result) {
@@ -469,22 +515,18 @@
 					if (province.includes(result[1])) {
 						this.initMadeIn = [result[1], result[1], result[2]];
 					} else if (result[1] === '重庆市') {
-						let area = ["城口县", "丰都县", "垫江县", "忠县", "云阳县", "奉节县", "巫山县", "巫溪县", "石柱土家族自治县",
-							"秀山土家族苗族自治县",
+						let area = ["城口县", "丰都县", "垫江县", "忠县", "云阳县", "奉节县", "巫山县", "巫溪县", "石柱土家族自治县", "秀山土家族苗族自治县",
 							"酉阳土家族苗族自治县", "彭水苗族土家族自治县"
 						];
 						if (area.includes(result[2])) //直辖县
 							this.initMadeIn = [result[1], '直辖县', result[2]];
 						else this.initMadeIn = [result[1], result[1], result[2]];
 					} else if (result[1] === '新疆维吾尔自治区') {
-						let area = ["石河子市", "阿拉尔市", "图木舒克市", "五家渠市", "北屯市", "铁门关市", "双河市", "可克达拉市", "昆玉市",
-							"胡杨河市"
-						];
+						let area = ["石河子市", "阿拉尔市", "图木舒克市", "五家渠市", "北屯市", "铁门关市", "双河市", "可克达拉市", "昆玉市", "胡杨河市"];
 						if (area.includes(result[2])) //直辖县
 							this.initMadeIn = [result[1], '直辖县', result[2]];
 					} else if (result[1] === '海南省') {
-						let area = ["五指山市", "琼海市", "文昌市", "万宁市", "东方市", "定安县", "屯昌县", "澄迈县", "临高县",
-							"白沙黎族自治县", "昌江黎族自治县",
+						let area = ["五指山市", "琼海市", "文昌市", "万宁市", "东方市", "定安县", "屯昌县", "澄迈县", "临高县", "白沙黎族自治县", "昌江黎族自治县",
 							"乐东黎族自治县", "陵水黎族自治县", "保亭黎族苗族自治县", "琼中黎族苗族自治县"
 						];
 						if (area.includes(result[2])) //直辖县
@@ -523,7 +565,6 @@
 			navToCategory(id) {
 				this.$util.navTo('/pages/workflow/catalog/category?id=' + id);
 			},
-
 			selectUnit(v) {
 				this.unitDrawerDialog = false;
 				if (this.good) this.unit = v;
@@ -544,8 +585,7 @@
 			},
 			computedGrossProfitRate(cost, price) {
 				if (cost === null || cost === 0 || cost === '0') return '100';
-				if (price === null || price === 0 || price === '0' || price === '0.00' || price === '0.0')
-					return '0';
+				if (price === null || price === 0 || price === '0' || price === '0.00' || price === '0.0') return '0';
 				let difference = price - cost;
 				return (difference / price * 100).toFixed(2);
 			},
@@ -601,8 +641,7 @@
 				const movingDistance = (currentTouchMoveY - this.currentTouchStartY) * 0.65;
 				const moreDistance = movingDistance > this.refresherThreshold ? (movingDistance - this
 					.refresherThreshold) * 0.3 : 0;
-				const computeDistance = movingDistance > this.refresherThreshold ? this
-					.refresherThreshold + moreDistance :
+				const computeDistance = movingDistance > this.refresherThreshold ? this.refresherThreshold + moreDistance :
 					movingDistance + moreDistance;
 				this.pullDownHeight = computeDistance;
 			},

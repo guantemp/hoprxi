@@ -16,9 +16,9 @@
 	<view style="padding:12rpx">
 		<hoprxi-tip :title="{name:'我的测试',
 					weight: 600}" iconFont="cuIcon-goods"></hoprxi-tip>
-						<text>爱十分萨法水电费</text>
-		<hoprxi-tip :title="{name:'我的测试'}" icon="/static/workflow_icon/order.png" 
-								:line="{pattern: 'dashed',position:'top'}" arrow></hoprxi-tip>
+		<text>爱十分萨法水电费</text>
+		<hoprxi-tip :title="{name:'我的测试'}" icon="/static/workflow_icon/order.png"
+			:line="{pattern: 'dashed',position:'top'}" arrow></hoprxi-tip>
 	</view>
 	<hoprxi-drag-fab :menus="menus" direction="vertical"
 		@appendGood="$util.navTo('/pages/workflow/catalog/good?sign=good')"
@@ -28,14 +28,13 @@
 	</hoprxi-drag-fab>
 	<hoprxi-drag-button dock radius class="bg-red"></hoprxi-drag-button>
 	<!-- 产地选择对话框 -->
-	<view class="cu-modal bottom-modal show">
+	<view class="cu-modal bottom-modal show border-radius">
 		<view class="cu-dialog">
 			<view class="flex align-center justify-between padding-lr-lg padding-tb-sm bg-white solid-bottom text-lg">
 				<text @tap.stop.prevent="hideOriginDialog">取消</text>
 				<text class="text-orange" @tap.stop.prevent="originDialogConfirm">确定</text>
 			</view>
-			<hoprxi-region-picker @change="handlerChange" :value="initPlaceOfOrigin" >
-			</hoprxi-region-picker>
+			<hoprxi-area-picker @change="handlerChange" level="city" :initialArea="['四川省','乐山市']"></hoprxi-area-picker>
 		</view>
 	</view>
 	<!--

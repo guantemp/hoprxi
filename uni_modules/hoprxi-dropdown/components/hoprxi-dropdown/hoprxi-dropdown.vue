@@ -78,7 +78,7 @@
 
 <script>
 	/*
-	 *@description 一个下拉的菜单
+	 * @description 一个下拉的菜单
 	 * @property {Array} menus 层级数组，id项目的列不能有重复的值
 	 * @value [{id:'xxx,name:'xxx',children:[{id:'xxx,name:'xxx'}]},{id:'xxx,name:'xxx',children:[{id:'xxx,name:'xxx'}]]
 	 */
