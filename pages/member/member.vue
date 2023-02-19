@@ -34,7 +34,7 @@
 				<text @tap.stop.prevent="hideOriginDialog">取消</text>
 				<text class="text-orange" @tap.stop.prevent="originDialogConfirm">确定</text>
 			</view>
-			<hoprxi-area-picker @change="handlerChange" level="city" :initialArea="['四川省','乐山市']"></hoprxi-area-picker>
+			<hoprxi-area-picker @change="handlerChange"  :initialArea="['四川省','乐山市','沐川县']"></hoprxi-area-picker>
 		</view>
 	</view>
 	<!--
