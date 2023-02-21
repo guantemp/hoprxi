@@ -5,10 +5,10 @@
 	<view v-if="Object.keys(item).length>0" class="flex justify-between padding-lr-xs margin-top-xs">
 		<view class="flex">
 			<button class="cu-btn radius shadow bg-grey basis-xs margin-right-sm cuIcon-pullleft"
-				:class="{'text-xxl': previous>0}" @tap.stop="previous">
+				:class="{'text-xxl': previous>0}" @tap.stop="load(previous)">
 			</button>
 			<button class="cu-btn radius shadow bg-grey basis-xs cuIcon-pullright" :class="{'text-xxl': next>0}"
-				@tap.stop="next">
+				@tap.stop="load(next)">
 			</button>
 		</view>
 		<button class="cu-btn radius shadow bg-gradual-blue basis-sm" @tap.stop="save">
@@ -51,11 +51,11 @@
 				<text class="text-red margin-left-xs">*</text>
 			</view>
 			<input v-model="scanResult" :placeholder="item.plu||item.barcode||(sign==='good'?'请输入商品条码':'请输入PLU码')"
-				@blur="scanResultBlur" type="number">
-			<view class="cu-capsule radius align-center">
-				<view class='cu-tag bg-blue text-lg' @tap.stop="scan"><text class='cuIcon-scan text-white'></text>
+				@change="scanResultChange" type="number">
+			<view class="cu-capsule radius">
+				<view class="cu-tag bg-blue text-lg" @tap.stop="scan"><text class='cuIcon-scan text-white'></text>
 				</view>
-				<view class="cu-tag line-blue text-df" @tap.stop="generate(sign)">生成</view>
+				<view class="cu-tag line-blue text-df" @tap.stop="generate">生成</view>
 			</view>
 		</view>
 		<view class="cu-form-group">
@@ -75,13 +75,13 @@
 		</view>
 		<view class="cu-form-group">
 			<view class="title">商品等级<text class="text-red margin-left-xs">*</text></view>
-			<input v-model="grade" :placeholder="item.grade||'合格品'" disabled @click="gradeDialog = true">		
+			<input v-model="grade" :placeholder="item.grade||'合格品'" disabled @click="gradeDialog = true">
 		</view>
 		<view class="cu-form-group">
 			<view class="title" @tap.stop="$util.toast('要求精确到到市级！')">
 				商品产地<text class="text-red margin-left-xs">*</text></view>
-			<input v-model="madeIn.name" :placeholder="item.madeIn||''" @change="madeInChange">
-			<text class="cuIcon-right" @tap.stop="showMadeInDialog"></text>
+			<input v-model="madeIn.name" :placeholder="item.madeIn||''" @change="searchArea">
+			<text class="cuIcon-right" @tap.stop="madeInSelect"></text>
 		</view>
 		<view class="flex justify-around padding-tb-sm bg-grey">
 			<button class="cu-btn bg-blue radius shadow-lg basis-sm"
@@ -141,7 +141,8 @@
 		<view class="cu-dialog">
 			<view class="flex align-center solid-bottom padding text-left bg-white">
 				商品别名：
-				<input type="text" :placeholder="(item.name&&item.name.alias)||'请输入商品的另外一个名称'" v-model="name.alias" class="text-green">
+				<input type="text" :placeholder="(item.name&&item.name.alias)||'请输入商品的另外一个名称'" v-model="name.alias"
+					class="text-green">
 			</view>
 			<view class="cu-bar" @tap="aliasModalDialog = false">
 				<text class="action flex-sub">好</text>
@@ -160,26 +161,26 @@
 			</block>
 		</view>
 	</view>
-	<!-- 产地选择对话框1 -->
-	<view class="cu-modal bottom-modal" :class="{'show':madeInDialog}" @tap="madeInDialog=false">
+	<!-- 产地选择对话框 -->
+	<view class="cu-modal bottom-modal" :class="{'show':madeInSelectDialog}" @tap="madeInSelectDialog=false">
 		<view class="cu-dialog">
 			<view class="flex align-center justify-between padding-lr-lg padding-tb-sm bg-white solid-bottom text-lg">
-				<text @tap.stop.prevent="madeInDialog=false">取消</text>
-				<text class="text-orange" @tap.stop.prevent="originDialogConfirm">确定</text>
+				<text @tap.stop.prevent="madeInSelectDialog=false">取消</text>
+				<text class="text-orange" @tap.stop.prevent="madeInSelectConfirm">确定</text>
 			</view>
-			<hoprxi-region-picker @change="handlerChange" :value="initPlaceOfOrigin" hideArea>
-			</hoprxi-region-picker>
+			<hoprxi-area-picker @selected="madeInSelected" :initialArea="initialArea" :showCounty="false">
+			</hoprxi-area-picker>
 		</view>
 	</view>
-	<!--产地选择对话框2-->
-	<view :class="['cu-modal',{'show':areaDialog}]" @tap="areaDialog = false">
+	<!--产地搜索对话框-->
+	<view :class="['cu-modal',{'show':searchAreaDialog}]" @tap="searchAreaDialog = false">
 		<view class="cu-dialog padding-lr-sm">
 			<view class="solid-bottom line-blue padding-tb-sm text-left text-lg align-center">
 				<text class="cuIcon-list margin-right-sm "></text>当前有多个可选地址
 			</view>
-			<block v-for="(area,index) in areas" :key="index">
+			<block v-for="(area,index) in areasSearched" :key="index">
 				<view class="flex justify-between solid-bottom align-center padding-tb-sm padding-lr-sm"
-					@tap="areaSelect(area)">
+					@tap="searchAreaSelect(area)">
 					<view><text>{{area.name}}</text>
 						<text class="text-sm margin-left-xs text-gray">{{area.parentName}}</text>
 					</view>
@@ -269,7 +270,8 @@
 		toRef
 	} from 'vue';
 	import {
-		formatMoney
+		formatMoney,
+		toast
 	} from '@/uni_modules/hoprxi-common/js_sdk/util.js';
 	import catalog from '@/data/catalog_test_data.js'; //用例数据库
 	import ajax from '@/uni_modules/u-ajax'
@@ -277,26 +279,154 @@
 	export default {
 		setup(props, content) {
 			let key = ref(0);
+			let sign = ref('');
 			let next = ref(133);
 			let previous = ref(0);
-			let sign = ref('');
-			let action = ref('');
+			const load = (key) => {};
+			const save = (action) => {
+				switch (action) {
+					case "save":
+						break;
+					default:
+						console.log(name.name);
+				}
+			};
 			let item = ref({});
 			let navBarHeight = ref(0);
-			let scanResult = null;
-			let name = {
-				name: null,
-				alias: null
+			const chooseImage = () => {
+				uni.chooseImage({
+					count: 4, //默认9
+					//sizeType: ['original', 'compressed'], //可以指定是原图还是压缩图，默认二者都有
+					//sourceType: ['camera'], //开相机  album 图册
+					success: (res) => {
+						if (item.value.images && item.value.images.length != 0) {
+							item.value.images = item.value.images.concat(res.tempFilePaths)
+						} else {
+							item.value.images = res.tempFilePaths
+						}
+					}
+				});
 			};
+			const viewImage = (e) => {
+				uni.previewImage({
+					urls: item.value.images,
+					current: e.currentTarget.dataset.url
+				});
+			};
+			const delImg = (e) => {
+				uni.showModal({
+					title: '召唤师',
+					content: '确定要删除这张图片？',
+					cancelText: '再看看',
+					confirmText: '再见',
+					success: res => {
+						if (res.confirm) {
+							item.value.images.splice(e.currentTarget.dataset.index, 1)
+						}
+					}
+				})
+			};
+			let scanResult = ref('');
+			const scan = () => {
+				uni.scanCode({
+					scanType: ['barCode'],
+					success: function(res) {
+						scanResult.value = res.result;
+					},
+					fail: function(res) {
+						console.log(JSON.stringify(res));
+					},
+				});
+			};
+			const generate = () => {
+				switch (sign.value) {
+					case "good":
+						break;
+					case "scale":
+						break;
+				}
+			};
+			const scanResultChange = () => {
+				switch (sign.value) {
+					case 'scale':
+						if (scanResult.value <= 0 || scanResult.value > 999999) toast('Plu码仅支持整数，范围在1-999999之间！')
+						break;
+					case 'barcode':
+						break;
+				}
+			};
+			let name = {};
 			const aliasModalDialog = ref(false);
 			let spec = null;
 			let category = null;
 			let grade = ref('合格品');
 			let gradeDialog = ref(false);
 			let madeIn = {};
-			let madeInDialog = ref(false);
-			let areaDialog = ref(false);
-			const areas = reactive([]);
+			let madeInSelectDialog = ref(false);
+			let madeInSelectedResult = null;
+			const madeInSelected = (data) => { //area-picker选择结果
+				madeInSelectedResult = data;
+			};
+			const madeInSelectConfirm = () => {
+				madeInSelectDialog.value = false;
+				madeIn.name = madeInSelectedResult[1].name;
+				madeIn.code = madeInSelectedResult[1].code;
+				madeIn.parentName = madeInSelectedResult[1].parentName;
+			};
+			let searchAreaDialog = ref(false);
+			const areasSearched = reactive([]);
+			const searchArea = () => {
+				ajax({
+					url: 'https://hoprxi.tooo.top/area/v1/areas',
+					data: {
+						search: '^' + madeIn.name,
+						filters: 'city,country'
+					}
+				}).then(res => {
+					areasSearched.length = 0;
+					for (const a of res.data.areas) {
+						areasSearched.push({
+							code: a.code,
+							name: a.name.name,
+							parentName: a.parent.name
+						})
+					};
+					if (areasSearched.length === 1) {
+						madeIn.name = areasSearched[0].name;
+						madeIn.code = areasSearched[0].code;
+						madeIn.parentName = areasSearched[0].parentName;
+					}
+					if (areasSearched.length > 1) {
+						searchAreaDialog.value = true;
+					}
+				}).catch(err => {
+					console.log(err)
+				});
+			};
+			const searchedAreaSelect = (a) => {
+				searchAreaDialog.value = false;
+				madeIn.name = a.name;
+				madeIn.code = a.code;
+				madeIn.parentName = a.parentName;
+			};
+			const initialArea = reactive([]);
+			const madeInSelect = () => {
+				initialArea.splice(0);
+				if (Object.values(madeIn).length > 0 && madeIn.name != "") {
+					initialArea.push(madeIn.parentName)
+					initialArea.push(madeIn.name)
+				} else {
+					let pattern = new RegExp(
+						/^([\u4e00-\u9fa5]{1,}[省|市|自治区]?)\.([\u4e00-\u9fa5]{1,}[市|区|县|州|盟|地区]?)$/i);
+					let result = pattern.exec(item.value.madeIn);
+					if (result) {
+						initialArea.push(result[1])
+						initialArea.push(result[2])
+					}
+				};
+				console.log(initialArea);
+				madeInSelectDialog.value = true;
+			};
 			const pricingStrategyModalDialog = ref(false);
 			const timeTab = ['30天', '60天', '180天', '360天'];
 			let timeTabCur = ref(0);
@@ -313,43 +443,6 @@
 					console.log(err)
 				});
 			});
-			const madeInChange = () => {
-				ajax({
-					url: 'https://hoprxi.tooo.top/area/v1/areas',
-					data: {
-						search: '^' + madeIn.name,
-						filters: 'city,country'
-					}
-				}).then(res => {
-					areas.length = 0;
-					for (const a of res.data.areas) {
-						areas.push({
-							code: a.code,
-							name: a.name.name,
-							parentName: a.parent.name
-						})
-					};
-					if (areas.length === 1) {
-						madeIn.name = areas[0].name;
-						madeIn.code = areas[0].code;
-						madeIn.parentName = areas[0].parentName;
-					}
-					if (areas.length > 1) {
-						areaDialog.value = true;
-						//madeIn.value = areas[1].name;
-					}
-					console.log(areas);
-				}).catch(err => {
-					console.log(err)
-				});
-			};
-			const areaSelect = (a) => {
-				madeIn.name = a.name;
-				madeIn.code = a.code;
-				madeIn.parentName = a.parentName;
-				console.log(madeIn);
-				areaDialog.value = false;
-			};
 			const grade_selected = (g) => {
 				grade.value = g;
 				gradeDialog = false;
@@ -358,10 +451,17 @@
 				previous,
 				next,
 				sign,
-				action,
 				item,
+				load,
+				save,
+				generate,
+				scanResultChange,
 				navBarHeight,
+				chooseImage,
+				viewImage,
+				delImg,
 				scanResult,
+				scan,
 				name,
 				aliasModalDialog,
 				spec,
@@ -370,11 +470,15 @@
 				gradeDialog,
 				grade_selected,
 				madeIn,
-				madeInDialog,
-				madeInChange,
-				areaDialog,
-				areas,
-				areaSelect,
+				madeInSelectDialog,
+				madeInSelected,
+				madeInSelectConfirm,
+				searchArea,
+				searchAreaDialog,
+				areasSearched,
+				searchedAreaSelect,
+				madeInSelect,
+				initialArea,
 				pricingStrategyModalDialog,
 				timeTab,
 				timeTabCur,
@@ -387,7 +491,6 @@
 		data() {
 			return {
 				good: null,
-				initMadeIn: [],
 				regionResult: null,
 				purchasePrice: '',
 				memberPrice: '',
@@ -402,7 +505,6 @@
 		},
 		onLoad(options) {
 			this.sign = options.sign || 'good';
-			this.action = options.action || 'new';
 			let key = options.id || options.plu;
 			if (key) {
 				for (const good of catalog.catalog) {
@@ -426,7 +528,7 @@
 			//let pattern = new RegExp("^([\u4e00-\u9fa5]{1,}[省|市|自治区]?)\.([\u4e00-\u9fa5]{1,}[市|区|县|州|盟|地区]?)$", "i");
 			//let pattern = new RegExp(/(^\d+)天$/i);
 			//let result = pattern.exec("35") //"内蒙古.呼和浩特"
-			console.log(this.grade);
+			//console.log(this.grade);
 		},
 		onReady() {
 			let query = uni.createSelectorQuery().in(this);
@@ -474,94 +576,6 @@
 			},
 		},
 		methods: {
-			save() {
-				console.log(this.scanResult);
-			},
-			scan() {
-				var that = this;
-				uni.scanCode({
-					scanType: ['barCode'],
-					success: function(res) {
-						that.scanResult = res.result;
-					},
-					fail: function(res) {
-						console.log(JSON.stringify(res));
-					},
-				});
-			},
-			generate(sign) {
-				switch (sign) {
-					case 'plu':
-						break;
-					case 'barcode':
-						break;
-				}
-			},
-			scanResultBlur(sign) {
-				switch (sign) {
-					case 'plu':
-						if (scanResult <= 0 || scanResult > 999999) this.$util.toast('Plu码仅支持整数，范围在1-999999之间！')
-						break;
-					case 'barcode':
-						break;
-				}
-			},
-			showMadeInDialog() {
-				let pattern = new RegExp(/^([\u4e00-\u9fa5]{1,}[省|市|自治区]?)\.([\u4e00-\u9fa5]{1,}[市|区|县|州|盟|地区]?)$/i);
-				let result = pattern.exec(this.item.madeIn);
-				if (this.madeIn) result = pattern.exec(this.madeIn);
-				if (result) {
-					let province = ["北京市", "天津市", "上海市"];
-					if (province.includes(result[1])) {
-						this.initMadeIn = [result[1], result[1], result[2]];
-					} else if (result[1] === '重庆市') {
-						let area = ["城口县", "丰都县", "垫江县", "忠县", "云阳县", "奉节县", "巫山县", "巫溪县", "石柱土家族自治县", "秀山土家族苗族自治县",
-							"酉阳土家族苗族自治县", "彭水苗族土家族自治县"
-						];
-						if (area.includes(result[2])) //直辖县
-							this.initMadeIn = [result[1], '直辖县', result[2]];
-						else this.initMadeIn = [result[1], result[1], result[2]];
-					} else if (result[1] === '新疆维吾尔自治区') {
-						let area = ["石河子市", "阿拉尔市", "图木舒克市", "五家渠市", "北屯市", "铁门关市", "双河市", "可克达拉市", "昆玉市", "胡杨河市"];
-						if (area.includes(result[2])) //直辖县
-							this.initMadeIn = [result[1], '直辖县', result[2]];
-					} else if (result[1] === '海南省') {
-						let area = ["五指山市", "琼海市", "文昌市", "万宁市", "东方市", "定安县", "屯昌县", "澄迈县", "临高县", "白沙黎族自治县", "昌江黎族自治县",
-							"乐东黎族自治县", "陵水黎族自治县", "保亭黎族苗族自治县", "琼中黎族苗族自治县"
-						];
-						if (area.includes(result[2])) //直辖县
-							this.initMadeIn = [result[1], '直辖县', result[2]];
-					} else if (result[1] === '湖北省') {
-						let area = ["仙桃市", "潜江市", "天门市", "神农架林区"];
-						if (area.includes(result[2])) //直辖县
-							this.initMadeIn = [result[1], '直辖县', result[2]];
-					}
-					if (this.initMadeIn.length === 0) {
-						this.initMadeIn = [result[1], result[2]];
-					}
-				} else {
-					this.initMadeIn = [];
-				}
-				//console.log(this.initPlaceOfOrigin);
-				this.madeInDialog = true;
-			},
-			handlerChange(res) {
-				let _this = this;
-				this.regionResult = {
-					...res
-				};
-			},
-			originDialogConfirm() {
-				this.madeInDialog = false;
-				let obj = this.regionResult.obj;
-				let province = ['110000', '120000', '310000', '500000'];
-				let city = ['429000', '469000']
-				if (province.includes(obj.province.value) || city.includes(obj.city.value)) {
-					this.madeIn = obj.province.label + "." + obj.area.label;
-				} else {
-					this.madeIn = obj.province.label + "." + obj.city.label;
-				}
-			},
 			navToCategory(id) {
 				this.$util.navTo('/pages/workflow/catalog/category?id=' + id);
 			},
@@ -596,39 +610,6 @@
 					let temp = this.shelfLife.replace(pattern, '');
 					this.shelfLife = temp + ' 天';
 				}
-			},
-			chooseImage() {
-				uni.chooseImage({
-					count: 4, //默认9
-					//sizeType: ['original', 'compressed'], //可以指定是原图还是压缩图，默认二者都有
-					//sourceType: ['camera'], //开相机  album 图册
-					success: (res) => {
-						if (this.item.images && this.item.images.length != 0) {
-							this.item.images = this.item.images.concat(res.tempFilePaths)
-						} else {
-							this.item.images = res.tempFilePaths
-						}
-					}
-				});
-			},
-			viewImage(e) {
-				uni.previewImage({
-					urls: this.item.images,
-					current: e.currentTarget.dataset.url
-				});
-			},
-			delImg(e) {
-				uni.showModal({
-					title: '召唤师',
-					content: '确定要删除这张图片？',
-					cancelText: '再看看',
-					confirmText: '再见',
-					success: res => {
-						if (res.confirm) {
-							this.item.images.splice(e.currentTarget.dataset.index, 1)
-						}
-					}
-				})
 			},
 			// 触摸按下处理
 			touchStart(e) {
