@@ -39,11 +39,15 @@
 								<text>规格：{{item.spec}}</text>
 							</view>
 							<view>
-								产地：<text>{{item.madeIn}}</text>
+								产地：{{item.madeIn.name}}
 							</view>
 							<view class="flex justify-between">
-								零售价：<text class="text-price text-red margin-right-sm">{{item.retailPrice}}</text>
-								会员价：<text class="text-price text-red">{{item.memberPrice}}</text>
+								<view>零售价：<text
+										class="text-red">{{item.retailPrice.amount}}/{{item.retailPrice.unit}}</text>
+								</view>
+								<view>会员价:<text
+										class="text-red margin-left-sm">{{item.memberPrice.amount}}/{{item.memberPrice.unit}}</text>
+								</view>
 							</view>
 						</view>
 					</view>
@@ -53,7 +57,8 @@
 		<hoprxi-drag-fab :menus="menus" @appendGood="$util.navTo('/pages/workflow/catalog/good?sign=good&action=new')"
 			@appendScale="$util.navTo('/pages/workflow/catalog/good?sign=scale&action=new')"
 			@editCategories="$util.navTo('/pages/workflow/catalog/category')"
-			@recovery="$util.navTo('/pages/public/recovery')" @editBrands="$util.navTo('/pages/workflow/catalog/brand')">
+			@recovery="$util.navTo('/pages/public/recovery')"
+			@editBrands="$util.navTo('/pages/workflow/catalog/brand')">
 		</hoprxi-drag-fab>
 		<!-- 遮罩层-->
 		<view :class="['mask',{'show':filterWindows}]" @tap="filterWindows = false"></view>
@@ -177,7 +182,6 @@
 				event: 'appendGood'
 			}, {
 				iconPath: '/static/workflow_icon/new_kg.png',
-
 				text: '新增散秤',
 				event: 'appendScale'
 			}, {
@@ -210,23 +214,19 @@
 			};
 			let navigatorHeight = ref(0);
 			let dropdownHeight = ref(0);
-
 			let delGoodModalDialog = ref(false);
 			let selectedGood = reactive({});
 			const del = (data) => {
 				delGoodModalDialog.value = true;
 				selectedGood = {};
-				if (data.id)
-					selectedGood.id = data.id;
-				else
-					selectedGood.plu = data.plu;
+				if (data.id) selectedGood.id = data.id;
+				else selectedGood.plu = data.plu;
 				selectedGood.name = data.name.name
 			};
 			const remove = (key) => {
 				//util.toast('模拟删除：' + key);//还没找到方法
 				delGoodModalDialog.value = false;
 			};
-
 			const categories = reactive([]);
 			const catalog = reactive([]);
 			const brands = reactive([]);
@@ -340,7 +340,6 @@
 			share(data) {
 				this.$util.toast('分享：' + (data.id || data.plu));
 			},
-
 			history(data) {
 				this.$util.toast('历史：' + (data.id || data.plu));
 				console.log(data);

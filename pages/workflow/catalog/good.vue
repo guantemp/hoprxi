@@ -11,15 +11,15 @@
 				@tap.stop="load(next)">
 			</button>
 		</view>
-		<button class="cu-btn radius shadow bg-gradual-blue basis-sm" @tap.stop="save">
-			<text class="icon-save margin-right-sm text-xxl"></text>保存</button>
+		<button class="cu-btn radius shadow bg-blue basis-sm" @tap.stop="save">
+			保存</button>
 	</view>
 	<view v-else class="flex margin-top-xs justify-end padding-lr-xs">
 		<button class="cu-btn radius shadow bg-gray" @tap="save('draft')">
 			存草稿</button>
-		<button class="cu-btn radius shadow bg-gradual-blue margin-left-xl" @tap.stop="save('save_and_new')">
+		<button class="cu-btn radius shadow bg-blue margin-left-xl" @tap.stop="save('save_and_new')">
 			保存&新增</button>
-		<button class="cu-btn radius shadow bg-gradual-blue margin-left-xs" @tap.stop="save">
+		<button class="cu-btn radius shadow bg-blue margin-left-xs" @tap.stop="save">
 			保存</button>
 	</view>
 	<view :style="[scrollContentStyle]" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
@@ -80,7 +80,7 @@
 		<view class="cu-form-group">
 			<view class="title" @tap.stop="$util.toast('要求精确到到市级！')">
 				商品产地<text class="text-red margin-left-xs">*</text></view>
-			<input v-model="madeIn.name" :placeholder="item.madeIn||''" @change="searchArea">
+			<input v-model="madeIn.name" :placeholder="item.madeIn&&item.madeIn.name||''" @change="searchArea">
 			<text class="cuIcon-right" @tap.stop="madeInSelect"></text>
 		</view>
 		<view class="flex justify-around padding-tb-sm bg-grey">
@@ -92,43 +92,38 @@
 			<view class="title" @tap.stop="$util.toast('最近一次入库价，仅作为录入商品时计算（参考）毛利率，不影响库存成本和实际毛利率！')">
 				预置进价<text class="cuIcon-info"></text>
 			</view>
-			<text class="text-price"></text>
-			<input :placeholder="item.storage&&item.storage.lastPurchasePrice||'0.00/PCS'" :value="purchasePrice"
-				type="digit" @blur="purchasePriceBlur">
+			<input v-if="Object.keys(item).length>0"
+				:placeholder="item.storage&&(item.storage.lastPurchasePrice.amount+'/'+item.storage.lastPurchasePrice.unit)||'0.00/PCS'"
+				disabled>
+			<input v-else
+				:placeholder="item.storage&&(item.storage.lastPurchasePrice.amount+'/'+item.storage.lastPurchasePrice.unit)||'0.00/PCS'"
+				:value="purchasePrice" type="digit" @blur="purchasePriceBlur">
 		</view>
 		<view class="cu-form-group">
 			<view class="title" @tap.stop="$util.toast('0.00元表示为未定价商品，POS系统每次销售时都会询问售价！')">
 				零&nbsp;&nbsp;售&nbsp;&nbsp;价<text class="cuIcon-info"></text></view>
-			<text class="text-price"></text>
 			<view class="flex flex-sub">
-				<badge v-if="retailGrossProfitRate" :count="'毛利率：'+ retailGrossProfitRate" class="basis-df">
-					<input
-						:placeholder="item.retailPrice&&(item.retailPrice.amount+'/'+item.retailPrice.unit)||'0.00/PCS'"
-						:value="retailPrice" type="digit" @blur="retailPriceBlur">
-				</badge>
-				<input v-else placeholder="0.00/PCS" :value="retailPrice" type="digit" @blur="retailPriceBlur">
+				<input :placeholder="item.retailPrice&&(item.retailPrice.amount+'/'+item.retailPrice.unit)||'0.00/PCS'"
+					:value="retailPrice" type="digit" @blur="retailPriceBlur">
+				<hoprxi-badge :count="'毛利率：'+ retailGrossProfitRate">
+				</hoprxi-badge>
 			</view>
 		</view>
 		<view class="cu-form-group">
 			<view class="title margin-right-sm">会&nbsp;&nbsp;员&nbsp;&nbsp;价</view>
-			<text class="text-price"></text>
 			<view class="flex flex-sub">
-				<badge v-if="retailGrossProfitRate" :count="'毛利率：'+ retailGrossProfitRate" class="basis-df">
-					<input :placeholder="good&&good.memberPrice||'0.00/PCS'" :value="memberPrice" type="digit"
-						@blur="memberPriceBlur">
-				</badge>
-				<input v-else placeholder="0.00/PCS" :value="memberPrice" type="digit" @blur="memberPriceBlur">
+				<hoprxi-badge :count="'毛利率：'+ retailGrossProfitRate" class="basis-df">
+					<input
+						:placeholder="item.memberPrice&&(item.memberPrice.amount+'/'+item.memberPrice.unit)||'0.00/PCS'"
+						:value="memberPrice" type="digit" @blur="memberPriceBlur">
+				</hoprxi-badge>
 			</view>
 		</view>
 		<view class="cu-form-group">
 			<view class="title margin-right-sm">VIP&nbsp;&nbsp;&nbsp;价</view>
-			<text class="text-price"></text>
 			<view class="flex flex-sub">
-				<badge v-if="retailGrossProfitRate" :count="'毛利率：'+ retailGrossProfitRate" class="basis-df">
-					<input :placeholder="good&&good.memberPrice||'0.00/PCS'" :value="memberPrice" type="digit"
-						@blur="memberPriceBlur">
-				</badge>
-				<input v-else placeholder="0.00/PCS" :value="memberPrice" type="digit" @blur="memberPriceBlur">
+				<input :placeholder="item.vipPrice&&(item.vipPrice.amount+'/'+item.vipPrice.unit)||'0.00/PCS'"
+					:value="vipPrice" type="digit" @blur="vipPriceBlur">
 			</view>
 		</view>
 		<view class="cu-form-group solid-bottom">
@@ -154,7 +149,7 @@
 		<view class="cu-dialog padding-lr-sm">
 			<block v-for="(g,index) in grades" :key="g">
 				<view class="flex justify-between solid-bottom align-center padding-tb padding-lr-sm"
-					:class="{'text-green text-bold':grade === g}" @tap="grade_selected(g)">
+					:class="{'text-green text-bold':grade === g}" @tap="grade = g">
 					<text>{{g}}</text>
 					<text class="cuIcon-check text-xl" v-if="grade === g"></text>
 				</view>
@@ -179,13 +174,17 @@
 				<text class="cuIcon-list margin-right-sm "></text>当前有多个可选地址
 			</view>
 			<block v-for="(area,index) in areasSearched" :key="index">
-				<view class="flex justify-between solid-bottom align-center padding-tb-sm padding-lr-sm"
-					@tap="searchAreaSelect(area)">
+				<view v-if="index <=13"
+					class="flex justify-between solid-bottom align-center padding-tb-sm padding-lr-sm"
+					@tap="searchedAreaSelect(area)">
 					<view><text>{{area.name}}</text>
 						<text class="text-sm margin-left-xs text-gray">{{area.parentName}}</text>
 					</view>
 				</view>
 			</block>
+			<view v-if="areasSearched.length>13" class="solid-top line-green padding-tb-sm text-right text-brown">
+				<text class="cuIcon-warn margin-right-sm"></text>候选地址太多，请缩小查询范围！
+			</view>
 		</view>
 	</view>
 	<!-- 定价策略对话框 -->
@@ -193,13 +192,13 @@
 		<view class="cu-dialog">
 			<image class="align-center margin-top-xs" style="width: 100%,height:136rpx;"
 				:src="(item.images&&item.images[0])||'/static/workflow_icon/archives.png'" mode="scaleToFill" />
-			<view class="text-bold text-left margin-top-xs padding-lr-xs">
+			<view class="text-bold text-left padding-lr-xs">
 				{{item.name&&item.name.name}}
 			</view>
 			<view class="flex justify-between text-olive text-sm padding-lr-xs">
 				<text v-if="sign === 'scale'">PLU码：{{item.plu}}</text>
 				<text v-else>条码：{{item.barcode}}</text>
-				<text>规格：{{item.specs||'--'}}</text>
+				<text>规格：{{item.spec||'--'}}</text>
 			</view>
 			<view class="flex text-center nav bg-cyan margin-top-xs">
 				<block v-for="(tab,index) in timeTab" :key="tab">
@@ -208,39 +207,39 @@
 					</view>
 				</block>
 			</view>
-			<view class="grid col-3 bg-cyan light ">
-				<view class="flex flex-direction cu-item solid-top solid-bottom padding-tb text-center">
+			<view class="grid col-3 bg-cyan light text-center">
+				<view class="flex-direction cu-item solid-top solid-bottom padding-tb ">
 					<view class="cuIcon-vip" style="font-size: 27rpx;"
 						@click.stop="$util.toast('普通用户定位到省，vip用户定位到周边3-5KM')">区域售价中位数</view>
 					<text class="text-bold text-price padding-top-sm"
 						style="font-size: 42rpx; color: orangered;">{{item.vip&&item.vip.referenceSalePrice||'134.58'}}</text>
 				</view>
-				<view class="flex flex-direction cu-item solid-left solid-bottom solid-top padding-tb text-center">
+				<view class="flex-direction cu-item solid-left solid-bottom solid-top padding-tb">
 					<view class="text-center" style="font-size: 27rpx;">售价</view>
-					<text class="text-bold text-price padding-top-sm text-orange"
-						style="font-size: 42rpx; color: brown;">{{item.retailPrice||'---'}}</text>
+					<text class="text-bold padding-top-sm text-orange"
+						style="font-size: 42rpx; color: brown;">{{item.retailPrice&&item.retailPrice.amount||'---'}}</text>
 				</view>
-				<view class="flex flex-direction cu-item solid-left solid-bottom solid-top padding-tb text-center">
+				<view class="flex-direction cu-item solid-left solid-bottom solid-top padding-tb">
 					<view class="cuIcon-vip" style="font-size: 27rpx;"
 						@click.stop="$util.toast('普通用户定位到省，vip用户定位到周边3-5KM')">区域销售金额</view>
 					<text class="text-bold text-price padding-top-sm text-orange"
-						style="font-size: 42rpx; color: red;">{{item.vip&&item.vip.referenceSalePrice||'96725.85'}}</text>
+						style="font-size: 42rpx; color: red;">{{item.vip&&item.vip.referencePurchasePrice||'96725.85'}}</text>
 				</view>
-				<view class="flex flex-direction cu-item solid-bottom padding-tb text-center">
+				<view class="flex-direction cu-item solid-bottom padding-tb">
 					<view class="text-center" style="font-size: 27rpx;"
 						@click.stop="$util.toast('普通用户定位到省，vip用户定位到周边3-5KM')">最近采购价</view>
-					<text class="text-bold text-price padding-top-sm text-orange"
-						style="font-size: 42rpx; color: blueviolet;">{{item.vip&&item.vip.referenceSalePrice||'---'}}</text>
+					<text class="text-bold  padding-top-sm text-orange"
+						style="font-size: 42rpx; color: blueviolet;">{{item.storage&&item.storage.lastPurchasePrice.amount||'---'}}</text>
 				</view>
-				<view class="flex flex-direction cu-item solid-left solid-bottom solid-right padding-tb text-center">
+				<view class="flex-direction cu-item solid-left solid-bottom solid-right padding-tb">
 					<view class="cuIcon-vip" style="font-size: 27rpx;"
 						@click.stop="$util.toast('普通用户定位到省，vip用户定位到周边3-5KM')">区域采购中位价</view>
 					<text class="text-bold text-price padding-top-sm text-orange"
 						style="font-size: 42rpx; color: cyan;">{{item.vip&&item.vip.referenceSalePrice||'110.88'}}</text>
 				</view>
 			</view>
-			<view class="flex flex-sub justify-center padding-lg bg-grey light"
-				@tap="pricingStrategyModalDialog = false">知道了</view>
+			<view class="flex flex-sub justify-center padding bg-grey light" @tap="pricingStrategyModalDialog = false">
+				知道了</view>
 		</view>
 	</view>
 	<!-- 单位选择抽屉框遮罩-->
@@ -256,7 +255,7 @@
 			<block v-for="(unitItem, index) in units" :key="unitItem">
 				<text class="padding-tb-xs padding-lr text-center margin-top-sm"
 					:class="unitItem === unit?'unitSelected text-red light bg-orange':'unit bg-grey'"
-					@tap.stop="selectUnit(unitItem)">{{unitItem}}</text>
+					@tap="unit = unitItem">{{unitItem}}</text>
 			</block>
 		</view>
 	</view>
@@ -266,8 +265,9 @@
 	import {
 		ref,
 		reactive,
+		computed,
 		onBeforeMount,
-		toRef
+		watch,
 	} from 'vue';
 	import {
 		formatMoney,
@@ -275,7 +275,6 @@
 	} from '@/uni_modules/hoprxi-common/js_sdk/util.js';
 	import catalog from '@/data/catalog_test_data.js'; //用例数据库
 	import ajax from '@/uni_modules/u-ajax'
-	const unitPattern = new RegExp(/\/?([\u4e00-\u9fa5]{1,2}|500g|kg|pcs)?$/);
 	export default {
 		setup(props, content) {
 			let key = ref(0);
@@ -315,7 +314,7 @@
 			};
 			const delImg = (e) => {
 				uni.showModal({
-					title: '召唤师',
+					title: '警告',
 					content: '确定要删除这张图片？',
 					cancelText: '再看看',
 					confirmText: '再见',
@@ -359,10 +358,16 @@
 			const aliasModalDialog = ref(false);
 			let spec = null;
 			let category = null;
-			let grade = ref('合格品');
-			let gradeDialog = ref(false);
+			const navToCategory = (id) => {
+				uni.navigateTo({
+					url: '/pages/workflow/catalog/category?id=' + id
+				})
+			};
+			let grade = '合格品';
+			const gradeDialog = ref(false); //如果使用tap并没有stop修饰，会冒泡到上级@tap事件并执行
+			const grades = ['优等品', '一等品', '合格品', '不合格品'];
 			let madeIn = {};
-			let madeInSelectDialog = ref(false);
+			const madeInSelectDialog = ref(false);
 			let madeInSelectedResult = null;
 			const madeInSelected = (data) => { //area-picker选择结果
 				madeInSelectedResult = data;
@@ -404,49 +409,96 @@
 				});
 			};
 			const searchedAreaSelect = (a) => {
-				searchAreaDialog.value = false;
 				madeIn.name = a.name;
 				madeIn.code = a.code;
 				madeIn.parentName = a.parentName;
+				searchAreaDialog.value = false;
 			};
 			const initialArea = reactive([]);
 			const madeInSelect = () => {
-				initialArea.splice(0);
+				initialArea.length = 0;
 				if (Object.values(madeIn).length > 0 && madeIn.name != "") {
-					initialArea.push(madeIn.parentName)
-					initialArea.push(madeIn.name)
+					initialArea.push(madeIn.parentName);
+					initialArea.push(madeIn.name);
 				} else {
-					let pattern = new RegExp(
-						/^([\u4e00-\u9fa5]{1,}[省|市|自治区]?)\.([\u4e00-\u9fa5]{1,}[市|区|县|州|盟|地区]?)$/i);
-					let result = pattern.exec(item.value.madeIn);
-					if (result) {
-						initialArea.push(result[1])
-						initialArea.push(result[2])
-					}
-				};
-				console.log(initialArea);
+					//let pattern = new RegExp(
+					///^([\u4e00-\u9fa5]{1,}[省|市|自治区]?)\.([\u4e00-\u9fa5]{1,}[市|区|县|州|盟|地区]?)$/i);
+					ajax({
+						url: 'https://hoprxi.tooo.top/area/v1/areas/:code',
+						params: {
+							code: item.value.madeIn.code
+						},
+					}).then((res) => {
+						let area = res.data;
+						initialArea.push(area.parent.name);
+						initialArea.push(area.name.name);
+					})
+				}
 				madeInSelectDialog.value = true;
 			};
 			const pricingStrategyModalDialog = ref(false);
 			const timeTab = ['30天', '60天', '180天', '360天'];
 			let timeTabCur = ref(0);
-			let retailPrice = ref(0);
-			const unitDrawerDialog = ref(false);
-			const grades = ['优等品', '一等品', '合格品', '不合格品'];
 			const units = [];
+			let unit = ref('');
+			const unitDrawerDialog = ref(false);
+			watch(unit, () => {
+				const unitPattern = new RegExp(/\/?([\u4e00-\u9fa5]{1,2}|500g|kg|pcs)?$/);
+				//unit = unitPattern.exec(item.retailPrice)[1];
+				if (retailPrice.value.length != 0) {
+					retailPrice.value = retailPrice.value.replace(unitPattern, '') + "/" + unit;
+				}
+				if (item) {
+					item.value.retailPrice.unit = unit;
+					item.value.memberPrice.unit = unit;
+					item.value.vipPrice.unit = unit;
+				}
+				if (item && item.value.storage) {
+					item.value.storage.lastPurchasePrice.unit = unit;
+				}
+				//console.log(item.value)
+			});
+			let pricePattern = new RegExp(/\/?([\u4e00-\u9fa5]{1,2}|500g|kg|pcs)?$/);
+			let purchasePrice = '';
+			let retailPrice = ref('');
+			const retailPriceBlur = (event) => {
+				retailPrice.value = event.target.value;
+				if (retailPrice) {
+					let temp = retailPrice.value.replace(pricePattern, '');
+					console.log(temp);
+					retailPrice.value = '¥ ' + formatMoney(temp) + "/" + (unit.value || 'pcs');
+					console.log(retailPrice.value);
+				}
+			};
+			let memberPrice = '';
+			let vipPrice = '';
+			const profitRate = computed(() => {
+				let cost = purchasePrice ? purchasePrice.replace(unitPattern, '') : good ? good.storage
+					.lastPurchasePrice.replace(unitPattern, '') : 0;
+				//console.log(cost);
+				if (retailPrice) return this.computedProfitRate(cost, retailPrice.replace(unitPattern, '')) + '%';
+				if (purchasePrice) {
+					if (good && !retailPrice) return this.computedProfitRate(cost, good.retailPrice.replace(
+						unitPattern, '')) + '%';
+					if (retailPrice) return this.computedProfitRate(cost, retailPrice.replace(unitPattern, '')) +
+						'%';
+					return '0%';
+				}
+				if (good) return computedProfitRate(cost, good.retailPrice.replace(unitPattern, '')) + '%';
+			});
+			const computedprofitRate = (cost, price) => {
+				if (cost === null || cost === 0 || cost === '0') return '100';
+				if (price === null || price === 0 || price === '0' || price === '0.00' || price === '0.0') return '0';
+				let difference = price - cost;
+				return (difference / price * 100).toFixed(2);
+			};
 			onBeforeMount(() => {
 				ajax({
 					url: 'https://hoprxi.tooo.top/catalog/core/v1/units',
 				}).then(res => {
 					for (const u of res.data.units) units.push(u)
-				}).catch(err => {
-					console.log(err)
 				});
 			});
-			const grade_selected = (g) => {
-				grade.value = g;
-				gradeDialog = false;
-			};
 			return {
 				previous,
 				next,
@@ -466,9 +518,10 @@
 				aliasModalDialog,
 				spec,
 				category,
+				navToCategory,
+				grades,
 				grade,
 				gradeDialog,
-				grade_selected,
 				madeIn,
 				madeInSelectDialog,
 				madeInSelected,
@@ -482,20 +535,19 @@
 				pricingStrategyModalDialog,
 				timeTab,
 				timeTabCur,
-				retailPrice,
-				unitDrawerDialog,
 				units,
-				grades,
+				unit,
+				unitDrawerDialog,
+				purchasePrice,
+				retailPrice,
+				retailPriceBlur,
+				memberPrice,
+				vipPrice
 			}
 		},
 		data() {
 			return {
 				good: null,
-				regionResult: null,
-				purchasePrice: '',
-				memberPrice: '',
-				originDialog: false,
-				unit: null,
 				shelfLife: '',
 				pullingDown: false, // 是否正在下拉
 				currentTouchStartY: 0,
@@ -507,27 +559,33 @@
 			this.sign = options.sign || 'good';
 			let key = options.id || options.plu;
 			if (key) {
+				if (this.sign === 'good') {
+					ajax({
+						url: 'https://hoprxi.tooo.top/catalog/core/v1/items/:id',
+						params: {
+							id: key
+						},
+					}).then((res) => {})
+				} else {
+					ajax({
+						url: 'https://hoprxi.tooo.top/catalog/scale/v1/items/:plu',
+						params: {
+							plu: key
+						},
+					}).then((res) => {
+						console.log(res.data);
+					})
+				}
 				for (const good of catalog.catalog) {
 					if (key == good.id || key == good.plu) {
 						this.item = good;
 						this.grade = good.grade;
+						this.unit = good.retailPrice.unit;
 						break;
 					}
 				}
+				console.log(this.item);
 			}
-			for (const item of catalog.catalog) {
-				if (item.id == options.id || item.plu == options.plu) {
-					this.good = item;
-					this.presetGrade = this.good.grade;
-					break;
-				}
-			}
-			if (this.good) {
-				this.unit = unitPattern.exec(this.good.retailPrice)[1];
-			}
-			//let pattern = new RegExp("^([\u4e00-\u9fa5]{1,}[省|市|自治区]?)\.([\u4e00-\u9fa5]{1,}[市|区|县|州|盟|地区]?)$", "i");
-			//let pattern = new RegExp(/(^\d+)天$/i);
-			//let result = pattern.exec("35") //"内蒙古.呼和浩特"
 			//console.log(this.grade);
 		},
 		onReady() {
@@ -535,34 +593,13 @@
 			query.select('#navBar').boundingClientRect().exec(rect => {
 				this.navBarHeight = rect[0].height;
 			});
-		},
-		watch: {
-			unit() {
-				if (this.retailPrice) {
-					this.retailPrice = this.retailPrice.replace(unitPattern, '') + "/" + this.unit;
-					return;
-				}
-				if (this.good && this.good.retailPrice) {
-					this.good.retailPrice = this.good.retailPrice.replace(unitPattern, '') + "/" + this.unit;
-				}
-			}
+			/*
+			uni.createSelectorQuery().select('#navBar').boundingClientRect(res => {
+				this.navBarHeight = res.height;
+			}).exec();
+			*/
 		},
 		computed: {
-			retailGrossProfitRate() {
-				let cost = this.purchasePrice ? this.purchasePrice.replace(unitPattern, '') : this.good ? this.good.storage
-					.lastPurchasePrice.replace(unitPattern, '') : 0;
-				if (this.retailPrice) return this.computedGrossProfitRate(cost, this.retailPrice.replace(unitPattern,
-					'')) + '%';
-				if (this.purchasePrice) {
-					if (this.good && !this.retailPrice) return this.computedGrossProfitRate(cost, this.good.retailPrice
-						.replace(unitPattern, '')) + '%';
-					if (this.retailPrice) return this.computedGrossProfitRate(cost, this.retailPrice.replace(unitPattern,
-						'')) + '%';
-					return '0%';
-				}
-				if (this.good) return this.computedGrossProfitRate(cost, this.good.retailPrice.replace(unitPattern, '')) +
-					'%';
-			},
 			scrollContentStyle() {
 				let style = {};
 				const {
@@ -576,33 +613,7 @@
 			},
 		},
 		methods: {
-			navToCategory(id) {
-				this.$util.navTo('/pages/workflow/catalog/category?id=' + id);
-			},
-			selectUnit(v) {
-				this.unitDrawerDialog = false;
-				if (this.good) this.unit = v;
-			},
-			purchasePriceBlur(event) {
-				this.purchasePrice = event.target.value;
-				if (this.purchasePrice) {
-					let temp = this.purchasePrice.replace(unitPattern, '');
-					this.purchasePrice = formatMoney(temp) + "/" + (this.unit || 'pcs');
-				}
-			},
-			retailPriceBlur(event) {
-				this.retailPrice = event.target.value;
-				if (this.retailPrice) {
-					let temp = this.retailPrice.replace(unitPattern, '');
-					this.retailPrice = formatMoney(temp) + "/" + (this.unit || 'pcs');
-				}
-			},
-			computedGrossProfitRate(cost, price) {
-				if (cost === null || cost === 0 || cost === '0') return '100';
-				if (price === null || price === 0 || price === '0' || price === '0.00' || price === '0.0') return '0';
-				let difference = price - cost;
-				return (difference / price * 100).toFixed(2);
-			},
+			purchasePriceBlur(event) {},
 			shelfLifeBlur(event) {
 				this.shelfLife = event.target.value;
 				if (this.shelfLife) {

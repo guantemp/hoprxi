@@ -10,7 +10,6 @@
 <script>
 	export default {
 		name: 'hoprxi-badge',
-
 		data() {
 			return {
 				maxCount: 99,
@@ -51,6 +50,7 @@
 	.badge {
 		position: relative;
 		display: inline-block;
+		width: 100%;
 	}
 
 	.badge-count {

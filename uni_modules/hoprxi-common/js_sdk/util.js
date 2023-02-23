@@ -98,16 +98,17 @@ export function formatDate(date, format) {
 	return format;
 }
 export function formatMoney(money, currency) {
-	let patt = new RegExp(/^(0+)([0-9]+(\.[0-9]{0,})?$)/);
+	let patt = new RegExp(/^¥(0+)([0-9]+(\.[0-9]{0,})?$)/);
 	money = money.replace(patt, function($0, $1, $2) {
 		return $2;
 	});
+	console.log("mon:" + money);
 	patt = new RegExp(/^[1-9][0-9]*\.[0-9]{1}$|^0\.[0-9]{1}$/);
-	if (patt.test(money)) return money + '0';
+	if (patt.test(money)) money = money + '0';
 	patt = new RegExp("^[1-9][0-9]*$|^0$");
-	if (patt.test(money)) return money + '.00';
+	if (patt.test(money)) money = money + '.00';
 	patt = new RegExp("^[1-9][0-9]*.$|^0.$");
-	if (patt.test(money)) return money + '00';
+	if (patt.test(money)) money = money + '00';
 	switch (currency) {
 		case "USD":
 			return '$' + money;

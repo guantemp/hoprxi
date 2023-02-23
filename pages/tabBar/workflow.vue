@@ -75,74 +75,67 @@
 				id: 4
 			});
 			const goods = [{
-					iconFont: 'icon-goods',
-					color: "text-blue",
-					url: '/pages/workflow/catalog/catalog',
-					title: '商品档案',
-					new: 15,
-				}, {
-					iconFont: 'icon-price-adjustment',
-					color: "text-olive",
-					url: '/pages/workflow/price/price_adjustment_sheet',
-					new: 2,
-					title: '调价单',
-				}, {
-					iconFont: 'icon-label-print',
-					color: "text-brown",
-					url: '/pages/workflow/label/label',
-					title: '标签打印',
-				},
-				{
-					iconFont: 'icon-promotion',
-					color: "text-red",
-					url: '/pages/workflow/price/promotion',
-					title: '促销',
-				}
-			];
+				iconFont: 'icon-goods',
+				color: "text-blue",
+				url: '/pages/workflow/catalog/catalog',
+				title: '商品档案',
+				new: 3
+			}, {
+				iconFont: 'icon-price-adjustment',
+				color: "text-olive",
+				url: '/pages/workflow/price/price_adjustment_sheet',
+				title: '调价单',
+			}, {
+				iconFont: 'icon-label-print',
+				color: "text-brown",
+				url: '/pages/workflow/label/label',
+				title: '标签打印',
+			}, {
+				iconFont: 'icon-promotion',
+				color: "text-red",
+				url: '/pages/workflow/price/promotion',
+				title: '促销',
+				new: 9
+			}];
 			const purchase = [{
-					iconFont: 'icon-contract',
-					color: "text-cyan",
-					url: '/pages/workflow/purchase/order',
-					title: '合同',
-
-				}, {
-					iconFont: 'icon-purchase-order',
-					color: "text-grey",
-					url: '/pages/workflow/purchase/order',
-					new: 12,
-					title: '订单',
-				}, {
-					iconFont: 'icon-purchase-receipt',
-					color: "text-blue",
-					url: '/pages/public/not_implemented',
-					title: '验收入库',
-				},
-				{
-					iconFont: 'icon-return-goods',
-					color: "text-olive",
-					url: '/pages/public/not_implemented',
-					title: '退货',
-				}
-			];
-			const warehouses =  [{
-					iconFont: 'icon-contract',
-					color: "text-cyan",
-					url: '/pages/workflow/purchase/order',
-					title: '库存查询',
-
-				}, {
-					iconFont: 'icon-purchase-order',
-					color: "text-grey",
-					url: '/pages/workflow/purchase/order',
-					new: 1,
-					title: '预盘单',
-				}, {
-					iconFont: 'icon-purchase-receipt',
-					color: "text-blue",
-					url: '/pages/public/not_implemented',
-					title: '出入库',
-				}
-			];
+				iconFont: 'icon-contract',
+				color: "text-cyan",
+				url: '/pages/workflow/purchase/order',
+				title: '合同',
+			}, {
+				iconFont: 'icon-purchase-order',
+				color: "text-grey",
+				url: '/pages/workflow/purchase/order',
+				new: 12,
+				title: '订单',
+			}, {
+				iconFont: 'icon-purchase-receipt',
+				color: "text-blue",
+				url: '/pages/public/not_implemented',
+				title: '验收入库',
+			}, {
+				iconFont: 'icon-return-goods',
+				color: "text-olive",
+				url: '/pages/public/not_implemented',
+				title: '退货',
+			}];
+			const warehouses = [{
+				iconFont: 'icon-contract',
+				color: "text-cyan",
+				url: '/pages/workflow/purchase/order',
+				title: '库存查询',
+			}, {
+				iconFont: 'icon-purchase-order',
+				color: "text-grey",
+				url: '/pages/workflow/purchase/order',
+				new: 1,
+				title: '预盘单',
+			}, {
+				iconFont: 'icon-purchase-receipt',
+				color: "text-blue",
+				url: '/pages/public/not_implemented',
+				title: '出入库',
+			}];
 			return {
 				shop,
 				goods,
@@ -158,12 +151,7 @@
 				this.shop.name = currPage.data.shop.name;
 				this.shop.location = currPage.data.shop.location;
 			}
-		},
-		methods: {
-			navBack() {
-				uni.navigateBack();
-			},
-		},
+		}
 	}
 </script>
 

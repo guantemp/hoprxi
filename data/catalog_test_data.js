@@ -300,329 +300,384 @@ export default {
 		name: "药品"
 	}],
 	catalog: [{
-			id: 201451060435585024,
-			name: {
-				name: "彩虹柠檬香电热灭蚊香液",
-				mnemonic: "chlmxdrmwxy",
-				alias: "彩虹电热灭蚊香液"
-			},
-			images: ["https://gd4.alicdn.com/imgextra/i3/478986120/O1CN01d9KJwK1v50WLzCYx3_!!478986120.jpg"],
-			barcode: 6907861191394,
-			spec: '150ml',
-			madeIn: '四川省.成都市',
-			grade: '一等品',
-			shelfLife: "180天",
-			category: {
-				id: "224",
-				name: "杀虫芳香"
-			},
-			retailPrice: {
-				amount: "￥19.59",
+		id: 52496163982907400,
+		name: {
+			name: "彩虹柠檬香电热灭蚊香液",
+			mnemonic: "chlmxdrmwxy",
+			alias: "彩虹电热灭蚊香液"
+		},
+		images: ["https://gd4.alicdn.com/imgextra/i3/478986120/O1CN01d9KJwK1v50WLzCYx3_!!478986120.jpg",
+			"https://gw.alicdn.com/imgextra/i1/761145626/O1CN01eY7pud1rQl0Z0FWQQ_!!761145626.jpg_Q75.jpg_.webp"
+		],
+		barcode: 6907861191394,
+		spec: '150ml',
+		madeIn: {
+			code: 510100,
+			name: '成都市'
+		},
+		grade: '一等品',
+		shelfLife: "180天",
+		category: {
+			id: "224",
+			name: "杀虫芳香"
+		},
+		retailPrice: {
+			amount: "￥19.59",
+			unit: "盒"
+		},
+		memberPrice: {
+			amount: "￥18.88",
+			unit: "盒"
+		},
+		vipPrice: {
+			amount: "￥17.15",
+			unit: "盒"
+		},
+		vip: {
+			referenceSalePrice: '19.00/瓶',
+			referencePurchasePrice: '12.60/瓶'
+		},
+		storage: {
+			lastPurchasePrice: {
+				amount: "￥13.00",
 				unit: "盒"
 			},
-			retailPrice: '19.59/盒',
-			memberPrice: '18.88/盒',
-			vipPrice: '17.15/盒',
-			vip: {
-				referenceSalePrice: '19.00/瓶',
-				referencePurchasePrice: '12.60/瓶'
-			},
-			storage: {
-				lastPurchasePrice: {
-					amount: "￥13",
-					unit: "盒"
-				},
-				amount: 226,
-				number: 12,
-				stockTurn: 1.33
-			},
-			promotion: {
-				title: '5.1节会员促销',
-				price: '1450.00/公斤',
-				startDate: "2021-05-06 00:00:00",
-				endDate: "2021-05-07 23:59:59",
-				explain: '厂家回馈用户，只限于本店PLUS会员用户'
-			},
-		}, {
-			plu: 133,
-			name: {
-				name: "广西沃柑",
-				mnemonic: "chlmxdrmwxy",
-				alias: "沃柑"
-			},
-			spec: '500g',
-			images: ['https://gd1.alicdn.com/imgextra/i1/1844773088/O1CN01KhI8VV1YgLqtKA4O6_!!1844773088.jpg'],
-			madeIn: '广西壮族自治区.桂林市',
-			grade: '优等品',
-			category: {
-				id: "98874",
-				name: "水果"
-			},
-			shelfLife: "3天",
-			retailPrice: '4.59/500g',
-			memberPrice: '4.00/500g',
-			vipPrice: '2.50/500g',
-			vip: {
-				referenceSalePrice: '3.99/500g',
-				referencePurchasePrice: '1.99/500g'
-			},
-			storage: {
-				lastPurchasePrice: '1.786/500g',
-				amount: 22.36,
-				number: 10.58,
-				stockTurn: 22.756
-			},
-		}, {
-			id: 201452393217567744,
-			name: {
-				name: "娃哈哈营养快线水果牛奶饮品（菠萝味）",
-				mnemonic: "chlmxdrmwxy",
-				alias: "营养快线"
-			},
-			barcode: 6902083898625,
-			spec: '550ml',
-			images: ['https://gd3.alicdn.com/imgextra/i3/2380078362/O1CN01m8D6Qi2BdqcFco9Eb_!!2380078362.jpg'],
-			madeIn: '浙江省.杭州市',
-			grade: '合格品',
-			category: {
-				id: '-99',
-				name: "未定义",
-			},
-			retailPrice: '11.98/瓶',
-			memberPrice: '10.98/瓶',
-			vipPrice: '4.98/瓶',
-			vip: {
-				referenceSalePrice: '12.00/瓶',
-				referencePurchasePrice: '6.98/瓶'
-			},
-			storage: {
-				lastPurchasePrice: '5.9875/瓶',
-				amount: 420,
-				number: 70,
-				stockTurn: 10.25
-			},
-		}, {
-			id: 201452853459475457,
-			name: {
-				name: "川骄无芯卷纸（白四层）",
-				mnemonic: "chlmxdrmwxy",
-				alias: "川骄卷纸"
-			},
-			barcode: 6970981171003,
-			spec: '1800g',
-			images: ['https://gd4.alicdn.com/imgextra/i4/3053115674/TB2LRXVisIrBKNjSZK9XXagoVXa_!!3053115674.jpg'],
-			category: {
-				id: "234",
-				name: "纸品"
-			},
-			storage: {
-				lastPurchasePrice: '7.98/提',
-				amount: 420,
-				number: 70,
-				stockTurn: 10.25
-			},
-			madeIn: '四川省.成都市',
-			grade: '合格品',
-			retailPrice: '11.98/提',
-			memberPrice: '0.00/提',
-			vipPrice: '0.00/提',
-		}, {
-			id: 201452966564125697,
-			name: {
-				"name": "云南三七牙膏（清新留兰）",
-				"mnemonic": "chlmxdrmwxy",
-				"alias": "云南三七牙膏（清新留兰）"
-			},
-			barcode: 6953067200880,
-			spec: '220g',
-			images: ['https://gd2.alicdn.com/imgextra/i2/2270196201/O1CN017IoRqi1vg6fAvkZey_!!2270196201.jpg'],
-			category: {
-				id: "24325",
-				name: "牙膏牙刷",
-			},
-			madeIn: '云南省.昆明市',
-			grade: '合格品',
-			retailPrice: '34.88/支',
-			memberPrice: '32.88/支',
-			vipPrice: '0.00/支',
-			vip: {
-				referenceSalePrice: '32.88/支',
-				referencePurchasePrice: '29.88/支',
-			},
-			storage: {
-				lastPurchasePrice: '27.98/支',
-				amount: 25,
-				number: 70,
-				stockTurn: 11.25
-			},
-		}, {
-			plu: 123,
-			name: {
-				"name": "红苋菜",
-				"mnemonic": "chlmxdrmwxy",
-				"alias": "红苋菜"
-			},
-			spec: '500g',
-			images: ['https://img.alicdn.com/imgextra/i4/1071273746/O1CN0132LZ5q1dXiPRSpI2l_!!1071273746.jpg'],
-			madeIn: '江阳区',
-			grade: '一级品',
-			category_id: "98874",
-			shelfLife: "0天",
-			retailPrice: '0.99/500g',
-			memberPrice: '0.95/500g',
-			vipPrice: '0.85/500g',
-			vip: {
-				referenceSalePrice: '1.59/500g',
-				referencePurchasePrice: '0.59/500g'
-			},
-			storage: {
-				lastPurchasePrice: '0.652/500g',
-				amount: 3.578,
-				number: 6.587,
-				stockTurn: 12.24
-			},
-		}, {
-			id: 201452966564158972,
-			name: {
-				"name": "菊品郁金银屑片",
-				"mnemonic": "chlmxdrmwxy",
-				"alias": "菊品郁金银屑片"
-			},
-			barcode: 6926094418474,
-			spec: '100片',
-			category: {
-				id: "A1323",
-				name: "药品"
-			},
-			madeIn: '陕西省.商洛市',
-			grade: '合格品',
-			vip: {
-				referenceSalePrice: '45.25/瓶',
-				referencePurchasePrice: '23.3333/瓶'
-			},
-			storage: {
-				lastPurchasePrice: '22.47/瓶',
-				amount: 240.23,
-				number: 12,
-				stockTurn: 7.33
-			},
-			retailPrice: '49.98/支',
-			memberPrice: '38.88/支',
-			vipPrice: '35.00/瓶',
-		}, {
-			id: 201452966564158973,
-			name: {
-				"name": "阿维A胶囊",
-				"mnemonic": "chlmxdrmwxy",
-				"alias": "阿维A胶囊"
-			},
-			barcode: '6920327600247',
-			spec: '10粒/板*3板',
-			madeIn: '重庆市',
-			grade: '合格品',
-			category: {
-				id: '-99',
-				name: "未定义",
-			},
-			vip: {
-				referenceSalePrice: '20.30/盒',
-				referencePurchasePrice: '12.45/盒'
-			},
-			storage: {
-				lastPurchasePrice: '11.11/盒',
-				amount: 14.43,
-				number: 1,
-				stockTurn: 0.33
-			},
-			retailPrice: '19.80/盒',
-			memberPrice: '18.80/盒',
-			vipPrice: '0.00/盒',
-		}, {
-			id: 201452966564158974,
-			name: {
-				"name": "阿莫西林胶囊",
-				"mnemonic": "chlmxdrmwxy",
-				"alias": "阿莫西林胶囊"
-			},
-			barcode: 6931435340314,
-			spec: '0.25g*50粒',
-			madeIn: '黑龙江.哈尔滨市',
-			grade: '合格品',
-			category: {
-				id: '-99',
-				name: "未定义",
-			},
-			vip: {
-				referenceSalePrice: '20.30/盒',
-				referencePurchasePrice: '12.45/盒'
-			},
-			storage: {
-				lastPurchasePrice: '11.11/盒',
-				amount: 14.43,
-				number: 1,
-				stockTurn: 0.33
-			},
-			retailPrice: '9.80/盒',
-			memberPrice: '8.80/盒',
-			vipPrice: '0.00/盒',
-		}, {
-			id: 201452564158974,
-			name: {
-				"name": "伊利金典有机纯牛奶",
-				"mnemonic": "chlmxdrmwxy",
-				"alias": "伊利金典有机纯牛奶"
-			},
-			barcode: 6907992508191,
-			spec: '250ml',
-			images: ['https://gd3.alicdn.com/imgextra/i3/2968065430/O1CN01geurKn1pyzQnSUi1m_!!2968065430.png'],
-			madeIn: '内蒙古.呼和浩特市',
-			grade: '合格品',
-			category: {
-				id: '-99',
-				name: "未定义",
-			},
-			vip: {
-				referenceSalePrice: '5.30/盒',
-				referencePurchasePrice: '4.852/盒'
-			},
-			storage: {
-				lastPurchasePrice: '4.785/盒',
-				amount: 180,
-				number: 36,
-				stockTurn: 21.98
-			},
-			retailPrice: '5.19/盒',
-			memberPrice: '5.02/盒',
-			vipPrice: '4.98/盒',
+			amount: 226,
+			number: 12,
+			stockTurn: 1.33
 		},
-		{
-			plu: 1243,
-			name: {
-				"name": "方山梨",
-				"mnemonic": "fsl",
-				"alias": "方山梨"
+		promotion: {
+			title: '5.1节会员促销',
+			price: {
+				amount: "￥13",
+				unit: "盒"
 			},
-			spec: '#70',
-			madeIn: '江阳区',
-			grade: '一级品',
-			category: {
-				id: '98874',
-				name: "水果",
+			startDate: "2021-05-06 00:00:00",
+			endDate: "2021-05-07 23:59:59",
+			explain: '厂家回馈用户，只限于本店PLUS会员用户'
+		},
+	}, {
+		plu: 133,
+		name: {
+			name: "广西沃柑",
+			mnemonic: "gxwg",
+			alias: "沃柑"
+		},
+		spec: '500g',
+		images: ['https://gd1.alicdn.com/imgextra/i1/1844773088/O1CN01KhI8VV1YgLqtKA4O6_!!1844773088.jpg',
+			"https://gd1.alicdn.com/imgextra/i1/2206854062979/O1CN01RhNe4F1XsQh47fQ6j_!!2206854062979.png"
+		],
+		madeIn: {
+			code: 451300,
+			name: '来宾市'
+		},
+		grade: '优等品',
+		category: {
+			id: "98874",
+			name: "水果"
+		},
+		shelfLife: "3天",
+		retailPrice: {
+			amount: "￥4.59",
+			unit: "500g"
+		},
+		memberPrice: {
+			amount: "￥4.00",
+			unit: "500g"
+		},
+		vipPrice: {
+			amount: "￥3.10",
+			unit: "500g"
+		},
+		vip: {
+			referenceSalePrice: '3.99',
+			referencePurchasePrice: '3221.99'
+		},
+		storage: {
+			lastPurchasePrice: {
+				amount: "￥1.79",
+				unit: "500g"
 			},
-			shelfLife: "0天",
-			retailPrice: '1.99/500g',
-			memberPrice: '1.95/500g',
-			vipPrice: '1.85/500g',
-			vip: {
-				referenceSalePrice: '1.59/500g',
-				referencePurchasePrice: '0.59/500g'
-			},
-			storage: {
-				lastPurchasePrice: '0.652/500g',
-				amount: 3.578,
-				number: 6.587,
-				stockTurn: 12.24
-			},
-		}
-	]
+			amount: 22.36,
+			number: 10.58,
+			stockTurn: 22.756
+		},
+	}, {
+		id: 52496163982907403,
+		name: {
+			name: "娃哈哈营养快线水果牛奶饮品（菠萝味）",
+			mnemonic: "chlmxdrmwxy",
+			alias: "营养快线"
+		},
+		barcode: 6902083898625,
+		spec: '550ml',
+		images: ['https://gd3.alicdn.com/imgextra/i3/2380078362/O1CN01m8D6Qi2BdqcFco9Eb_!!2380078362.jpg'],
+		madeIn: {
+			code: 330100,
+			name: '杭州市'
+		},
+		grade: '合格品',
+		category: {
+			id: '-99',
+			name: "未定义",
+		},
+		retailPrice: '11.98/瓶',
+		memberPrice: '10.98/瓶',
+		vipPrice: '4.98/瓶',
+		vip: {
+			referenceSalePrice: '12.00/瓶',
+			referencePurchasePrice: '6.98/瓶'
+		},
+		storage: {
+			lastPurchasePrice: '5.9875/瓶',
+			amount: 420,
+			number: 70,
+			stockTurn: 10.25
+		},
+	}, {
+		id: 52496321492179002,
+		name: {
+			name: "川骄无芯卷纸（白四层）",
+			mnemonic: "chlmxdrmwxy",
+			alias: "川骄卷纸"
+		},
+		barcode: 6970981171003,
+		spec: '1800g',
+		images: ['https://gd4.alicdn.com/imgextra/i4/3053115674/TB2LRXVisIrBKNjSZK9XXagoVXa_!!3053115674.jpg'],
+		category: {
+			id: "234",
+			name: "纸品"
+		},
+		storage: {
+			lastPurchasePrice: '7.98/提',
+			amount: 420,
+			number: 70,
+			stockTurn: 10.25
+		},
+		madeIn: {
+			code: 510100,
+			name: '成都市'
+		},
+		grade: '合格品',
+		retailPrice: '11.98/提',
+		memberPrice: '0.00/提',
+		vipPrice: '0.00/提',
+	}, {
+		id: 52496321492179000,
+		name: {
+			"name": "云南三七牙膏（清新留兰）",
+			"mnemonic": "chlmxdrmwxy",
+			"alias": "云南三七牙膏（清新留兰）"
+		},
+		barcode: 6953067200880,
+		spec: '220g',
+		images: ['https://gd2.alicdn.com/imgextra/i2/2270196201/O1CN017IoRqi1vg6fAvkZey_!!2270196201.jpg'],
+		category: {
+			id: "24325",
+			name: "牙膏牙刷",
+		},
+		madeIn: {
+			code: 530100,
+			name: '昆明市'
+		},
+		grade: '合格品',
+		retailPrice: '34.88/支',
+		memberPrice: '32.88/支',
+		vipPrice: '0.00/支',
+		vip: {
+			referenceSalePrice: '32.88/支',
+			referencePurchasePrice: '29.88/支',
+		},
+		storage: {
+			lastPurchasePrice: '27.98/支',
+			amount: 25,
+			number: 70,
+			stockTurn: 11.25
+		},
+	}, {
+		plu: 123,
+		name: {
+			"name": "红苋菜",
+			"mnemonic": "chlmxdrmwxy",
+			"alias": "红苋菜"
+		},
+		spec: '500g',
+		images: ['https://img.alicdn.com/imgextra/i4/1071273746/O1CN0132LZ5q1dXiPRSpI2l_!!1071273746.jpg'],
+		madeIn: {
+			code: 511500,
+			name: '宜宾市'
+		},
+		grade: '一级品',
+		category_id: "98874",
+		shelfLife: "0天",
+		retailPrice: '0.99/500g',
+		memberPrice: '0.95/500g',
+		vipPrice: '0.85/500g',
+		vip: {
+			referenceSalePrice: '1.59/500g',
+			referencePurchasePrice: '0.59/500g'
+		},
+		storage: {
+			lastPurchasePrice: '0.652/500g',
+			amount: 3.578,
+			number: 6.587,
+			stockTurn: 12.24
+		},
+	}, {
+		id: 52496321492179005,
+		name: {
+			"name": "菊品郁金银屑片",
+			"mnemonic": "chlmxdrmwxy",
+			"alias": "菊品郁金银屑片"
+		},
+		barcode: 6926094418474,
+		spec: '100片',
+		category: {
+			id: "A1323",
+			name: "药品"
+		},
+		madeIn: {
+			code: 611000,
+			name: '商洛市'
+		},
+		grade: '合格品',
+		vip: {
+			referenceSalePrice: '45.25/瓶',
+			referencePurchasePrice: '23.3333/瓶'
+		},
+		storage: {
+			lastPurchasePrice: '22.47/瓶',
+			amount: 240.23,
+			number: 12,
+			stockTurn: 7.33
+		},
+		retailPrice: '49.98/支',
+		memberPrice: '38.88/支',
+		vipPrice: '35.00/瓶',
+	}, {
+		id: 52496321492179007,
+		name: {
+			"name": "阿维A胶囊",
+			"mnemonic": "chlmxdrmwxy",
+			"alias": "阿维A胶囊"
+		},
+		barcode: '6920327600247',
+		spec: '10粒/板*3板',
+		madeIn: {
+			code: 500100,
+			name: '重庆市'
+		},
+		grade: '合格品',
+		category: {
+			id: '-99',
+			name: "未定义",
+		},
+		vip: {
+			referenceSalePrice: '20.30/盒',
+			referencePurchasePrice: '12.45/盒'
+		},
+		storage: {
+			lastPurchasePrice: '11.11/盒',
+			amount: 14.43,
+			number: 1,
+			stockTurn: 0.33
+		},
+		retailPrice: '19.80/盒',
+		memberPrice: '18.80/盒',
+		vipPrice: '0.00/盒',
+	}, {
+		id: 52496321492179006,
+		name: {
+			"name": "阿莫西林胶囊",
+			"mnemonic": "chlmxdrmwxy",
+			"alias": "阿莫西林胶囊"
+		},
+		barcode: 6931435340314,
+		spec: '0.25g*50粒',
+		madeIn: {
+			code: 230100,
+			name: '哈尔滨市'
+		},
+		grade: '合格品',
+		category: {
+			id: '-99',
+			name: "未定义",
+		},
+		vip: {
+			referenceSalePrice: '20.30/盒',
+			referencePurchasePrice: '12.45/盒'
+		},
+		storage: {
+			lastPurchasePrice: '11.11/盒',
+			amount: 14.43,
+			number: 1,
+			stockTurn: 0.33
+		},
+		retailPrice: '9.80/盒',
+		memberPrice: '8.80/盒',
+		vipPrice: '0.00/盒',
+	}, {
+		id: 52496321492179004,
+		name: {
+			"name": "伊利金典有机纯牛奶",
+			"mnemonic": "chlmxdrmwxy",
+			"alias": "伊利金典有机纯牛奶"
+		},
+		barcode: 6907992508191,
+		spec: '250ml',
+		images: ['https://gd3.alicdn.com/imgextra/i3/2968065430/O1CN01geurKn1pyzQnSUi1m_!!2968065430.png'],
+		madeIn: {
+			code: 150100,
+			name: '呼和浩特市'
+		},
+		grade: '合格品',
+		category: {
+			id: '-99',
+			name: "未定义",
+		},
+		vip: {
+			referenceSalePrice: '5.30/盒',
+			referencePurchasePrice: '4.852/盒'
+		},
+		storage: {
+			lastPurchasePrice: '4.785/盒',
+			amount: 180,
+			number: 36,
+			stockTurn: 21.98
+		},
+		retailPrice: '5.19/盒',
+		memberPrice: '5.02/盒',
+		vipPrice: '4.98/盒',
+	}, {
+		plu: 1243,
+		name: {
+			"name": "方山梨",
+			"mnemonic": "fsl",
+			"alias": "方山梨"
+		},
+		spec: '#70',
+		madeIn: {
+			code: 510500,
+			name: '泸州市'
+		},
+		grade: '一级品',
+		category: {
+			id: '98874',
+			name: "水果",
+		},
+		shelfLife: "0天",
+		retailPrice: '1.99/500g',
+		memberPrice: '1.95/500g',
+		vipPrice: '1.85/500g',
+		vip: {
+			referenceSalePrice: '1.59/500g',
+			referencePurchasePrice: '0.59/500g'
+		},
+		storage: {
+			lastPurchasePrice: '0.652/500g',
+			amount: 3.578,
+			number: 6.587,
+			stockTurn: 12.24
+		},
+	}]
 }

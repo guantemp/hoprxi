@@ -27,8 +27,9 @@
 		@recovery="$util.navTo('/pages/public/recovery')">
 	</hoprxi-drag-fab>
 	<hoprxi-drag-button dock radius class="bg-red"></hoprxi-drag-button>
+	<view>{{formatMoney("¥23.2/pcs")}}{{formatMoney("23.23")}}</view>
 	<!-- 产地选择对话框 -->
-	<view class="cu-modal bottom-modal show border-radius">
+	<view class="cu-modal bottom-modal border-radius">
 		<view class="cu-dialog">
 			<view class="flex align-center justify-between padding-lr-lg padding-tb-sm bg-white solid-bottom text-lg">
 				<text @tap.stop.prevent="hideOriginDialog">取消</text>
@@ -51,6 +52,9 @@
 		onBeforeMount,
 		watch
 	} from 'vue';
+	import {
+		formatMoney,
+	} from '@/uni_modules/hoprxi-common/js_sdk/util.js';
 	import catalog_test from '@/data/catalog_test_data.js'; //用例
 	export default {
 		setup(props, content) {
@@ -109,6 +113,9 @@
 			check(object) {
 				console.log("member");
 				console.log(object);
+			},
+			formatMoney(value){
+				console.log(formatMoney(value))
 			}
 		}
 	}

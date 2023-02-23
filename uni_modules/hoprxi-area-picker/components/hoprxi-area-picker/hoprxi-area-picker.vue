@@ -15,6 +15,7 @@
 	import {
 		reactive,
 		watch,
+		watchEffect,
 		onBeforeMount
 	} from 'vue';
 	import ajax from '@/uni_modules/u-ajax'
@@ -22,7 +23,7 @@
 		name: 'hoprxi-area-picker',
 		props: {
 			initialArea: {
-				type: [Array, String],
+				type: Array,
 				default: []
 			},
 			showCounty: {
@@ -35,7 +36,7 @@
 			const cities = reactive([]);
 			const counties = reactive([]);
 			const initialIndex = reactive([]);
-			const oldSelectedIndex = reactive([]);
+			const oldSelectedIndex = [];
 			const selected = [];
 			const query = (code) => {
 				return new Promise(resolve => {
@@ -55,42 +56,6 @@
 						};
 						return resolve(areas);
 					}).catch(err => {})
-				});
-			};
-			const _first = () => {
-				return new Promise(resolve => {
-					query(156).then((areas) => {
-						for (const province of areas) provinces.push(province);
-						let provinceIndex = provinces.findIndex((p) => {
-							return p.name === props.initialArea[0];
-						})
-						if (provinceIndex === -1) provinceIndex = 0;
-						initialIndex.push(provinceIndex);
-						oldSelectedIndex.push(provinceIndex)
-						selected.push({
-							code: provinces[provinceIndex].code,
-							name: provinces[provinceIndex].name,
-							parentName: provinces[provinceIndex].parentName,
-						});
-						return query(provinces[provinceIndex]['code']) //[]取属性		
-					}).then((areas) => {
-						cities.length = 0;
-						for (const city of areas) cities.push(city);
-						let cityIndex = cities.findIndex((c) => {
-							return c.name === props.initialArea[1];
-						});
-						if (cityIndex === -1) cityIndex = 0;
-						setTimeout(() => { //奇怪的写法，initialIndex必须要延迟，在没有promise保证下picker-view中的value才起作用
-							initialIndex.push(cityIndex);
-						}, 0);
-						oldSelectedIndex.push(cityIndex)
-						selected.push({
-							code: cities[cityIndex].code,
-							name: cities[cityIndex].name,
-							parentName: cities[cityIndex].parentName,
-						});
-						if (props.showCounty) return resolve(query(cities[cityIndex]['code'])) //[]取属性
-					});
 				});
 			};
 			const _second = (index) => {
@@ -157,10 +122,10 @@
 						});
 						if (countyIndex === -1) countyIndex = 0;
 						setTimeout(() => { //奇怪的写法，必须要延迟，picker-view中的value才起作用
-							initialIndex.push(countyIndex);
+							initialIndex.splice(2, 1, countyIndex);
 						}, 0);
-						oldSelectedIndex.push(countyIndex);
-						selected.push({
+						oldSelectedIndex.splice(2, 1, countyIndex);
+						selected.splice(2, 1, {
 							code: counties[countyIndex].code,
 							name: counties[countyIndex].name,
 							parentName: counties[countyIndex].parentName,
@@ -171,8 +136,49 @@
 				}
 				content.emit('selected', selected);
 			};
+			const _first = () => {
+				return new Promise(resolve => {
+					query(156).then((areas) => {
+						for (const province of areas) provinces.push(province);
+						let provinceIndex = provinces.findIndex((p) => {
+							return p.name === props.initialArea[0];
+						})
+						if (provinceIndex === -1) provinceIndex = 0;
+						initialIndex.splice(0, 1, provinceIndex);
+						oldSelectedIndex.splice(0, 1, provinceIndex)
+						selected.splice(0, 1, {
+							code: provinces[provinceIndex].code,
+							name: provinces[provinceIndex].name,
+							parentName: provinces[provinceIndex].parentName,
+						});
+						return query(provinces[provinceIndex]['code']) //[]取属性		
+					}).then((areas) => {
+						cities.length = 0;
+						for (const city of areas) cities.push(city);
+						let cityIndex = cities.findIndex((c) => {
+							return c.name === props.initialArea[1];
+						});
+						if (cityIndex === -1) cityIndex = 0;
+						setTimeout(() => { //奇怪的写法，initialIndex必须要延迟，在没有promise保证下picker-view中的value才起作用
+							initialIndex.splice(1, 1, cityIndex);
+						}, 0);
+						oldSelectedIndex.splice(1, 1, cityIndex)
+						selected.splice(1, 1, {
+							code: cities[cityIndex].code,
+							name: cities[cityIndex].name,
+							parentName: cities[cityIndex].parentName,
+						});
+						if (props.showCounty) return resolve(query(cities[cityIndex]['code'])) //[]取属性
+					});
+				});
+			};
 			onBeforeMount(init);
-			watch(props.initialArea, init);
+			watch(() => props.initialArea, () => {
+				init()
+			}, {
+				deep: true //非常重要，没有它area数组不会被watch到
+			});
+			//watch(props.initialArea,init) 会起作用，但服务端会报props.initialArea不是一个该监听的对象警告
 			return {
 				provinces,
 				cities,
