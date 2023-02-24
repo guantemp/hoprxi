@@ -94,41 +94,41 @@
 			</view>
 			<input v-if="Object.keys(item).length>0"
 				:placeholder="item.storage&&(item.storage.lastPurchasePrice.amount+'/'+item.storage.lastPurchasePrice.unit)||'0.00/PCS'"
-				disabled>
+				disabled class="text-right">
 			<input v-else
 				:placeholder="item.storage&&(item.storage.lastPurchasePrice.amount+'/'+item.storage.lastPurchasePrice.unit)||'0.00/PCS'"
-				:value="purchasePrice" type="digit" @blur="purchasePriceBlur">
+				:value="purchasePrice" type="digit" @blur="purchasePriceBlur" class="text-right">
 		</view>
 		<view class="cu-form-group">
 			<view class="title" @tap.stop="$util.toast('0.00元表示为未定价商品，POS系统每次销售时都会询问售价！')">
-				零&nbsp;&nbsp;售&nbsp;&nbsp;价<text class="cuIcon-info"></text></view>
-			<view class="flex flex-sub">
+				零售价<text class="cuIcon-info"></text></view>
+			<view class="flex flex-sub align-end">
 				<input :placeholder="item.retailPrice&&(item.retailPrice.amount+'/'+item.retailPrice.unit)||'0.00/PCS'"
-					:value="retailPrice" type="digit" @blur="retailPriceBlur">
+					:value="retailPrice" type="digit" @blur="retailPriceBlur" class="text-right">
 				<hoprxi-badge :count="'毛利率：'+ retailGrossProfitRate">
 				</hoprxi-badge>
 			</view>
 		</view>
 		<view class="cu-form-group">
-			<view class="title margin-right-sm">会&nbsp;&nbsp;员&nbsp;&nbsp;价</view>
+			<view class="title margin-right-sm">会员价</view>
 			<view class="flex flex-sub">
-				<hoprxi-badge :count="'毛利率：'+ retailGrossProfitRate" class="basis-df">
-					<input
-						:placeholder="item.memberPrice&&(item.memberPrice.amount+'/'+item.memberPrice.unit)||'0.00/PCS'"
-						:value="memberPrice" type="digit" @blur="memberPriceBlur">
+				<hoprxi-badge :count="'毛利率：'+ retailGrossProfitRate" class="text-right">
 				</hoprxi-badge>
+				<input :placeholder="item.memberPrice&&(item.memberPrice.amount+'/'+item.memberPrice.unit)||'0.00/PCS'"
+					:value="memberPrice" type="digit" @blur="memberPriceBlur" class="text-right">
 			</view>
 		</view>
 		<view class="cu-form-group">
-			<view class="title margin-right-sm">VIP&nbsp;&nbsp;&nbsp;价</view>
+			<view class="title margin-right-sm">VIP价</view>
 			<view class="flex flex-sub">
 				<input :placeholder="item.vipPrice&&(item.vipPrice.amount+'/'+item.vipPrice.unit)||'0.00/PCS'"
-					:value="vipPrice" type="digit" @blur="vipPriceBlur">
+					:value="vipPrice" type="digit" @blur="vipPriceBlur" class="text-right">
 			</view>
 		</view>
 		<view class="cu-form-group solid-bottom">
-			<view class="title">保&nbsp;&nbsp;质&nbsp;&nbsp;期</view>
-			<input :placeholder="good&&good.shelfLife||'0 天'" :value="shelfLife" type="number" @blur="shelfLifeBlur">
+			<view class="title">保质期</view>
+			<input :placeholder="item.shelfLife||'0 天'" :value="shelfLife" type="number" @blur="shelfLifeBlur"
+				class="text-right">
 		</view>
 	</view>
 	<!-- 别名对话框 -->
@@ -271,6 +271,7 @@
 	} from 'vue';
 	import {
 		formatMoney,
+		moneyFormat,
 		toast
 	} from '@/uni_modules/hoprxi-common/js_sdk/util.js';
 	import catalog from '@/data/catalog_test_data.js'; //用例数据库
@@ -290,6 +291,17 @@
 						console.log(name.name);
 				}
 			};
+			const scrollContentStyle = computed(() => {
+				let style = {};
+				const {
+					pullDownHeight,
+					pullingDown
+				} = this;
+				style.transform = pullingDown ? `translateY(${pullDownHeight}px)` : `translateY(0px)`;
+				style.transition = pullingDown ? `transform .1s linear` :
+					`transform 0.3s cubic-bezier(0.19,1.64,0.42,0.72)`;
+				return style;
+			});
 			let item = ref({});
 			let navBarHeight = ref(0);
 			const chooseImage = () => {
@@ -443,10 +455,15 @@
 			let unit = ref('');
 			const unitDrawerDialog = ref(false);
 			watch(unit, () => {
-				const unitPattern = new RegExp(/\/?([\u4e00-\u9fa5]{1,2}|500g|kg|pcs)?$/);
-				//unit = unitPattern.exec(item.retailPrice)[1];
+				const unitPattern = new RegExp(/\/([\u4e00-\u9fa5]{1,2}|500g|kg|pcs)?$/);
 				if (retailPrice.value.length != 0) {
-					retailPrice.value = retailPrice.value.replace(unitPattern, '') + "/" + unit;
+					retailPrice.value = retailPrice.value.replace(unitPattern, '') + "/" + unit.value;
+				}
+				if (memberPrice.value.length != 0) {
+					memberPrice.value = memberPrice.value.replace(unitPattern, '') + "/" + unit.value;
+				}
+				if (vipPrice.value.length != 0) {
+					vipPrice.value = vipPrice.value.replace(unitPattern, '') + "/" + unit.value;
 				}
 				if (item) {
 					item.value.retailPrice.unit = unit;
@@ -463,15 +480,23 @@
 			let retailPrice = ref('');
 			const retailPriceBlur = (event) => {
 				retailPrice.value = event.target.value;
-				if (retailPrice) {
-					let temp = retailPrice.value.replace(pricePattern, '');
-					console.log(temp);
-					retailPrice.value = '¥ ' + formatMoney(temp) + "/" + (unit.value || 'pcs');
-					console.log(retailPrice.value);
+				format(retailPrice);
+			};
+			let memberPrice = ref('');
+			const memberPriceBlur = (event) => {
+				memberPrice.value = event.target.value;
+				format(memberPrice);
+			};
+			let vipPrice = ref('');
+			const vipPriceBlur = (event) => {
+				vipPrice.value = event.target.value;
+				format(vipPrice);
+			};
+			const format = (price) => {
+				if (price) {
+					price.value = moneyFormat(price.value) + "/" + (unit.value || 'pcs');
 				}
 			};
-			let memberPrice = '';
-			let vipPrice = '';
 			const profitRate = computed(() => {
 				let cost = purchasePrice ? purchasePrice.replace(unitPattern, '') : good ? good.storage
 					.lastPurchasePrice.replace(unitPattern, '') : 0;
@@ -491,6 +516,14 @@
 				if (price === null || price === 0 || price === '0' || price === '0.00' || price === '0.0') return '0';
 				let difference = price - cost;
 				return (difference / price * 100).toFixed(2);
+			};
+			let shelfLife = ref('');
+			const shelfLifeBlur = (event) => {
+				shelfLife.value = event.target.value;
+				if (shelfLife) {
+					let pattern = new RegExp(/天$/);
+					shelfLife.value = shelfLife.value.replace(pattern, '') + ' 天';
+				}
 			};
 			onBeforeMount(() => {
 				ajax({
@@ -542,13 +575,16 @@
 				retailPrice,
 				retailPriceBlur,
 				memberPrice,
-				vipPrice
+				memberPriceBlur,
+				vipPrice,
+				vipPriceBlur,
+				shelfLife,
+				shelfLifeBlur
 			}
 		},
 		data() {
 			return {
 				good: null,
-				shelfLife: '',
 				pullingDown: false, // 是否正在下拉
 				currentTouchStartY: 0,
 				pullDownHeight: 0, // 下拉高度
@@ -565,7 +601,9 @@
 						params: {
 							id: key
 						},
-					}).then((res) => {})
+					}).then((res) => {
+						console.log(res.data);
+					})
 				} else {
 					ajax({
 						url: 'https://hoprxi.tooo.top/catalog/scale/v1/items/:plu',
@@ -574,6 +612,8 @@
 						},
 					}).then((res) => {
 						console.log(res.data);
+					}).catch((err)=>{
+						toast("没有查询到此商品！")
 					})
 				}
 				for (const good of catalog.catalog) {
@@ -613,15 +653,6 @@
 			},
 		},
 		methods: {
-			purchasePriceBlur(event) {},
-			shelfLifeBlur(event) {
-				this.shelfLife = event.target.value;
-				if (this.shelfLife) {
-					let pattern = new RegExp(/天$/);
-					let temp = this.shelfLife.replace(pattern, '');
-					this.shelfLife = temp + ' 天';
-				}
-			},
 			// 触摸按下处理
 			touchStart(e) {
 				this.currentTouchStartY = e.touches[0].clientY;

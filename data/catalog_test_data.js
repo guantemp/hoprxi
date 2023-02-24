@@ -300,7 +300,7 @@ export default {
 		name: "药品"
 	}],
 	catalog: [{
-		id: 52496163982907400,
+		id: '52496163982907400',
 		name: {
 			name: "彩虹柠檬香电热灭蚊香液",
 			mnemonic: "chlmxdrmwxy",
@@ -403,7 +403,7 @@ export default {
 			stockTurn: 22.756
 		},
 	}, {
-		id: 52496163982907403,
+		id: '52496163982907403',
 		name: {
 			name: "娃哈哈营养快线水果牛奶饮品（菠萝味）",
 			mnemonic: "chlmxdrmwxy",
@@ -421,21 +421,33 @@ export default {
 			id: '-99',
 			name: "未定义",
 		},
-		retailPrice: '11.98/瓶',
-		memberPrice: '10.98/瓶',
-		vipPrice: '4.98/瓶',
+		retailPrice: {
+			amount: "￥11.98",
+			unit: "瓶"
+		},
+		memberPrice: {
+			amount: "￥11.98",
+			unit: "瓶"
+		},
+		vipPrice: {
+			amount: "￥4.98",
+			unit: "瓶"
+		},
 		vip: {
 			referenceSalePrice: '12.00/瓶',
 			referencePurchasePrice: '6.98/瓶'
 		},
 		storage: {
-			lastPurchasePrice: '5.9875/瓶',
+			lastPurchasePrice: {
+				amount: "￥5.9875",
+				unit: "瓶"
+			},
 			amount: 420,
 			number: 70,
 			stockTurn: 10.25
 		},
 	}, {
-		id: 52496321492179002,
+		id: '52496321492179002',
 		name: {
 			name: "川骄无芯卷纸（白四层）",
 			mnemonic: "chlmxdrmwxy",
@@ -449,7 +461,10 @@ export default {
 			name: "纸品"
 		},
 		storage: {
-			lastPurchasePrice: '7.98/提',
+			lastPurchasePrice: {
+				amount: "￥7.98",
+				unit: "瓶"
+			},
 			amount: 420,
 			number: 70,
 			stockTurn: 10.25
@@ -459,11 +474,20 @@ export default {
 			name: '成都市'
 		},
 		grade: '合格品',
-		retailPrice: '11.98/提',
-		memberPrice: '0.00/提',
-		vipPrice: '0.00/提',
+		memberPrice: {
+			amount: "￥0.00",
+			unit: "提"
+		},
+		retailPrice: {
+			amount: "￥11.98",
+			unit: "提"
+		},
+		vipPrice: {
+			amount: "￥0.00",
+			unit: "提"
+		}
 	}, {
-		id: 52496321492179000,
+		id: '52496321492179000',
 		name: {
 			"name": "云南三七牙膏（清新留兰）",
 			"mnemonic": "chlmxdrmwxy",
@@ -481,15 +505,27 @@ export default {
 			name: '昆明市'
 		},
 		grade: '合格品',
-		retailPrice: '34.88/支',
-		memberPrice: '32.88/支',
-		vipPrice: '0.00/支',
+		retailPrice: {
+			amount: "￥34.88",
+			unit: "支"
+		},
+		memberPrice: {
+			amount: "￥31.88",
+			unit: "支"
+		},
+		vipPrice: {
+			amount: "￥0",
+			unit: "支"
+		},
 		vip: {
 			referenceSalePrice: '32.88/支',
 			referencePurchasePrice: '29.88/支',
 		},
 		storage: {
-			lastPurchasePrice: '27.98/支',
+			lastPurchasePrice: {
+				amount: "￥27.98",
+				unit: "瓶"
+			},
 			amount: 25,
 			number: 70,
 			stockTurn: 11.25
@@ -510,21 +546,33 @@ export default {
 		grade: '一级品',
 		category_id: "98874",
 		shelfLife: "0天",
-		retailPrice: '0.99/500g',
-		memberPrice: '0.95/500g',
-		vipPrice: '0.85/500g',
+		retailPrice: {
+			amount: "￥1.98",
+			unit: "kg"
+		},
+		memberPrice: {
+			amount: "￥1.683",
+			unit: "kg"
+		},
+		vipPrice: {
+			amount: "￥1.48",
+			unit: "kg"
+		},
 		vip: {
 			referenceSalePrice: '1.59/500g',
 			referencePurchasePrice: '0.59/500g'
 		},
 		storage: {
-			lastPurchasePrice: '0.652/500g',
+			lastPurchasePrice: {
+				amount: "￥1.243",
+				unit: "kg"
+			},
 			amount: 3.578,
 			number: 6.587,
 			stockTurn: 12.24
 		},
 	}, {
-		id: 52496321492179005,
+		id: '52496321492179005',
 		name: {
 			"name": "菊品郁金银屑片",
 			"mnemonic": "chlmxdrmwxy",
@@ -546,16 +594,28 @@ export default {
 			referencePurchasePrice: '23.3333/瓶'
 		},
 		storage: {
-			lastPurchasePrice: '22.47/瓶',
+			lastPurchasePrice: {
+				amount: "￥22.47",
+				unit: "瓶"
+			},
 			amount: 240.23,
 			number: 12,
 			stockTurn: 7.33
 		},
-		retailPrice: '49.98/支',
-		memberPrice: '38.88/支',
-		vipPrice: '35.00/瓶',
+		retailPrice: {
+			amount: "￥49.98",
+			unit: "瓶"
+		},
+		memberPrice: {
+			amount: "￥38.88",
+			unit: "瓶"
+		},
+		vipPrice: {
+			amount: "￥35",
+			unit: "瓶"
+		}
 	}, {
-		id: 52496321492179007,
+		id: '52496321492179007',
 		name: {
 			"name": "阿维A胶囊",
 			"mnemonic": "chlmxdrmwxy",
@@ -577,16 +637,28 @@ export default {
 			referencePurchasePrice: '12.45/盒'
 		},
 		storage: {
-			lastPurchasePrice: '11.11/盒',
+			lastPurchasePrice: {
+				amount: "￥11.11",
+				unit: "盒"
+			},
 			amount: 14.43,
 			number: 1,
 			stockTurn: 0.33
 		},
-		retailPrice: '19.80/盒',
-		memberPrice: '18.80/盒',
-		vipPrice: '0.00/盒',
+		retailPrice: {
+			amount: "￥19.80",
+			unit: "盒"
+		},
+		memberPrice: {
+			amount: "￥18.80",
+			unit: "盒"
+		},
+		vipPrice: {
+			amount: "￥0.00",
+			unit: "盒"
+		}
 	}, {
-		id: 52496321492179006,
+		id: '52496321492179006',
 		name: {
 			"name": "阿莫西林胶囊",
 			"mnemonic": "chlmxdrmwxy",
@@ -608,16 +680,28 @@ export default {
 			referencePurchasePrice: '12.45/盒'
 		},
 		storage: {
-			lastPurchasePrice: '11.11/盒',
+			lastPurchasePrice: {
+				amount: "￥8.8",
+				unit: "盒"
+			},
 			amount: 14.43,
 			number: 1,
 			stockTurn: 0.33
 		},
-		retailPrice: '9.80/盒',
-		memberPrice: '8.80/盒',
-		vipPrice: '0.00/盒',
+		retailPrice: {
+			amount: "￥9.80",
+			unit: "盒"
+		},
+		memberPrice: {
+			amount: "￥8.80",
+			unit: "盒"
+		},
+		vipPrice: {
+			amount: "￥6.00",
+			unit: "盒"
+		}
 	}, {
-		id: 52496321492179004,
+		id: '52496321492179004',
 		name: {
 			"name": "伊利金典有机纯牛奶",
 			"mnemonic": "chlmxdrmwxy",
@@ -640,14 +724,26 @@ export default {
 			referencePurchasePrice: '4.852/盒'
 		},
 		storage: {
-			lastPurchasePrice: '4.785/盒',
+			lastPurchasePrice: {
+				amount: "￥4.785",
+				unit: "盒"
+			},
 			amount: 180,
 			number: 36,
 			stockTurn: 21.98
 		},
-		retailPrice: '5.19/盒',
-		memberPrice: '5.02/盒',
-		vipPrice: '4.98/盒',
+		retailPrice: {
+			amount: "￥5.19",
+			unit: "盒"
+		},
+		memberPrice: {
+			amount: "￥5.023",
+			unit: "盒"
+		},
+		vipPrice: {
+			amount: "￥4.12",
+			unit: "盒"
+		}
 	}, {
 		plu: 1243,
 		name: {
@@ -666,15 +762,27 @@ export default {
 			name: "水果",
 		},
 		shelfLife: "0天",
-		retailPrice: '1.99/500g',
-		memberPrice: '1.95/500g',
-		vipPrice: '1.85/500g',
+		retailPrice: {
+			amount: "￥1.989",
+			unit: "500g"
+		},
+		memberPrice: {
+			amount: "￥1.95",
+			unit: "500g"
+		},
+		vipPrice: {
+			amount: "￥1.79",
+			unit: "500g"
+		},
 		vip: {
 			referenceSalePrice: '1.59/500g',
 			referencePurchasePrice: '0.59/500g'
 		},
 		storage: {
-			lastPurchasePrice: '0.652/500g',
+			lastPurchasePrice: {
+				amount: "￥0.652",
+				unit: "500g"
+			},
 			amount: 3.578,
 			number: 6.587,
 			stockTurn: 12.24

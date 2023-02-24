@@ -11,23 +11,7 @@
 		</view>
 	</hoprxi-navigation>
 
-	<hoprxi-dropdown :menus="categories" :props="defaultProps"></hoprxi-dropdown>
-
-	<view style="padding:12rpx">
-		<hoprxi-tip :title="{name:'我的测试',
-					weight: 600}" iconFont="cuIcon-goods"></hoprxi-tip>
-		<text>爱十分萨法水电费</text>
-		<hoprxi-tip :title="{name:'我的测试'}" icon="/static/workflow_icon/order.png"
-			:line="{pattern: 'dashed',position:'top'}" arrow></hoprxi-tip>
-	</view>
-	<hoprxi-drag-fab :menus="menus" direction="vertical"
-		@appendGood="$util.navTo('/pages/workflow/catalog/good?sign=good')"
-		@appendScale="$util.navTo('/pages/workflow/catalog/good?sign=scale')"
-		@editCategories="$util.navTo('/pages/workflow/catalog/category')"
-		@recovery="$util.navTo('/pages/public/recovery')">
-	</hoprxi-drag-fab>
-	<hoprxi-drag-button dock radius class="bg-red"></hoprxi-drag-button>
-	<view>{{formatMoney("¥23.2/pcs")}}{{formatMoney("23.23")}}</view>
+	<view style="padding:12rpx" @tap="formatMoney">点我给结果：</view>
 	<!-- 产地选择对话框 -->
 	<view class="cu-modal bottom-modal border-radius">
 		<view class="cu-dialog">
@@ -35,7 +19,7 @@
 				<text @tap.stop.prevent="hideOriginDialog">取消</text>
 				<text class="text-orange" @tap.stop.prevent="originDialogConfirm">确定</text>
 			</view>
-			<hoprxi-area-picker @change="change" :initialArea="['四川省','乐山市','井研县']" ></hoprxi-area-picker>
+			<hoprxi-area-picker @change="change" :initialArea="['四川省','乐山市','井研县']"></hoprxi-area-picker>
 		</view>
 	</view>
 	<!--
@@ -98,6 +82,7 @@
 		},
 		data() {
 			return {
+				res: "撒旦法",
 				disabledIds: ["-99"],
 				expandedIds: ["1", "3446", "a25423", "gj"],
 				checkedIds: ["-99", "43645", "754", "1234", "98874", "1532", "b25423", "24325", "24326", "24323465345"],
@@ -114,8 +99,30 @@
 				console.log("member");
 				console.log(object);
 			},
-			formatMoney(value){
-				console.log(formatMoney(value))
+			formatMoney() {
+				let patt = new RegExp(/^¥?[1-9][0-9]*\.[0-9]{1}$|^0\.[0-9]{1}$/);
+				"021.".replace(/(0)?(\d+)(.)?/, function(m, $1, $2, $3, $4) {
+					console.log(m)
+					console.log($1)
+					console.log($2)
+					console.log($3)
+					console.log($4)
+				})
+				console.log("021".replace(/(0)?(\d+)(.)?/,"$2.00"));
+				console.log("021.".replace(/(0)?(\d+)(.)?/,"$2.00"));
+				console.log("0".replace(/(0)(.)?/,"$1.00"));
+				console.log("0.".replace(/(0)(.)?/,"$1.00"));
+				/*
+				/*
+				console.log("0".replace(/0/, '0.00'))
+				console.log("0.2".replace(/((0)?\d+)|((0)?.\d{1})/, '$1.00$2.00$30$40'))
+				console.log(".21".replace(/.(\d{1})/, '0.$1'))
+				
+				console.log("23.245754/规格".replace(patt, ''))
+				console.log("0.245754/规格".replace(patt, ''))
+				*/
+				const unitPattern = new RegExp(/\/([\u4e00-\u9fa5]{1,2}|500g|kg|pcs)?$/);
+				console.log("unit:" + "¥23.245754/规格".replace(unitPattern, ''))
 			}
 		}
 	}

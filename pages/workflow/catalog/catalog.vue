@@ -264,7 +264,10 @@
 					//$util.toast(err);
 				});
 				//item
-				for (const item of catalog_test.catalog) catalog.push(item);
+				for (const item of catalog_test.catalog) {
+					console.log(item)
+					catalog.push(item);
+				}
 				//brand
 				ajax({
 					url: 'https://hoprxi.tooo.top/catalog/core/v1/brands',
