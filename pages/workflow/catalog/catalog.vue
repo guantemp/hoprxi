@@ -265,7 +265,6 @@
 				});
 				//item
 				for (const item of catalog_test.catalog) {
-					console.log(item)
 					catalog.push(item);
 				}
 				//brand

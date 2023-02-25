@@ -339,7 +339,7 @@ export default {
 		},
 		storage: {
 			lastPurchasePrice: {
-				amount: "￥13.00",
+				amount: "¥13.00",
 				unit: "盒"
 			},
 			amount: 226,

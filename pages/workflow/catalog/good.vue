@@ -2,7 +2,7 @@
 	<hoprxi-navigation :title="Object.keys(item).length>0?'商品编辑':'商品新增'"
 		:backgroundColor="[1, ['#6B73FF', '#000DFF', 135]]" :titleFont="['#FFF']" id="navBar">
 	</hoprxi-navigation>
-	<view v-if="Object.keys(item).length>0" class="flex justify-between padding-lr-xs margin-top-xs">
+	<view v-if="Object.keys(item).length>0" class="flex justify-between padding-lr-xs margin-top-xs" id="edit">
 		<view class="flex">
 			<button class="cu-btn radius shadow bg-grey basis-xs margin-right-sm cuIcon-pullleft"
 				:class="{'text-xxl': previous>0}" @tap.stop="load(previous)">
@@ -14,7 +14,7 @@
 		<button class="cu-btn radius shadow bg-blue basis-sm" @tap.stop="save">
 			保存</button>
 	</view>
-	<view v-else class="flex margin-top-xs justify-end padding-lr-xs">
+	<view v-else class="flex margin-top-xs justify-end padding-lr-xs" id="new">
 		<button class="cu-btn radius shadow bg-gray" @tap="save('draft')">
 			存草稿</button>
 		<button class="cu-btn radius shadow bg-blue margin-left-xl" @tap.stop="save('save_and_new')">
@@ -105,14 +105,14 @@
 			<view class="flex flex-sub align-end">
 				<input :placeholder="item.retailPrice&&(item.retailPrice.amount+'/'+item.retailPrice.unit)||'0.00/PCS'"
 					:value="retailPrice" type="digit" @blur="retailPriceBlur" class="text-right">
-				<hoprxi-badge :count="'毛利率：'+ retailGrossProfitRate">
+				<hoprxi-badge :count="'毛利率：'+ profitRate">
 				</hoprxi-badge>
 			</view>
 		</view>
 		<view class="cu-form-group">
 			<view class="title margin-right-sm">会员价</view>
 			<view class="flex flex-sub">
-				<hoprxi-badge :count="'毛利率：'+ retailGrossProfitRate" class="text-right">
+				<hoprxi-badge :count="'毛利率：'+ profitRate" class="text-right">
 				</hoprxi-badge>
 				<input :placeholder="item.memberPrice&&(item.memberPrice.amount+'/'+item.memberPrice.unit)||'0.00/PCS'"
 					:value="memberPrice" type="digit" @blur="memberPriceBlur" class="text-right">
@@ -278,7 +278,7 @@
 	import ajax from '@/uni_modules/u-ajax'
 	export default {
 		setup(props, content) {
-			let key = ref(0);
+			let key = ref('');
 			let sign = ref('');
 			let next = ref(133);
 			let previous = ref(0);
@@ -291,18 +291,67 @@
 						console.log(name.name);
 				}
 			};
+			let pullingDown = ref(false); // 是否正在下拉
+			let currentTouchStartY = 0;
+			let pullDownHeight = 0; // 下拉高度
+			let refresherThreshold = 60 //下拉刷新阈值60px
 			const scrollContentStyle = computed(() => {
 				let style = {};
-				const {
-					pullDownHeight,
-					pullingDown
-				} = this;
-				style.transform = pullingDown ? `translateY(${pullDownHeight}px)` : `translateY(0px)`;
-				style.transition = pullingDown ? `transform .1s linear` :
+				style.transform = pullingDown.value ? `translateY(${pullDownHeight}px)` : `translateY(0px)`;
+				style.transition = pullingDown.value ? `transform .1s linear` :
 					`transform 0.3s cubic-bezier(0.19,1.64,0.42,0.72)`;
 				return style;
 			});
+			const touchStart = (e) => {
+				currentTouchStartY = e.touches[0].clientY;
+			};
+			const touchMove = (e) => {
+				if (e.touches[0].clientY < currentTouchStartY) return;
+				const currentTouchMoveY = e.touches[0].clientY;
+				if ((currentTouchMoveY - currentTouchStartY) > 8) pullingDown.value = true;
+				const movingDistance = (currentTouchMoveY - currentTouchStartY) * 0.65;
+				const moreDistance = movingDistance > refresherThreshold ? (movingDistance - refresherThreshold) *
+					0.3 : 0;
+				const computeDistance = movingDistance > refresherThreshold ? refresherThreshold + moreDistance :
+					movingDistance + moreDistance;
+				pullDownHeight = computeDistance;
+				console.log(pullDownHeight)
+			};
+			const touchEnd = (e) => { // 触摸松开处理
+				if (pullDownHeight >= refresherThreshold) {
+					pullingDown.value = false;
+					pullDownHeight = 0;
+					refresh();
+				} else {
+					pullingDown.value = false;
+					pullDownHeight = 0;
+				}
+			};
 			let item = ref({});
+			const refresh = () => {
+				uni.showLoading({
+					title: '',
+				});
+				for (const good of catalog.catalog) {
+					if (key.value == good.id || key.value == good.plu) {
+						madeIn.value = {};
+						item.value = good;
+						grade.value = item.value.grade;
+						unit.value = item.value.retailPrice.unit;
+						break;
+					}
+				}
+				setTimeout(() => {
+					//延时关闭  加载中的 loading框
+					uni.hideLoading()
+					// 服务端响应的 message 提示
+					uni.showToast({
+						title: "刷新成功",
+						icon: "success",
+						position: 'bottom'
+					})
+				}, 500)
+			};
 			let navBarHeight = ref(0);
 			const chooseImage = () => {
 				uni.chooseImage({
@@ -375,10 +424,10 @@
 					url: '/pages/workflow/catalog/category?id=' + id
 				})
 			};
-			let grade = '合格品';
+			let grade = ref('合格品');
 			const gradeDialog = ref(false); //如果使用tap并没有stop修饰，会冒泡到上级@tap事件并执行
 			const grades = ['优等品', '一等品', '合格品', '不合格品'];
-			let madeIn = {};
+			let madeIn = ref({});
 			const madeInSelectDialog = ref(false);
 			let madeInSelectedResult = null;
 			const madeInSelected = (data) => { //area-picker选择结果
@@ -386,9 +435,7 @@
 			};
 			const madeInSelectConfirm = () => {
 				madeInSelectDialog.value = false;
-				madeIn.name = madeInSelectedResult[1].name;
-				madeIn.code = madeInSelectedResult[1].code;
-				madeIn.parentName = madeInSelectedResult[1].parentName;
+				madeIn.value = madeInSelectedResult[1]
 			};
 			let searchAreaDialog = ref(false);
 			const areasSearched = reactive([]);
@@ -396,7 +443,7 @@
 				ajax({
 					url: 'https://hoprxi.tooo.top/area/v1/areas',
 					data: {
-						search: '^' + madeIn.name,
+						search: '^' + madeIn.value.name,
 						filters: 'city,country'
 					}
 				}).then(res => {
@@ -409,9 +456,7 @@
 						})
 					};
 					if (areasSearched.length === 1) {
-						madeIn.name = areasSearched[0].name;
-						madeIn.code = areasSearched[0].code;
-						madeIn.parentName = areasSearched[0].parentName;
+						madeIn.value = areasSearched[0];
 					}
 					if (areasSearched.length > 1) {
 						searchAreaDialog.value = true;
@@ -421,17 +466,15 @@
 				});
 			};
 			const searchedAreaSelect = (a) => {
-				madeIn.name = a.name;
-				madeIn.code = a.code;
-				madeIn.parentName = a.parentName;
+				madeIn.value = a;
 				searchAreaDialog.value = false;
 			};
 			const initialArea = reactive([]);
 			const madeInSelect = () => {
 				initialArea.length = 0;
-				if (Object.values(madeIn).length > 0 && madeIn.name != "") {
-					initialArea.push(madeIn.parentName);
-					initialArea.push(madeIn.name);
+				if (Object.keys(madeIn).length > 0 && madeIn.value.name != undefined && madeIn.value.name != "") {
+					initialArea.push(madeIn.value.parentName);
+					initialArea.push(madeIn.value.name);
 				} else {
 					//let pattern = new RegExp(
 					///^([\u4e00-\u9fa5]{1,}[省|市|自治区]?)\.([\u4e00-\u9fa5]{1,}[市|区|县|州|盟|地区]?)$/i);
@@ -493,23 +536,34 @@
 				format(vipPrice);
 			};
 			const format = (price) => {
-				if (price) {
-					price.value = moneyFormat(price.value) + "/" + (unit.value || 'pcs');
+				if (price.value) {
+					price.value = moneyFormat(price.value, 3) + "/" + (unit.value || 'pcs');
 				}
 			};
 			const profitRate = computed(() => {
-				let cost = purchasePrice ? purchasePrice.replace(unitPattern, '') : good ? good.storage
-					.lastPurchasePrice.replace(unitPattern, '') : 0;
-				//console.log(cost);
-				if (retailPrice) return this.computedProfitRate(cost, retailPrice.replace(unitPattern, '')) + '%';
+				const pattern = new RegExp(/^(¥|￥)(\d+.\d{2,}$)/);
+				new Promise(resolve => {
+					resolve(item);
+				}).then((res) => {
+					console.log(res.value.storage.lastPurchasePrice.amount.replace(pattern, '$2'));
+					let cost = purchasePrice.vaule ? purchasePrice.value.replace(pattern, '$2') : Object
+						.keys(item).length > 0 ? item.value.storage.lastPurchasePrice.amount.replace(
+							pattern, '$2') : 0;
+					console.log(cost)
+				});
+				//let cost = purchasePrice.vaule ? purchasePrice.value.replace(unitPattern, '') : Object.keys(item)
+				//	.length > 0 ? item.value.storage.lastPurchasePrice.amount.replace(pattern, '') : 0;
+				/*
+				if (retailPrice) return computedProfitRate(cost, retailPrice.replace(unitPattern, '')) + '%';
 				if (purchasePrice) {
-					if (good && !retailPrice) return this.computedProfitRate(cost, good.retailPrice.replace(
-						unitPattern, '')) + '%';
-					if (retailPrice) return this.computedProfitRate(cost, retailPrice.replace(unitPattern, '')) +
-						'%';
+					if (item && !retailPrice) return computedProfitRate(cost, item.retailPrice.replace(unitPattern,
+						'')) + '%';
+					if (retailPrice) return computedProfitRate(cost, retailPrice.value.replace(unitPattern, '')) + '%';
 					return '0%';
 				}
-				if (good) return computedProfitRate(cost, good.retailPrice.replace(unitPattern, '')) + '%';
+				if (item) return computedProfitRate(cost, item.value.retailPrice.replace(unitPattern, '')) + '%';
+				*/
+				return '20%';
 			});
 			const computedprofitRate = (cost, price) => {
 				if (cost === null || cost === 0 || cost === '0') return '100';
@@ -533,12 +587,19 @@
 				});
 			});
 			return {
+				key,
 				previous,
 				next,
 				sign,
 				item,
+				refresh,
 				load,
 				save,
+				pullingDown,
+				scrollContentStyle,
+				touchStart,
+				touchMove,
+				touchEnd,
 				generate,
 				scanResultChange,
 				navBarHeight,
@@ -578,13 +639,13 @@
 				memberPriceBlur,
 				vipPrice,
 				vipPriceBlur,
+				profitRate,
 				shelfLife,
 				shelfLifeBlur
 			}
 		},
 		data() {
 			return {
-				good: null,
 				pullingDown: false, // 是否正在下拉
 				currentTouchStartY: 0,
 				pullDownHeight: 0, // 下拉高度
@@ -593,38 +654,38 @@
 		},
 		onLoad(options) {
 			this.sign = options.sign || 'good';
-			let key = options.id || options.plu;
-			if (key) {
+			this.key = options.id || options.plu;
+			if (this.key) {
 				if (this.sign === 'good') {
 					ajax({
 						url: 'https://hoprxi.tooo.top/catalog/core/v1/items/:id',
 						params: {
-							id: key
+							id: this.key
 						},
 					}).then((res) => {
-						console.log(res.data);
+						//console.log(res.data);
 					})
 				} else {
 					ajax({
 						url: 'https://hoprxi.tooo.top/catalog/scale/v1/items/:plu',
 						params: {
-							plu: key
+							plu: this.key
 						},
 					}).then((res) => {
-						console.log(res.data);
-					}).catch((err)=>{
+						//console.log(res.data);
+					}).catch((err) => {
 						toast("没有查询到此商品！")
 					})
 				}
 				for (const good of catalog.catalog) {
-					if (key == good.id || key == good.plu) {
+					if (this.key == good.id || this.key == good.plu) {
 						this.item = good;
 						this.grade = good.grade;
 						this.unit = good.retailPrice.unit;
 						break;
 					}
 				}
-				console.log(this.item);
+				//console.log(this.item);
 			}
 			//console.log(this.grade);
 		},
@@ -638,69 +699,6 @@
 				this.navBarHeight = res.height;
 			}).exec();
 			*/
-		},
-		computed: {
-			scrollContentStyle() {
-				let style = {};
-				const {
-					pullDownHeight,
-					pullingDown
-				} = this;
-				style.transform = pullingDown ? `translateY(${pullDownHeight}px)` : `translateY(0px)`;
-				style.transition = pullingDown ? `transform .1s linear` :
-					`transform 0.3s cubic-bezier(0.19,1.64,0.42,0.72)`;
-				return style;
-			},
-		},
-		methods: {
-			// 触摸按下处理
-			touchStart(e) {
-				this.currentTouchStartY = e.touches[0].clientY;
-			},
-			touchMove(e) {
-				if (e.touches[0].clientY < this.currentTouchStartY) return;
-				const currentTouchMoveY = e.touches[0].clientY;
-				if ((currentTouchMoveY - this.currentTouchStartY) > 8) this.pullingDown = true;
-				const movingDistance = (currentTouchMoveY - this.currentTouchStartY) * 0.65;
-				const moreDistance = movingDistance > this.refresherThreshold ? (movingDistance - this
-					.refresherThreshold) * 0.3 : 0;
-				const computeDistance = movingDistance > this.refresherThreshold ? this.refresherThreshold + moreDistance :
-					movingDistance + moreDistance;
-				this.pullDownHeight = computeDistance;
-			},
-			// 触摸松开处理
-			touchEnd(e) {
-				if (this.pullDownHeight >= this.refresherThreshold) {
-					this.pullingDown = false;
-					this.pullDownHeight = 0;
-					this.refreshData();
-				} else {
-					this.pullingDown = false;
-					this.pullDownHeight = 0;
-				}
-			},
-			refreshData() {
-				uni.showLoading({
-					title: '',
-				});
-				for (const item of catalog.catalog) {
-					if (item.id === this.good.id || item.plu === this.good.plu) {
-						this.good = item;
-						this.unit = unitPattern.exec(this.good.retailPrice)[1];
-						break;
-					}
-				}
-				setTimeout(() => {
-					// 服务端响应的 message 提示
-					uni.showToast({
-						title: "刷新成功",
-						icon: "success",
-						position: 'bottom'
-					})
-					//延时关闭  加载中的 loading框
-					uni.hideLoading()
-				}, 200)
-			}
 		}
 	}
 </script>
