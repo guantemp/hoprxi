@@ -17,61 +17,62 @@
 		</view>
 		<!--工资条-->
 		<view class="pay">
-			<hoprxi-tip icon="/static/user_icon/pay.png" :title="{name:'我的工资',weight:280}"
-				:line="{pattern:'dashed',color:'#d4e7ed'}" @arrowClick="$util.navTo(hasLogin?'':'/pages/user/login')" arrow/>
+			<hoprxi-cell icon="/static/user_icon/pay.png" :title="{name:'我的工资',weight:320}"
+				:line="{pattern:'dashed',color:'#d4e7ed'}" @arrowClick="$util.navTo(hasLogin?'':'/pages/user/login')"
+				arrow />
 			<view style=" height: 180rpx;width: 60%;margin-top: 20rpx;">
 				<qiun-data-charts type="arcbar" :opts="opts" :chartData="chartData" />
-		</view>
-	</view>
-	<!--个人服务-->
-	<view class="service">
-		<hoprxi-tip icon="/static/user_icon/service.png" :title="{name:'我的服务',weight:280}"
-			:line="{pattern:'dashed',color:'#d4e7ed'}"/>
-		<view class="cu-list grid col-3 no-border">
-			<view class="cu-item " @tap.stop="$util.navTo('/pages/public/not_implemented')">
-				<view class="text-red">
-					<image class="grid_img" src="/static/user_icon/notice.png" />
-					<view class="cu-tag badge">
-						<block>2</block>
-					</view>
-				</view>
-				<text>公告</text>
-			</view>
-			<view class="cu-item" @tap.stop="this.$util.navTo('/pages/public/not_implemented')">
-				<view class="text-red">
-					<image class="grid_img" src="/static/user_icon/task.png" />
-					<view class="cu-tag badge">
-						<block>4</block>
-					</view>
-				</view>
-				<text>任务中心</text>
-			</view>
-			<view class="cu-item" @tap.stop="this.$util.navTo('/pages/public/not_implemented')">
-				<view class="text-red">
-					<image class="grid_img" src="/static/user_icon/telecast.png" />
-				</view>
-				<text>直播</text>
-			</view>
-			<view class="cu-item" @tap.stop="this.$util.navTo('/pages/public/not_implemented')">
-				<view class="text-red">
-					<image class="grid_img" src="/static/user_icon/shopping.png" />
-				</view>
-				<text>商城</text>
-			</view>
-			<view class="cu-item" @tap.stop="this.$util.navTo('/pages/public/not_implemented')">
-				<view class="text-red">
-					<image class="grid_img" src="/static/user_icon/share.png" />
-				</view>
-				<text>分享</text>
-			</view>
-			<view class="cu-item" @tap.stop="this.$util.navTo('/pages/public/not_implemented')">
-				<view class="text-red">
-					<image class="grid_img" src="/static/user_icon/set.png" />
-				</view>
-				<text>设置</text>
 			</view>
 		</view>
-	</view>
+		<!--个人服务-->
+		<view class="service">
+			<hoprxi-cell icon="/static/user_icon/service.png" :title="{name:'我的服务',weight:320}"
+				:line="{pattern:'dashed',color:'#d4e7ed'}" />
+			<view class="cu-list grid col-3 no-border">
+				<view class="cu-item " @tap.stop="$util.navTo('/pages/public/not_implemented')">
+					<view class="text-red">
+						<image class="grid_img" src="/static/user_icon/notice.png" />
+						<view class="cu-tag badge">
+							<block>2</block>
+						</view>
+					</view>
+					<text>公告</text>
+				</view>
+				<view class="cu-item" @tap.stop="this.$util.navTo('/pages/public/not_implemented')">
+					<view class="text-red">
+						<image class="grid_img" src="/static/user_icon/task.png" />
+						<view class="cu-tag badge">
+							<block>4</block>
+						</view>
+					</view>
+					<text>任务中心</text>
+				</view>
+				<view class="cu-item" @tap.stop="this.$util.navTo('/pages/public/not_implemented')">
+					<view class="text-red">
+						<image class="grid_img" src="/static/user_icon/telecast.png" />
+					</view>
+					<text>直播</text>
+				</view>
+				<view class="cu-item" @tap.stop="this.$util.navTo('/pages/public/not_implemented')">
+					<view class="text-red">
+						<image class="grid_img" src="/static/user_icon/shopping.png" />
+					</view>
+					<text>商城</text>
+				</view>
+				<view class="cu-item" @tap.stop="this.$util.navTo('/pages/public/not_implemented')">
+					<view class="text-red">
+						<image class="grid_img" src="/static/user_icon/share.png" />
+					</view>
+					<text>分享</text>
+				</view>
+				<view class="cu-item" @tap.stop="this.$util.navTo('/pages/public/not_implemented')">
+					<view class="text-red">
+						<image class="grid_img" src="/static/user_icon/set.png" />
+					</view>
+					<text>设置</text>
+				</view>
+			</view>
+		</view>
 	</view>
 </template>
 

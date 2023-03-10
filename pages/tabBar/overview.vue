@@ -6,6 +6,20 @@
 		<view class="cu-item text-gray">
 			<view class="bg-gray light content">
 				<view class="cu-capsule radius">
+					<view class="cu-tag bg-green">version 0.1.3</view>
+					<view class="cu-tag line-green">2023-03-10</view>
+				</view>
+				<view class="margin-top flex flex-direction">
+					<text>1、增加了guide组件（splash页面）</text>
+					<text>2、完成了依据网络查询area-picker组件</text>
+					<text>3、修改了自定义组件dropdown的开发工具运行报错</text>
+					<text>4、修改了自定义组件cell的vue3改造</text>
+				</view>
+			</view>
+		</view>
+		<view class="cu-item text-gray">
+			<view class="bg-gray light content">
+				<view class="cu-capsule radius">
 					<view class="cu-tag bg-green">version 0.1.2</view>
 					<view class="cu-tag line-green">2023-01-13</view>
 				</view>
