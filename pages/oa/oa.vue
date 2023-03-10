@@ -4,7 +4,7 @@
 			id="navBar" :surplusHeight="12">
 		</hoprxi-navigation>
 		<view class="work">
-			<hoprxi-tip icon="/static/oa_icon/affair.png" :title="{name:'事务',weight:260}"
+			<hoprxi-cell icon="/static/oa_icon/affair.png" :title="{name:'事务',weight:260}"
 				:line="{pattern:'dashed',color:'#d4e7ed'}" />
 			<view class="cu-list grid col-4 no-border item_grid_list">
 				<block v-for="(item, index) in affair" :key="index">
@@ -21,7 +21,7 @@
 			</view>
 		</view>
 		<view class="work">
-			<hoprxi-tip icon="/static/oa_icon/logistics.png" :title="{name:'后勤',weight:260}"
+			<hoprxi-cell icon="/static/oa_icon/logistics.png" :title="{name:'后勤',weight:260}"
 				:line="{pattern:'dashed',color:'#d4e7ed'}" />
 			<view class="cu-list grid col-4 no-border item_grid_list">
 				<view class="cu-item" v-for="(item, index) in logistics" :key="index"
@@ -37,7 +37,7 @@
 			</view>
 		</view>
 		<view class="work">
-			<hoprxi-tip icon="/static/oa_icon/finance.png" :title="{name:'财务',weight:260}"
+			<hoprxi-cell icon="/static/oa_icon/finance.png" :title="{name:'财务',weight:260}"
 				:line="{pattern:'dashed',color:'#d4e7ed'}" />
 			<view class="cu-list grid col-4 no-border item_grid_list">
 				<view class="cu-item" v-for="(item, index) in finance" :key="index"

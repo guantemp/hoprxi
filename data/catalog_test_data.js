@@ -9,10 +9,10 @@ export default {
 	}, {
 		id: '1',
 		name: "生鲜",
-		sub: [{
+		children: [{
 			id: "211",
 			name: "水产",
-			sub: [{
+			children: [{
 				id: "dsy",
 				name: "淡水鱼"
 			}, {
@@ -28,10 +28,10 @@ export default {
 		}, {
 			id: "2134",
 			name: "肉类",
-			sub: [{
+			children: [{
 				id: "754",
 				name: "畜肉",
-				sub: [{
+				children: [{
 					id: "23467",
 					name: "猪肉",
 				}, {
@@ -47,7 +47,7 @@ export default {
 			}, {
 				id: "1234",
 				name: "禽肉",
-				sub: [{
+				children: [{
 					id: "12341",
 					name: "鸡",
 				}, {
@@ -64,7 +64,7 @@ export default {
 		}, {
 			id: "98874",
 			name: "水果",
-			sub: [{
+			children: [{
 				id: "jg",
 				name: "浆果"
 			}, {
@@ -74,7 +74,7 @@ export default {
 		}, {
 			id: "9874",
 			name: "蔬菜",
-			sub: [{
+			children: [{
 				id: "syj",
 				name: "食用菌"
 			}, {
@@ -88,14 +88,13 @@ export default {
 	}, {
 		id: "9832546898",
 		name: "粮油",
-		selector: "single",
-		sub: [{
+		children: [{
 			id: "3446",
 			name: "食用油啊啊啊",
-			sub: [{
+			children: [{
 				id: "231532",
 				name: "菜籽油",
-				sub: [{
+				children: [{
 					id: "2315321",
 					name: "低阶酸酸"
 				}, {
@@ -123,7 +122,7 @@ export default {
 			}, {
 				id: "2332",
 				name: "橄榄油",
-				sub: [{
+				children: [{
 					id: "23321",
 					name: "希腊的"
 				}, {
@@ -139,7 +138,7 @@ export default {
 			}, {
 				id: "2r5423",
 				name: "调味油",
-				sub: [{
+				children: [{
 					id: "2r54231",
 					name: "藤椒油"
 				}, {
@@ -150,7 +149,7 @@ export default {
 		}, {
 			id: "898er956",
 			name: "粮食",
-			sub: [{
+			children: [{
 				id: "898er9562",
 				name: "谷类"
 			}, {
@@ -163,10 +162,10 @@ export default {
 		}, {
 			id: "3",
 			name: "调味品",
-			sub: [{
+			children: [{
 				id: "t436534",
 				name: "酱油",
-				sub: [{
+				children: [{
 					id: "t436535",
 					name: "老抽",
 				}, {
@@ -189,7 +188,7 @@ export default {
 		}, {
 			id: "65898956",
 			name: "调味料",
-			sub: [{
+			children: [{
 				id: "ewtrew",
 				name: "香料"
 			}, {
@@ -199,7 +198,7 @@ export default {
 		}, {
 			id: "242678",
 			name: "制品",
-			sub: [{
+			children: [{
 				id: "335r23",
 				name: "面包蛋糕"
 			}, {
@@ -219,7 +218,7 @@ export default {
 	}, {
 		id: "8",
 		name: "五金家电",
-		sub: [{
+		children: [{
 			id: "24323465345",
 			name: "小家电",
 		}, {
@@ -230,17 +229,17 @@ export default {
 		id: "4r",
 		name: "日化",
 		selector: "multi",
-		sub: [{
+		children: [{
 			id: "41",
 			name: "纸品",
-			sub: [{
+			children: [{
 				id: "411",
 				name: "抽纸",
 			}]
 		}, {
 			id: "42",
 			name: "清洁用品",
-			sub: [{
+			children: [{
 				id: "421",
 				name: "牙膏牙刷",
 			}, {
@@ -269,13 +268,14 @@ export default {
 	}, {
 		id: "6",
 		name: "烟酒",
-		sub: [{
+		expand:true,
+		children: [{
 			id: "61",
 			name: "香烟"
 		}, {
 			id: "62",
 			name: "酒类",
-			sub: [{
+			children: [{
 				id: "621",
 				name: "白酒"
 			}, {
@@ -580,6 +580,7 @@ export default {
 		},
 		barcode: 6926094418474,
 		spec: '100片',
+		images: [],
 		category: {
 			id: "A1323",
 			name: "药品"
@@ -623,6 +624,7 @@ export default {
 		},
 		barcode: '6920327600247',
 		spec: '10粒/板*3板',
+		images: ['https://gw.alicdn.com/imgextra/i2/2212886861762/O1CN01IcXcEK1Ot2bCZVGQW_!!2212886861762.jpg_Q75.jpg_.webp'],
 		madeIn: {
 			code: 500100,
 			name: '重庆市'
@@ -666,6 +668,7 @@ export default {
 		},
 		barcode: 6931435340314,
 		spec: '0.25g*50粒',
+		images: [],
 		madeIn: {
 			code: 230100,
 			name: '哈尔滨市'

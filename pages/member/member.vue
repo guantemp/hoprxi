@@ -11,7 +11,7 @@
 		</view>
 	</hoprxi-navigation>
 
-	<view style="padding:12rpx" @tap="formatMoney">点我给结果：</view>
+	<hoprxi-dropdown :menus="categories" id="dropdown"></hoprxi-dropdown>
 	<!-- 产地选择对话框 -->
 	<view class="cu-modal bottom-modal border-radius">
 		<view class="cu-dialog">
@@ -21,6 +21,19 @@
 			</view>
 			<hoprxi-area-picker @change="change" :initialArea="['四川省','乐山市','井研县']"></hoprxi-area-picker>
 		</view>
+	</view>
+	<view class="flex margin-top-xl justify-end">
+		<hoprxi-badge count='22'>
+			<input :placeholder="item&&item.shelfLife||'0 天'" value="等下过来大厦" type="number" class="text-right">
+		</hoprxi-badge>
+	</view>
+	<view class="flex margin-top-xl justify-end flex-sub">
+		<hoprxi-badge :count="'毛利率：20.23%'" left bg-color="red">
+			<input :placeholder="item&&item.shelfLife||'0 天'" value="等下过来大厦" type="number" class="text-right">
+		</hoprxi-badge>
+	</view>
+	<view class="flex margin-top-xl justify-end flex-sub">
+		<input :placeholder="item&&item.shelfLife||'0 天'" value="等下过来大厦" type="number" class="text-right">
 	</view>
 	<!--
 	<hoprxi-tree :trees="categories" checkType="checkbox" :disabledIds="disabledIds" :expandedIds="expandedIds"
@@ -75,14 +88,19 @@
 					name: "全部",
 				});
 			});
+			const customTheme = ref({
+				color: 'red',
+				txt: '萨尔图区而为'
+			});
 			return {
 				categories,
-				menus
+				menus,
+				customTheme
 			}
 		},
 		data() {
 			return {
-				res: "撒旦法",
+				a: "撒旦法",
 				disabledIds: ["-99"],
 				expandedIds: ["1", "3446", "a25423", "gj"],
 				checkedIds: ["-99", "43645", "754", "1234", "98874", "1532", "b25423", "24325", "24326", "24323465345"],
@@ -101,17 +119,18 @@
 			},
 			formatMoney() {
 				let patt = new RegExp(/^¥?[1-9][0-9]*\.[0-9]{1}$|^0\.[0-9]{1}$/);
-				"021.".replace(/(0)?(\d+)(.)?/, function(m, $1, $2, $3, $4) {
+				"¥ 25.000/盒".replace(/^(¥|￥|¥ |￥ )(\d+.\d{2,})/, function(m, $1, $2, $3, $4) {
 					console.log(m)
 					console.log($1)
 					console.log($2)
 					console.log($3)
 					console.log($4)
 				})
-				console.log("021".replace(/(0)?(\d+)(.)?/,"$2.00"));
-				console.log("021.".replace(/(0)?(\d+)(.)?/,"$2.00"));
-				console.log("0".replace(/(0)(.)?/,"$1.00"));
-				console.log("0.".replace(/(0)(.)?/,"$1.00"));
+				console.log("¥ 25.000/盒".replace(/\/([\u4e00-\u9fa5]{1,2}|500g|kg|pcs)?$/,'').replace(/^(¥|￥|¥ |￥ )(\d+.\d{2,}$)/,'$2'));
+				console.log("021".replace(/(0)?(\d+)(.)?/, "$2.00"));
+				console.log("021.".replace(/(0)?(\d+)(.)?/, "$2.00"));
+				console.log("0".replace(/(0)(.)?/, "$1.00"));
+				console.log("0.".replace(/(0)(.)?/, "$1.00"));
 				/*
 				/*
 				console.log("0".replace(/0/, '0.00'))
@@ -129,4 +148,23 @@
 </script>
 
 <style lang='scss'>
+	.profitRate {
+		&::before {
+			content: '奥术洪流';
+			position: relative;
+			top: 0;
+			right: 35%;
+			background-color: v-bind("customTheme.color");
+			border-radius: 200rpx;
+			min-width: 26px;
+			min-height: 14px;
+
+			text-align: center;
+			padding: 0 20rpx;
+			font-size: 26rpx;
+			z-index: 9;
+
+			white-space: nowrap;
+		}
+	}
 </style>

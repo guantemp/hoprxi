@@ -2,7 +2,8 @@
 	<hoprxi-navigation :title="Object.keys(item).length>0?'商品编辑':'商品新增'"
 		:backgroundColor="[1, ['#6B73FF', '#000DFF', 135]]" :titleFont="['#FFF']" id="navBar">
 	</hoprxi-navigation>
-	<view v-if="Object.keys(item).length>0" class="flex justify-between padding-lr-xs margin-top-xs" id="edit">
+	<view v-if="Object.keys(item).length>0" class="flex justify-between padding-lr-xs margin-top-xs" id="top">
+		<!-- :style="{position: 'fixed',top:navBarHeight+'px',width:'100vw'}" -->
 		<view class="flex">
 			<button class="cu-btn radius shadow bg-grey basis-xs margin-right-sm cuIcon-pullleft"
 				:class="{'text-xxl': previous>0}" @tap.stop="load(previous)">
@@ -14,7 +15,7 @@
 		<button class="cu-btn radius shadow bg-blue basis-sm" @tap.stop="save">
 			保存</button>
 	</view>
-	<view v-else class="flex margin-top-xs justify-end padding-lr-xs" id="new">
+	<view v-else class="flex margin-top-xs justify-end padding-lr-xs" id="top">
 		<button class="cu-btn radius shadow bg-gray" @tap="save('draft')">
 			存草稿</button>
 		<button class="cu-btn radius shadow bg-blue margin-left-xl" @tap.stop="save('save_and_new')">
@@ -29,7 +30,7 @@
 		</view>
 		<view class="cu-bar bg-white">
 			<view class="action title">商品图片</view>
-			<view class="action">{{Object.keys(item).length===0?0:item.images.length}}/9</view>
+			<view class="action">{{(Object.keys(item).length===0||!item.images)?0:item.images.length}}/9</view>
 		</view>
 		<view class="cu-form-group">
 			<view class="grid col-3 grid-square flex-sub">
@@ -39,7 +40,8 @@
 						<text class='cuIcon-close'></text>
 					</view>
 				</view>
-				<view class="solids" @tap="chooseImage" v-if="Object.keys(item).length===0||item.images.length<9">
+				<view class="solids" @tap="chooseImage"
+					v-if="Object.keys(item).length===0||!item.images||item.images.length<9">
 					<text class='cuIcon-cameraadd'></text>
 				</view>
 			</view>
@@ -80,7 +82,7 @@
 		<view class="cu-form-group">
 			<view class="title" @tap.stop="$util.toast('要求精确到到市级！')">
 				商品产地<text class="text-red margin-left-xs">*</text></view>
-			<input v-model="madeIn.name" :placeholder="item.madeIn&&item.madeIn.name||''" @change="searchArea">
+			<input v-model="madeIn.name" :placeholder="item.madeIn&&item.madeIn.name||''" @confirm="searchArea" confirm-type="go">
 			<text class="cuIcon-right" @tap.stop="madeInSelect"></text>
 		</view>
 		<view class="flex justify-around padding-tb-sm bg-grey">
@@ -102,20 +104,22 @@
 		<view class="cu-form-group">
 			<view class="title" @tap.stop="$util.toast('0.00元表示为未定价商品，POS系统每次销售时都会询问售价！')">
 				零售价<text class="cuIcon-info"></text></view>
-			<view class="flex flex-sub align-end">
-				<input :placeholder="item.retailPrice&&(item.retailPrice.amount+'/'+item.retailPrice.unit)||'0.00/PCS'"
-					:value="retailPrice" type="digit" @blur="retailPriceBlur" class="text-right">
+			<view class="flex flex-sub justify-end">
 				<hoprxi-badge :count="'毛利率：'+ profitRate">
+					<input
+						:placeholder="item.retailPrice&&(item.retailPrice.amount+'/'+item.retailPrice.unit)||'0.00/PCS'"
+						:value="retailPrice" type="digit" @blur="retailPriceBlur" class="text-right" confirm-type="done">
 				</hoprxi-badge>
 			</view>
 		</view>
 		<view class="cu-form-group">
 			<view class="title margin-right-sm">会员价</view>
-			<view class="flex flex-sub">
-				<hoprxi-badge :count="'毛利率：'+ profitRate" class="text-right">
+			<view class="flex justify-end">
+				<hoprxi-badge :count="'毛利率：'+ profitRate" left>
+					<input
+						:placeholder="item.memberPrice&&(item.memberPrice.amount+'/'+item.memberPrice.unit)||'0.00/PCS'"
+						:value="memberPrice" type="digit" @blur="memberPriceBlur" class="text-right ">
 				</hoprxi-badge>
-				<input :placeholder="item.memberPrice&&(item.memberPrice.amount+'/'+item.memberPrice.unit)||'0.00/PCS'"
-					:value="memberPrice" type="digit" @blur="memberPriceBlur" class="text-right">
 			</view>
 		</view>
 		<view class="cu-form-group">
@@ -174,7 +178,7 @@
 				<text class="cuIcon-list margin-right-sm "></text>当前有多个可选地址
 			</view>
 			<block v-for="(area,index) in areasSearched" :key="index">
-				<view v-if="index <=13"
+				<view v-if="index <= 13"
 					class="flex justify-between solid-bottom align-center padding-tb-sm padding-lr-sm"
 					@tap="searchedAreaSelect(area)">
 					<view><text>{{area.name}}</text>
@@ -268,6 +272,7 @@
 		computed,
 		onBeforeMount,
 		watch,
+		onMounted,
 	} from 'vue';
 	import {
 		formatMoney,
@@ -291,15 +296,18 @@
 						console.log(name.name);
 				}
 			};
+			let navBarHeight = ref(0);
+			let topHeight = ref(0);
 			let pullingDown = ref(false); // 是否正在下拉
 			let currentTouchStartY = 0;
-			let pullDownHeight = 0; // 下拉高度
-			let refresherThreshold = 60 //下拉刷新阈值60px
+			let pullDownHeight = ref(0.0); // 下拉高度
+			const refresherThreshold = 60 //下拉刷新阈值60px
 			const scrollContentStyle = computed(() => {
 				let style = {};
-				style.transform = pullingDown.value ? `translateY(${pullDownHeight}px)` : `translateY(0px)`;
+				style.transform = pullingDown.value ? `translateY(${pullDownHeight.value}px)` : `translateY(0px)`;
 				style.transition = pullingDown.value ? `transform .1s linear` :
 					`transform 0.3s cubic-bezier(0.19,1.64,0.42,0.72)`;
+				//style.height = `calc(100vh - ${topHeight.value}px`;
 				return style;
 			});
 			const touchStart = (e) => {
@@ -308,23 +316,22 @@
 			const touchMove = (e) => {
 				if (e.touches[0].clientY < currentTouchStartY) return;
 				const currentTouchMoveY = e.touches[0].clientY;
-				if ((currentTouchMoveY - currentTouchStartY) > 8) pullingDown.value = true;
+				if ((currentTouchMoveY - currentTouchStartY) > 20) pullingDown.value = true;
 				const movingDistance = (currentTouchMoveY - currentTouchStartY) * 0.65;
 				const moreDistance = movingDistance > refresherThreshold ? (movingDistance - refresherThreshold) *
 					0.3 : 0;
 				const computeDistance = movingDistance > refresherThreshold ? refresherThreshold + moreDistance :
 					movingDistance + moreDistance;
-				pullDownHeight = computeDistance;
-				console.log(pullDownHeight)
+				pullDownHeight.value = computeDistance;
 			};
-			const touchEnd = (e) => { // 触摸松开处理
-				if (pullDownHeight >= refresherThreshold) {
+			const touchEnd = (e) => { // 触摸松开处理	
+				if (pullDownHeight.value >= refresherThreshold) {
 					pullingDown.value = false;
-					pullDownHeight = 0;
+					pullDownHeight.value = 0;
 					refresh();
 				} else {
 					pullingDown.value = false;
-					pullDownHeight = 0;
+					pullDownHeight.value = 0;
 				}
 			};
 			let item = ref({});
@@ -352,7 +359,6 @@
 					})
 				}, 500)
 			};
-			let navBarHeight = ref(0);
 			const chooseImage = () => {
 				uni.chooseImage({
 					count: 4, //默认9
@@ -440,6 +446,9 @@
 			let searchAreaDialog = ref(false);
 			const areasSearched = reactive([]);
 			const searchArea = () => {
+				uni.showLoading({
+					title: '正在查询...',
+				});
 				ajax({
 					url: 'https://hoprxi.tooo.top/area/v1/areas',
 					data: {
@@ -447,6 +456,7 @@
 						filters: 'city,country'
 					}
 				}).then(res => {
+					uni.hideLoading();
 					areasSearched.length = 0;
 					for (const a of res.data.areas) {
 						areasSearched.push({
@@ -497,8 +507,8 @@
 			const units = [];
 			let unit = ref('');
 			const unitDrawerDialog = ref(false);
+			const unitPattern = new RegExp(/\/([\u4e00-\u9fa5]{1,2}|500g|kg|pcs)?$/);
 			watch(unit, () => {
-				const unitPattern = new RegExp(/\/([\u4e00-\u9fa5]{1,2}|500g|kg|pcs)?$/);
 				if (retailPrice.value.length != 0) {
 					retailPrice.value = retailPrice.value.replace(unitPattern, '') + "/" + unit.value;
 				}
@@ -518,7 +528,6 @@
 				}
 				//console.log(item.value)
 			});
-			let pricePattern = new RegExp(/\/?([\u4e00-\u9fa5]{1,2}|500g|kg|pcs)?$/);
 			let purchasePrice = '';
 			let retailPrice = ref('');
 			const retailPriceBlur = (event) => {
@@ -536,21 +545,28 @@
 				format(vipPrice);
 			};
 			const format = (price) => {
-				if (price.value) {
+				if (price && price.value != '') {
 					price.value = moneyFormat(price.value, 3) + "/" + (unit.value || 'pcs');
 				}
 			};
+			let pricePattern = new RegExp(/^(¥|￥|¥ |￥ )(\d+.\d{2,})/);
 			const profitRate = computed(() => {
-				const pattern = new RegExp(/^(¥|￥)(\d+.\d{2,}$)/);
+				console.log(retailPrice.value)
 				new Promise(resolve => {
 					resolve(item);
 				}).then((res) => {
-					console.log(res.value.storage.lastPurchasePrice.amount.replace(pattern, '$2'));
-					let cost = purchasePrice.vaule ? purchasePrice.value.replace(pattern, '$2') : Object
-						.keys(item).length > 0 ? item.value.storage.lastPurchasePrice.amount.replace(
-							pattern, '$2') : 0;
-					console.log(cost)
+					let cost = purchasePrice.vaule ? purchasePrice.value.replace(pricePattern, '$2') :
+						Object.keys(item).length > 0 ? item.value.storage.lastPurchasePrice.amount.replace(
+							pricePattern, '$2') : 0;
+					if (retailPrice && retailPrice.value != '') {
+						let a = computedProfitRate(cost, retailPrice.value.replace(unitPattern, '')
+							.replace(pricePattern, '$2'))
+						console.log(a);
+						return a;
+					}
+					//console.log(cost)
 				});
+				//console.log(retailPrice.value)
 				//let cost = purchasePrice.vaule ? purchasePrice.value.replace(unitPattern, '') : Object.keys(item)
 				//	.length > 0 ? item.value.storage.lastPurchasePrice.amount.replace(pattern, '') : 0;
 				/*
@@ -563,18 +579,18 @@
 				}
 				if (item) return computedProfitRate(cost, item.value.retailPrice.replace(unitPattern, '')) + '%';
 				*/
-				return '20%';
+				//return '20.56%';
 			});
-			const computedprofitRate = (cost, price) => {
-				if (cost === null || cost === 0 || cost === '0') return '100';
-				if (price === null || price === 0 || price === '0' || price === '0.00' || price === '0.0') return '0';
+			const computedProfitRate = (cost, price) => {
+				if (cost === null || cost === 0 || cost === '0') return '100%';
+				if (price === null || price === 0 || price === '0' || price === '0.00' || price === '0.0') return '0%';
 				let difference = price - cost;
-				return (difference / price * 100).toFixed(2);
+				return (difference / price * 100).toFixed(2) + '%';
 			};
 			let shelfLife = ref('');
 			const shelfLifeBlur = (event) => {
 				shelfLife.value = event.target.value;
-				if (shelfLife) {
+				if (shelfLife && shelfLife.value != '') {
 					let pattern = new RegExp(/天$/);
 					shelfLife.value = shelfLife.value.replace(pattern, '') + ' 天';
 				}
@@ -586,6 +602,14 @@
 					for (const u of res.data.units) units.push(u)
 				});
 			});
+			onMounted(() => {
+				uni.createSelectorQuery().select('#navBar').boundingClientRect(res => {
+					navBarHeight.value = res.height;
+				}).exec();
+				uni.createSelectorQuery().select('#top').boundingClientRect(res => {
+					topHeight.value = navBarHeight.value + res.height;
+				}).exec();
+			});
 			return {
 				key,
 				previous,
@@ -595,14 +619,14 @@
 				refresh,
 				load,
 				save,
-				pullingDown,
+				navBarHeight,
 				scrollContentStyle,
 				touchStart,
 				touchMove,
 				touchEnd,
+				pullingDown,
 				generate,
 				scanResultChange,
-				navBarHeight,
 				chooseImage,
 				viewImage,
 				delImg,
@@ -644,14 +668,6 @@
 				shelfLifeBlur
 			}
 		},
-		data() {
-			return {
-				pullingDown: false, // 是否正在下拉
-				currentTouchStartY: 0,
-				pullDownHeight: 0, // 下拉高度
-				refresherThreshold: 60 //下拉刷新阈值60px
-			}
-		},
 		onLoad(options) {
 			this.sign = options.sign || 'good';
 			this.key = options.id || options.plu;
@@ -663,7 +679,7 @@
 							id: this.key
 						},
 					}).then((res) => {
-						//console.log(res.data);
+						console.log(res.data);
 					})
 				} else {
 					ajax({
@@ -672,9 +688,9 @@
 							plu: this.key
 						},
 					}).then((res) => {
-						//console.log(res.data);
+						console.log(res.data);
 					}).catch((err) => {
-						toast("没有查询到此商品！")
+						//toast("没有查询到此商品！")
 					})
 				}
 				for (const good of catalog.catalog) {
@@ -688,17 +704,6 @@
 				//console.log(this.item);
 			}
 			//console.log(this.grade);
-		},
-		onReady() {
-			let query = uni.createSelectorQuery().in(this);
-			query.select('#navBar').boundingClientRect().exec(rect => {
-				this.navBarHeight = rect[0].height;
-			});
-			/*
-			uni.createSelectorQuery().select('#navBar').boundingClientRect(res => {
-				this.navBarHeight = res.height;
-			}).exec();
-			*/
 		}
 	}
 </script>

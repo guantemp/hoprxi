@@ -8,7 +8,7 @@
 			</view>
 		</hoprxi-navigation>
 		<view class="item">
-			<hoprxi-tip icon="/static/workflow_icon/item.png" :title="{name:'商品',weight:280}"
+			<hoprxi-cell icon="/static/workflow_icon/item.png" :title="{name:'商品',weight:320}"
 				:line="{pattern:'dashed',color:'#d4e7ed'}" />
 			<view class="cu-list grid col-4 no-border">
 				<block v-for="(good,index) in goods" :key="index">
@@ -24,7 +24,7 @@
 			</view>
 		</view>
 		<view class="purchase">
-			<hoprxi-tip icon="/static/workflow_icon/order.png" :title="{name:'采购',weight:320}"
+			<hoprxi-cell icon="/static/workflow_icon/order.png" :title="{name:'采购',weight:320}"
 				:line="{pattern:'dashed',color:'#d4e7ed'}" />
 			<view class="cu-list grid col-4 no-border">
 				<block v-for="(item,index) in purchase" :key="index">
@@ -40,7 +40,7 @@
 			</view>
 		</view>
 		<view class="warehouse">
-			<hoprxi-tip icon="/static/workflow_icon/order.png" :title="{name:'库管',weight:320}"
+			<hoprxi-cell icon="/static/workflow_icon/order.png" :title="{name:'库管',weight:320}"
 				:line="{pattern:'dashed',color:'#d4e7ed'}" />
 			<view class="cu-list grid col-4 no-border">
 				<block v-for="(item,index) in warehouses" :key="index">

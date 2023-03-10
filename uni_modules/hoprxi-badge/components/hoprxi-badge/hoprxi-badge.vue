@@ -1,48 +1,53 @@
 <template>
 	<view class="badge">
 		<slot></slot>
-		<view class="badge-dot" v-if="dot&&count!==0"></view>
-		<view class="badge-count" v-else-if="count" @click="onClick()">{{count}}</view>
-		<view class="badge-count" v-else @click="onClick()">{{finalCount}}</view>
+		<view v-if="count == 0" class="badge-dot" :style="{backgroundColor:bgColor}" @click="onClick()"></view>
+		<view v-else-if="count <= maxCount" class="badge-count" :class="left?'left':'right'"
+			:style="{backgroundColor:bgColor}" @click="onClick()">
+			{{count}}
+		</view>
+		<view v-else class="badge-count" :class="left?'left':'right'" :style="{backgroundColor:bgColor}"
+			@click="onClick()">{{finalCount}}</view>
 	</view>
 </template>
 
 <script>
+	import {
+		ref,
+		reactive,
+		computed,
+		watch
+	} from 'vue';
 	export default {
 		name: 'hoprxi-badge',
-		data() {
-			return {
-				maxCount: 99,
-			}
-		},
 		props: {
 			count: {
 				type: String,
 				default: ''
 			},
-			dot: {
+			left: {
 				type: Boolean,
-				default: false
+				default: false,
 			},
 			bgColor: {
 				type: String,
-				default: ''
+				default: '#8799a3'
 			}
 		},
 		setup(props, content) {
-
-		},
-		computed: {
-			finalCount() {
-				return this.count > this.maxCount ? `${this.maxCount}+` : this.count
+			const maxCount = 99;
+			const finalCount = computed(() => {
+				return props.count > maxCount ? `${maxCount}+` : props.count
+			});
+			const onClick = () => {
+				content.emit('click');
+			};
+			return {
+				maxCount,
+				finalCount,
+				onClick
 			}
 		},
-		methods: {
-			onClick() {
-				//this.badgeStyle = `width: ${String(this.text).length * 8 + 12}px`
-				this.$emit('click');
-			}
-		}
 	}
 </script>
 
@@ -55,41 +60,48 @@
 
 	.badge-count {
 		position: absolute;
-		transform: translateX(95%);
-		top: -8rpx;
-		right: 1rpx;
-		min-width: 32rpx;
-		min-height: 28rpx;
-		line-height: 28rpx;
-		border-radius: 200rpx;
+		top: -9px;
+		min-width: 16px;
+		min-height: 14px;
+		line-height: 14px;
+		border-radius: 100px;
 
 		text-align: center;
-		padding: 0 10rpx;
-		font-size: 18rpx;
+		padding: 0 5px;
+		font-size: 9px;
 		color: #ffffff;
 
 		white-space: nowrap;
 		z-index: 2;
+
+		&.left {
+			transform: translateX(-35%);
+			left: 0;
+		}
+
+		&.right {
+			transform: translateX(-15%);
+			right: 0;
+		}
 	}
 
-	.badge-count:not([class*="bg-"]) {
-		background-color: #dd514c;
-	}
 
 	.badge-dot {
 		position: absolute;
-		transform: translateX(95%);
-		top: -8rpx;
-		right: 0rpx;
-		min-height: 16rpx;
-		min-width: 16rpx;
+		transform: translateX(-15%);
+		top: -8px;
+		right: 0;
+		min-height: 8px;
+		min-width: 8px;
 		border-radius: 100%;
 
-		z-index: 10;
+		z-index: 2;
 		box-shadow: 0 0 0 1rpx #fff;
 	}
 
+	/*
 	.badge-dot:not([class*="bg-"]) {
 		background-color: #dd514c;
 	}
+*/
 </style>

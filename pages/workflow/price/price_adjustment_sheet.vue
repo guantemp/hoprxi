@@ -1,17 +1,15 @@
 <template>
 	<view class="bg-grey">
 		<hoprxi-navigation title="调价单" :backgroundColor="[1, ['#AC32E4', '#7918F2', 90]]"
-			:titleFont="['#FFF','left',700]" :surplusHeight="45" id="navBar">
+			:titleFont="['#FFF','left',900]" :surplusHeight="46" id="navBar">
 			<template slot="extendSlot" class="cu-bar search">
-				<view class="search-form radius">
-					<text class="cuIcon-search"></text>
+				<view class="search-form radius" style="height:38px">
+					<text class="cuIcon-search text-bold text-xl"></text>
 					<input v-model="scanResult" :adjust-position="false" type="text" placeholder="请输入单据号、商品条码"
-						confirm-type="search">
-					<text class="cuIcon-scan text-blue text-bold" @tap="scan"></text>
+						confirm-type="search" placeholder-class="text-df">
+					<text class="cuIcon-scan text-blue text-bold text-xxl" @tap="scan"></text>
 				</view>
-				<view class="action text-white">
-					<text class="cuIcon-filter margin-left-xs" @click="query"></text>
-				</view>
+				<view class="action text-white cuIcon-filter text-xxl" @click="query"></view>
 			</template>
 		</hoprxi-navigation>
 		<view class="flex justify-around align-center bg-white solid padding-tb-sm padding-lr-lg" v-if="dateShow">
@@ -21,40 +19,35 @@
 		</view>
 		<scroll-view scroll-y :scroll-with-animation="true" :enable-back-to-top="true"
 			:style="{height:dateShow?'calc(98.5vh - '+(fixedHeight+dateShowHeight)+'px - 10rpx)':'calc(98.5vh - '+ fixedHeight +'px - 10rpx)'}">
-
 			<view class="flex text-center bg-white nav">
 				<view class="cu-item flex-sub" :class="{'text-orange cur':index === tabCur}"
 					v-for="(item,index) in tabList" :key="index" @tap="tabSelect" :data-id="index">
 					{{item}}
 				</view>
 			</view>
-
-			<block v-for="(sheet,index) in priceAdjustmentSheet" :key="index">
-				<view class="sheet">
-					<hoprxi-cell :title="'单据号: ' + sheet.sheetNumber" :titleFont="['#8799a3',28,700]"
-						:line="['dashed','#e4e7ed']" :decorateIconClass="'cuIcon-comment'">
-						<template #executableSlot>
-							<text v-if="sheet.approval==='normal' || sheet.approval==='denied'"
-								class="cuIcon-delete text-blue"
-								@click.stop="showDeleteModalDialog(sheet.sheetNumber,$event)"
-								data-target="DialogModalDelete"></text>
-						</template>
-					</hoprxi-cell>
-					<view class="sheetDetailed margin-top-xs padding-lr-xs bg-white"
-						@tap.stop="navToSheet(sheet.sheetNumber)">
-						<text class="iconfont icon-price-adjustment left" :style="[{color:selectColor(sheet)}]"></text>
-						<view class="flex flex-direction midlle text-cut">
-							<text>申请日期：{{sheet.applyDate}}</text>
-							<text class="text-cut">适配门店：{{sheet.store}}</text>
-							<text class="margin-bottom-xs">生效日期：{{sheet.effectDate}}</text>
-							<hoprxi-tip :title="{name:'申请人：',weight:100,size:28}" :line="{pattern:'dashed',color:'#d4e7ed',position:'top'}" />
-							<hoprxi-cell :title="'申请人：' + sheet.proposer" :line="['dashed','#e4e7ed','top']">
-							</hoprxi-cell>
-						</view>
-						<text class="cuIcon-right text-grey margin-left-sm right"></text>
+			<view class="sheet" v-for="(sheet,index) in priceAdjustmentSheet" :key="index">
+				<hoprxi-cell iconFont="cuIcon-comment"
+					:title="{name:'单据号: ' + sheet.sheetNumber,weight:500,size:15,color:selectColor(sheet)}"
+					:line="{pattern:'dashed',color:'#d4e7ed'}">
+					<!-- <template #slotName></template> -->
+					<text v-if="sheet.approval==='normal' || sheet.approval==='denied'" class="cuIcon-delete text-blue"
+						@click.stop="showDeleteModalDialog(sheet.sheetNumber,$event)"
+						data-target="DialogModalDelete"></text>
+				</hoprxi-cell>
+				<view class="sheetDetailed margin-top-xs padding-lr-xs bg-white align-center"
+					@tap.stop="navToSheet(sheet.sheetNumber)">
+					<text class="iconfont icon-price-adjustment left" :style="[{color:selectColor(sheet)}]"></text>
+					<view class="flex flex-direction midlle text-cut">
+						<text>申请日期：{{sheet.applyDate}}</text>
+						<text class="text-cut">适配门店：{{sheet.store}}</text>
+						<text class="margin-bottom-xs">生效日期：{{sheet.effectDate}}</text>
+						<hoprxi-cell :title="{name:'申请人：'+ sheet.proposer,size:14,weight:400}"
+							:line="{pattern:'dashed',color:'#d4e7ed',position:'top'}">
+						</hoprxi-cell>
 					</view>
+					<text class="cuIcon-right text-grey margin-left-sm right"></text>
 				</view>
-			</block>
+			</view>
 		</scroll-view>
 		<!-- bootom -->
 		<view class="add">
@@ -162,9 +155,9 @@
 					setTimeout(() => {
 						let query = uni.createSelectorQuery().in(this);
 						query.select('.flex.justify-around.align-center.bg-white').boundingClientRect().exec(
-							res => {
-								this.dateShowHeight = res[0].height;
-							});
+						res => {
+							this.dateShowHeight = res[0].height;
+						});
 					}, 1);
 				}
 			},
@@ -179,7 +172,7 @@
 			},
 			selectColor(vaule) {
 				if (vaule.approval === "pass") return "#39b54a";
-				if (vaule.approval === "denied") return "#f37b1d";
+				if (vaule.approval === "denied") return "#e54d42";
 				return "#8799a3";
 			},
 			showDeleteModalDialog(sheetNumber, event) {
@@ -259,10 +252,10 @@
 		.sheetDetailed {
 			display: flex;
 			align-items: center;
-
+			justify-content: center;
 
 			.left {
-				font-size: 86rpx;
+				font-size: 43px;
 				flex: 0 0 16%;
 			}
 
@@ -272,7 +265,7 @@
 
 			.right {
 				flex: 0 0 3%;
-				font-size: 24rpx;
+				font-size: 12px;
 			}
 		}
 	}

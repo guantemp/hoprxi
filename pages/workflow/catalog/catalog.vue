@@ -1,136 +1,133 @@
 <template>
-	<view class="text-df">
-		<hoprxi-navigation title="商品目录" :backgroundColor="[1, ['#6B73FF', '#000DFF', 135]]"
-			:titleFont="['#FFF','left',1200]" id="navBar" :surplusHeight="46">
-			<template slot="extendSlot" class="cu-bar search">
-				<view class="search-form radius" style="height:76rpx">
-					<text class="cuIcon-search text-bold text-xl"></text>
-					<input v-model="scanResult" :adjust-position="false" type="text" placeholder="请输入商品条码/名称/拼音首字母"
-						confirm-type="search" placeholder-class="text-df">
-					<text class="cuIcon-scan text-blue text-bold text-xxl" @tap="scan"></text>
-				</view>
-				<view class="action text-white cuIcon-filter text-xxl" @tap="filterWindows = !filterWindows">
+	<hoprxi-navigation title="商品目录" :backgroundColor="[1, ['#6B73FF', '#000DFF', 135]]" :titleFont="['#FFF','left',400]"
+		id="navBar" :surplusHeight="46">
+		<template slot="extendSlot" class="cu-bar search">
+			<view class="search-form radius" style="height:38px">
+				<text class="cuIcon-search text-bold text-xl"></text>
+				<input v-model="scanResult" :adjust-position="false" type="text" placeholder="请输入商品条码/名称/拼音首字母"
+					confirm-type="search" placeholder-class="text-df">
+				<text class="cuIcon-scan text-blue text-bold text-xxl" @tap="scan"></text>
+			</view>
+			<view class="action text-white cuIcon-filter text-xxl" @tap="filterWindows = !filterWindows">
+			</view>
+		</template>
+	</hoprxi-navigation>
+	<hoprxi-dropdown :menus="categories" id="dropdown" style="font-size: 15px;"></hoprxi-dropdown>
+	<view v-if="catalog.length === 0" class="flex justify-center flex-direction align-center"
+		:style="{height:'calc(100vh - ' + (navigatorHeight + dropdownHeight) + 'px)'}">
+		<text class="cuIcon-like text-red text-xsl"></text>
+		<text>吔、吔、切克闹...</text>
+	</view>
+	<scroll-view v-else scroll-y :scroll-with-animation="true" :enable-back-to-top="true"
+		:style="{height:'calc(100vh - ' + (navigatorHeight + dropdownHeight) + 'px)'}" class="text-df">
+		<hoprxi-slider :buttons="buttons" :items="catalog" @del="del" @history="history" @favor="favor" @share="share"
+			@click="navigationToDetail">
+			<template v-slot="{item}">
+				<view class="flex padding-lr-sm padding-tb-xs align-center solid-top" @longpress="onLongPress"
+					:data-id="item.id||item.plu" :data-sign="item.id?'id':'plu'">
+					<view class="imageWrapper">
+						<image class="good-img"
+							:src="(item.images&&item.images[0])||(item.barcode?'/static/workflow_icon/archives.png':'/static/workflow_icon/plu.png')"
+							mode="aspectFill" />
+					</view>
+					<view class="flex flex-direction flex-sub">
+						<view class="text-cut">{{item.name.name}}</view>
+						<view class="flex justify-between">
+							<text v-if="item.barcode">条码：{{item.barcode}}</text>
+							<text v-else>PLU：{{item.plu}}</text>
+							<text>规格：{{item.spec}}</text>
+						</view>
+						<view>
+							产地：{{item.madeIn.name}}
+						</view>
+						<view class="flex justify-between">
+							<view>零售价：<text
+									class="text-red">{{item.retailPrice.amount}}/{{item.retailPrice.unit}}</text>
+							</view>
+							<view>会员价:<text
+									class="text-red margin-left-sm">{{item.memberPrice.amount}}/{{item.memberPrice.unit}}</text>
+							</view>
+						</view>
+					</view>
 				</view>
 			</template>
-		</hoprxi-navigation>
-		<hoprxi-dropdown :menus="categories" id="dropdown"></hoprxi-dropdown>
-		<view v-if="catalog.length === 0" class="flex justify-center flex-direction align-center"
-			:style="{height:'calc(100vh - ' + (navigatorHeight + dropdownHeight) + 'px)'}">
-			<text class="cuIcon-like text-red text-xsl"></text>
-			<text>吔、吔、切克闹...</text>
-		</view>
-		<scroll-view v-else scroll-y :scroll-with-animation="true" :enable-back-to-top="true"
-			:style="{height:'calc(100vh - ' + (navigatorHeight + dropdownHeight) + 'px)'}">
-			<hoprxi-slider :buttons="buttons" :items="catalog" @del="del" @history="history" @favor="favor"
-				@share="share" @click="navigationToDetail">
-				<template v-slot="{item}">
-					<view class="flex padding-lr-sm padding-tb-xs align-center solid-top" @longpress="onLongPress"
-						:data-id="item.id||item.plu" :data-sign="item.id?'id':'plu'">
-						<view class="imageWrapper">
-							<image class="good-img"
-								:src="(item.images&&item.images[0])||(item.barcode?'/static/workflow_icon/archives.png':'/static/workflow_icon/plu.png')"
-								mode="aspectFill" />
-						</view>
-						<view class="flex flex-direction flex-sub">
-							<view class="text-cut">{{item.name.name}}</view>
-							<view class="flex justify-between">
-								<text v-if="item.barcode">条码：{{item.barcode}}</text>
-								<text v-else>PLU：{{item.plu}}</text>
-								<text>规格：{{item.spec}}</text>
-							</view>
-							<view>
-								产地：{{item.madeIn.name}}
-							</view>
-							<view class="flex justify-between">
-								<view>零售价：<text
-										class="text-red">{{item.retailPrice.amount}}/{{item.retailPrice.unit}}</text>
-								</view>
-								<view>会员价:<text
-										class="text-red margin-left-sm">{{item.memberPrice.amount}}/{{item.memberPrice.unit}}</text>
-								</view>
-							</view>
-						</view>
-					</view>
-				</template>
-			</hoprxi-slider>
-		</scroll-view>
-		<hoprxi-drag-fab :menus="menus" @appendGood="$util.navTo('/pages/workflow/catalog/good?sign=good&action=new')"
-			@appendScale="$util.navTo('/pages/workflow/catalog/good?sign=scale&action=new')"
-			@editCategories="$util.navTo('/pages/workflow/catalog/category')"
-			@recovery="$util.navTo('/pages/public/recovery')"
-			@editBrands="$util.navTo('/pages/workflow/catalog/brand')">
-		</hoprxi-drag-fab>
-		<!-- 遮罩层-->
-		<view :class="['mask',{'show':filterWindows}]" @tap="filterWindows = false"></view>
-		<!-- 高级过滤对话框 -->
-		<view class="drawerWindow" :class="{'show':filterWindows}" :style="{top:'calc(' + navigatorHeight + 'px)'}">
-			<view class="flex"><text class="cuIcon-roundclose text-xl" @tap="filterWindows = false"></text><text
-					class="flex-twice text-center">筛选</text> </view>
-			<scroll-view scroll-y class="margin-top">
-				<view class="flex justify-between padding-lr-xs">排序
-					<view class="text-sm" @tap="sortExchange === 'asc'?sortExchange = 'desc':sortExchange ='asc'"
-						:class="sortExchange === 'asc'?'text-red':'text-green'">
-						<text
-							:class="sortExchange === 'asc'?'icon-asc':'icon-desc'"></text>{{sortExchange === 'asc'?'升序':'降序'}}
-					</view>
+		</hoprxi-slider>
+	</scroll-view>
+	<hoprxi-drag-fab :menus="menus" @appendGood="$util.navTo('/pages/workflow/catalog/good?sign=good&action=new')"
+		@appendScale="$util.navTo('/pages/workflow/catalog/good?sign=scale&action=new')"
+		@editCategories="$util.navTo('/pages/workflow/catalog/category')"
+		@recovery="$util.navTo('/pages/public/recovery')" @editBrands="$util.navTo('/pages/workflow/catalog/brand')">
+	</hoprxi-drag-fab>
+	<!-- 遮罩层-->
+	<view :class="['mask',{'show':filterWindows}]" @tap="filterWindows = false"></view>
+	<!-- 高级过滤对话框 -->
+	<view class="drawerWindow" :class="{'show':filterWindows}" :style="{top:'calc(' + navigatorHeight + 'px)'}">
+		<view class="flex"><text class="cuIcon-roundclose text-xl" @tap="filterWindows = false"></text><text
+				class="flex-twice text-center">筛选</text> </view>
+		<scroll-view scroll-y class="margin-top">
+			<view class="flex justify-between padding-lr-xs">排序
+				<view class="text-sm" @tap="sortExchange === 'asc'?sortExchange = 'desc':sortExchange ='asc'"
+					:class="sortExchange === 'asc'?'text-red':'text-green'">
+					<text
+						:class="sortExchange === 'asc'?'icon-asc':'icon-desc'"></text>{{sortExchange === 'asc'?'升序':'降序'}}
 				</view>
-				<view class="flex flex-wrap margin-bottom-sm">
-					<block v-for="(sort,index) in sorts" :key="sort">
-						<view :class="['lattice',{'selected':sort === selectedFilter[0]}]" @tap.top="sortChecked(sort)">
-							<text>{{sort}}</text>
-						</view>
-					</block>
-				</view>
-				<view class="flex justify-between margin-bottom-sm solid-top padding-top-sm  padding-lr-xs">价格
-					<view class="text-xs text-center" @tap="showPrice=!showPrice">
-						{{showPrice?'收缩':'展开'}}<text :class="showPrice?'cuIcon-fold':'cuIcon-unfold'"></text>
-					</view>
-				</view>
-				<view class="flex justify-between padding-lr-xs">
-					<input placeholder="最低零售价" class="input1" type="digit">
-					<text class="cuIcon-move margin-lr  padding-top-sm"></text>
-					<input placeholder="最高零售价" class="input1" type="digit">
-				</view>
-				<view v-show="showPrice" class="flex justify-between padding-lr-xs margin-top-xs">
-					<input placeholder="最低会员价" class="input1" type="digit">
-					<text class="cuIcon-move margin-lr  padding-top-sm"></text>
-					<input placeholder="最高会员价" class="input1" type="digit">
-				</view>
-				<view v-show="showPrice" class="flex justify-between padding-lr-xs margin-top-xs">
-					<input placeholder="最低VIP价" class="input1" type="digit">
-					<text class="cuIcon-move margin-lr  padding-top-sm"></text>
-					<input placeholder="最高VIP价" class="input1" type="digit">
-				</view>
-				<view class="margin-top-sm solid-top padding-top-sm">品牌</view>
-				<view class="flex flex-wrap">
-					<block v-for="(brand,index) in brands" :key="brand">
-						<view :class="['lattice',{'selected':isCheckedBrand(brand)}]" @tap.top="brandChecked(brand)">
-							<text>{{brand}}</text>
-						</view>
-					</block>
-				</view>
-			</scroll-view>
-			<view class="bootom">
-				<button class="cu-btn radius shadow bg-grey basis-sm" @tap.stop="restFilter">重置</button>
-				<button class="cu-btn radius shadow bg-grey basis-sm margin-left-sm" @tap.stop="">确定</button>
 			</view>
+			<view class="flex flex-wrap margin-bottom-sm">
+				<block v-for="(sort,index) in sorts" :key="sort">
+					<view :class="['lattice',{'selected':sort === selectedFilter[0]}]" @tap.top="sortChecked(sort)">
+						<text>{{sort}}</text>
+					</view>
+				</block>
+			</view>
+			<view class="flex justify-between margin-bottom-sm solid-top padding-top-sm  padding-lr-xs">价格
+				<view class="text-xs text-center" @tap="showPrice=!showPrice">
+					{{showPrice?'收缩':'展开'}}<text :class="showPrice?'cuIcon-fold':'cuIcon-unfold'"></text>
+				</view>
+			</view>
+			<view class="flex justify-between padding-lr-xs">
+				<input placeholder="最低零售价" class="input1" type="digit">
+				<text class="cuIcon-move margin-lr  padding-top-sm"></text>
+				<input placeholder="最高零售价" class="input1" type="digit">
+			</view>
+			<view v-show="showPrice" class="flex justify-between padding-lr-xs margin-top-xs">
+				<input placeholder="最低会员价" class="input1" type="digit">
+				<text class="cuIcon-move margin-lr  padding-top-sm"></text>
+				<input placeholder="最高会员价" class="input1" type="digit">
+			</view>
+			<view v-show="showPrice" class="flex justify-between padding-lr-xs margin-top-xs">
+				<input placeholder="最低VIP价" class="input1" type="digit">
+				<text class="cuIcon-move margin-lr  padding-top-sm"></text>
+				<input placeholder="最高VIP价" class="input1" type="digit">
+			</view>
+			<view class="margin-top-sm solid-top padding-top-sm">品牌</view>
+			<view class="flex flex-wrap">
+				<block v-for="(brand,index) in brands" :key="brand">
+					<view :class="['lattice',{'selected':isCheckedBrand(brand)}]" @tap.top="brandChecked(brand)">
+						<text>{{brand}}</text>
+					</view>
+				</block>
+			</view>
+		</scroll-view>
+		<view class="bootom">
+			<button class="cu-btn radius shadow bg-grey basis-sm" @tap.stop="restFilter">重置</button>
+			<button class="cu-btn radius shadow bg-grey basis-sm margin-left-sm" @tap.stop="">确定</button>
 		</view>
-		<!-- 删除对话框 -->
-		<view class="cu-modal" :class="{'show':delGoodModalDialog}">
-			<view class="cu-dialog">
-				<view class="cu-bar bg-white">
-					<view class="content text-bold text-orange">警 告</view>
-				</view>
-				<view class="padding-xs bg-white">
-					<text class="text-bold text-lg">确定要删除商品?</text><br />
-					<br />
-					<text class="text-blue margin-top-xl text-sm">若出现误操作，请在回收站找回</text>
-				</view>
-				<view class="cu-bar">
-					<view class="action margin-0 flex-sub text-green" @tap="delGoodModalDialog = false">取消</view>
-					<view class="action margin-0 flex-sub solid-left" @tap="remove(selectedGood.id||selectedGood.plu)">
-						确定</view>
-				</view>
+	</view>
+	<!-- 删除对话框 -->
+	<view class="cu-modal" :class="{'show':delGoodModalDialog}">
+		<view class="cu-dialog">
+			<view class="cu-bar bg-white">
+				<view class="content text-bold text-orange">警 告</view>
+			</view>
+			<view class="padding-xs bg-white">
+				<text class="text-bold text-lg">确定要删除商品?</text><br />
+				<br />
+				<text class="text-blue margin-top-xl text-sm">若出现误操作，请在回收站找回</text>
+			</view>
+			<view class="cu-bar">
+				<view class="action margin-0 flex-sub text-green" @tap="delGoodModalDialog = false">取消</view>
+				<view class="action margin-0 flex-sub solid-left" @tap="remove(selectedGood.id||selectedGood.plu)">
+					确定</view>
 			</view>
 		</view>
 	</view>

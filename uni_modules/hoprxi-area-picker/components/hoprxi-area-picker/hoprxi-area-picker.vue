@@ -1,13 +1,13 @@
 <template>
-	<picker-view indicator-style="height:44px" :value="initialIndex" @change="change">
+	<picker-view class="picker-view" indicator-style="height:44px" :value="initialIndex" @change="change">
 		<picker-view-column>
-			<view v-for="(province,index) in provinces" :key="index">{{province.name}}</view>
+			<view class="view" v-for="(province,index) in provinces" :key="index">{{province.name}}</view>
 		</picker-view-column>
 		<picker-view-column>
-			<view v-for="(city,index) in cities" :key="index">{{city.name}}</view>
+			<view class="view" v-for="(city,index) in cities" :key="index">{{city.name}}</view>
 		</picker-view-column>
 		<picker-view-column v-if="showCounty">
-			<view v-for="(county,index) in counties" :key="index">{{county.name}}</view>
+			<view class="view" v-for="(county,index) in counties" :key="index">{{county.name}}</view>
 		</picker-view-column>
 	</picker-view>
 </template>
@@ -190,13 +190,13 @@
 	}
 </script>
 <style lang="scss">
-	picker-view {
-		height: 476rpx;
+	.picker-view {
+		height: 238px;
 		overflow: hidden;
 		background-color: rgba(155, 255, 255, 1);
 	}
 
-	picker-view-column view {
+	.view {
 		text-align: center;
 		width: 100%;
 		height: 44px;

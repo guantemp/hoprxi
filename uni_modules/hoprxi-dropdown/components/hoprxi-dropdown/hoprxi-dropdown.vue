@@ -1,41 +1,42 @@
 <template>
-	<scroll-view scroll-x class="navigation bg-white" scroll-with-animation :scroll-left="tab_scroll">
-		<view class="tab" :ref="tab" :class="{'text-orange cur text-bold':index === selected}"
-			v-for="(tab,index) in tabs" :key="tab.id" :data-id="tab.id" @tap="tabSelect">
-			<text>{{tab.name}}</text>
-			<text v-if="tab.sub" class="cuIcon-triangledownfill subIcon" :data-id="tab.id"
-				:class="{'selected':index === selected && popupShow}" @tap="triangledown"></text>
+	<scroll-view scroll-x class="navigation bg-white" scroll-with-animation :scroll-left="tab_scroll"
+		enable-flex="true">
+		<view class="tab" :class="{'cur':index === primary}" v-for="(tab,index) in tabs" :key="index" :data-id="index"
+			@tap.stop="tabSelect" :style="[tab.children?'padding: 0 18px 0 7px':'']">
+			<text>{{showTitle(index)}}</text>
+			<text v-if="tab.children" class="cuIcon-triangledownfill subIcon" :data-id="index"
+				:class="{'selected':index === primary && popupShow}" @tap="triangledown"></text>
 		</view>
 	</scroll-view>
 	<!-- 遮罩层-->
 	<view :class="['mask',{'show':popupShow}]" @tap="popupShow = false"></view>
 	<!--4个层级-->
-	<view :class="['popup',{'hide':!popupShow}]" v-if="tabs[selected].depth >= 4">
-		<scroll-view class="left" :scroll-y="true"
-			scroll-into-view="{{select[selected]&&'label_'+select[selected].level2_id}}">
-			<block v-for="(one,index) in tabs[selected].sub" :key="one.id">
+	<view :class="['popup',{'hide':!popupShow}]" v-if="tabs[primary].depth >= 4">
+		<scroll-view class="left" :scroll-y="true" enable-flex="true"
+			scroll-into-view="{{select[primary]&&'label_'+ select[primary].level2_id}}">
+			<block v-for="(one,index) in tabs[primary].children" :key="one.id">
 				<view class="left_menu" :id="'label_'+one.id"
-					:class="{'bg-white text-red':select[selected]&&select[selected].level2_id === one.id&&!select[selected].level2_cancel}"
+					:class="{'bg-white text-red':select[primary]&&select[primary].level2_id === one.id&&!select[primary].level2_cancel}"
 					@tap.stop="second_menu_selected(one.id)">
-					<text>{{one.name}}</text>
+					<text class="text">{{one.name}}</text>
 				</view>
 			</block>
 		</scroll-view>
-		<scroll-view class="right" :scroll-y="true" 
-			:scroll-into-view="select[selected]&&'label_'+ (select[selected].level4_id||select[selected].level3_id)">
+		<scroll-view class="right" :scroll-y="true"
+			:scroll-into-view="select[primary]&&'label_'+ (select[primary].level4_id||select[primary].level3_id)">
 			<block v-for="(two,index) in children()" :key="two.id">
-				<view class="label" :class="{'text-orange':select[selected]&&select[selected].level3_id === two.id}"
+				<view class="label" :class="{'text-orange':select[primary]&&select[primary].level3_id === two.id}"
 					:id="'label_'+two.id" @tap.top="three_menu_selected(two.id)">
-					<text>{{two.name}}</text>
+					<text class="text">{{two.name}}</text>
 					<text class="cuIcon-check text-lg text-bold"
-						v-if="select[selected]&&select[selected].level3_id === two.id"></text>
+						v-if="select[primary]&&select[primary].level3_id === two.id"></text>
 				</view>
-				<view class="items" v-if="two.sub">
-					<block v-for="(three,three_index) in two.sub" :key="three.id">
+				<view class="items" v-if="two.children">
+					<block v-for="(three,three_index) in two.children" :key="three.id">
 						<view class="item" @tap.top="four_menu_selected(three.id)"
-							:class="{'selected':select[selected]&&select[selected].level4_id === three.id}"
+							:class="{'selected':select[primary]&&select[primary].level4_id === three.id}"
 							:id="'label_'+three.id">
-							<text>{{three.name}}</text>
+							<text class="text">{{three.name}}</text>
 						</view>
 					</block>
 				</view>
@@ -43,31 +44,31 @@
 			</block>
 		</scroll-view>
 	</view>
-	<!--3个层级-->
-	<view :class="['popup',{'hide':!popupShow}]" v-else-if="tabs[selected].depth <= 3">
+	<!--2,3个层级-->
+	<view :class="['popup',{'hide':!popupShow}]" v-else-if="tabs[primary].depth <= 3">
 		<scroll-view class="filter" scroll-y :scroll-with-animation="true" :enable-back-to-top="true"
-			scroll-into-view="{{select[selected]&&'label_'+(select[selected].level3_id||select[selected].level2_id)}}"
-			:style="{'height:calc(52vh - 108rpx);' : tabs[selected].selector === 'multi'}">
-			<block v-for="(one,index) in tabs[selected].sub" :key="one.id">
+			scroll-into-view="{{select[primary]&&'label_'+(select[primary].level3_id||select[primary].level2_id)}}"
+			:style="{'height:calc(52vh - 108rpx);' : tabs[primary].selector === 'multi'}">
+			<block v-for="(one,index) in tabs[primary].children" :key="one.id">
 				<view class="label"
-					:class="{'text-red text-bold':select[selected]&&select[selected].level2_id === one.id&&!select[selected].level2_cancel}"
+					:class="{'text-red text-bold':select[primary]&&select[primary].level2_id === one.id&&!select[primary].level2_cancel}"
 					:id="'label_'+ one.id" @tap="second_menu_selected(one.id)">
-					<text>{{one.name.name}}</text>
+					<text class="text">{{one.name.name}}</text>
 					<text class="cuIcon-check text-lg text-bold"
-						v-if="select[selected]&&select[selected].level2_id === one.id&&!select[selected].level2_cancel"></text>
+						v-if="select[primary]&&select[primary].level2_id === one.id&&!select[primary].level2_cancel"></text>
 				</view>
-				<view class="items items-extend" v-if="one.sub">
-					<block v-for="(two,three_index) in one.sub" :key="two.id">
+				<view class="items items-extend" v-if="one.children">
+					<block v-for="(two,three_index) in one.children" :key="two.id">
 						<view class="item item-extend" @tap.top="three_menu_selected(two.id)" :id="'label_'+ two.id"
-							:class="{'selected':select[selected]&&select[selected].level3_id === two.id}">
-							<text>{{two.name.name}}</text>
+							:class="{'selected':select[primary]&&select[primary].level3_id === two.id}">
+							<text class="text">{{two.name.name}}</text>
 						</view>
 					</block>
 				</view>
 				<view class="division"></view>
 			</block>
 		</scroll-view>
-		<view class="filterBtn" v-if="tabs[selected].selector === 'multi'">
+		<view class="filterBtn" v-if="tabs[primary].selector === 'multi'">
 			<button class="cu-btn radius shadow bg-orange basis-sm margin-right-sm text-lg" @tap.stop="rest_multi">
 				<text>重置</text></button>
 			<button class="cu-btn radius shadow bg-orange basis-sm text-lg" @tap.stop="">
@@ -85,7 +86,7 @@
 	import {
 		reactive,
 		ref,
-		onMounted,
+		onBeforeMount,
 		watch
 	} from 'vue';
 	import {
@@ -94,11 +95,8 @@
 	export default {
 		name: 'hoprxi-dropdown',
 		props: {
+			single: Boolean,
 			menus: {
-				Type: Array,
-				default: []
-			},
-			perset: {
 				Type: Array,
 				default: []
 			},
@@ -106,9 +104,9 @@
 				type: Object,
 				default: {
 					id: 'id', // 指定id为节点对象的某个属性值
-					sub: 'children', // 指定子树为节点对象的某个属性值
+					children: 'children', // 指定子树为节点对象的某个属性值
 					name: 'name', // 指定标签为节点对象的某个属性值
-					selector: 'selector' //选择类型 single_select,multi_select
+					selector: 'selector' //选择类型：缺省单选single不标注,多选标注：multi
 				}
 			},
 		},
@@ -116,181 +114,27 @@
 			const tabs = reactive([{
 				depth: 1
 			}]);
-			let popupShow = ref(false);
 			let tab_scroll = ref(0);
-			let selected = ref(0);
-			watch(props.menus, (n, o) => { //使用()=>tabs.depth监视内部的,props的不使用
-				let i = 0;
-				for (const menu of props.menus) {
-					//console.log(menu)
-					const id = getPropertyFromData(menu, props.props, 'id');
-					const name = getPropertyFromData(menu, props.props, 'name');
-					let parent = {
-						id: id,
-						name: name,
-					}
-					const selector = getPropertyFromData(menu, props.props, 'selector');
-					if (selector) {
-						parent = {
-							...parent,
-							selector: selector
-						}
-					}
-					const sub = getPropertyFromData(menu, props.props, 'sub');
-					tabs[i] = {
-						..._translate(parent, sub),
-						depth: depth(sub),
-					}
-					i += 1;
-				}
-			});
-			const _translate = (parent, children = []) => {
-				if (!parent) return;
-				if (children && Array.isArray(children) && children.length > 0) {
-					let items = [];
-					for (const child of children) {
-						let temp = {
-							id: getPropertyFromData(child, props.props, 'id'),
-							name: getPropertyFromData(child, props.props, 'name'),
-						};
-						let sub = getPropertyFromData(child, props.props, 'sub');
-						if (sub && Array.isArray(sub) && sub.length > 0) {
-							items.push(_translate(temp, sub))
-						} else {
-							items.push(temp);
-						};
-					}
-					parent = {
-						...parent,
-						sub: items
-					}
-				}
-				return parent;
+			let primary = ref(0);
+			let popupShow = ref(false);
+			const tabSelect = (event) => {
+				primary.value = event.currentTarget.dataset.id;
+				//css tab中 (margin:8+padding:16)*2=48
+				if (primary.value <= 2) tab_scroll.value = (primary.value - 1) * 48;
+				else if (primary.value > 2 && primary.value <= 5) tab_scroll.value = (primary.value - 0.6) *
+				48; //左移时预先显示2个项目
+				else tab_scroll.value = (primary.value + 0.6) * 48;
+				if (popupShow.value && !tabs[primary.value].children) popupShow.value = false
 			};
-			const depth = (treeData) => {
-				let floor = 0
-				let max = 0
-				const _each = (data, floor) => {
-					if (data && Array.isArray(data) && data.length > 0) {
-						data.forEach(e => {
-							max = floor > max ? floor : max;
-							let sub = getPropertyFromData(e, props.props, 'sub');
-							//if (sub && Array.isArray(sub) && sub.length > 0) {
-							_each(sub, floor + 1)
-							//}
-						})
-					}
-				}
-				_each(treeData, 1)
-				return max + 1;
+			const showTitle = (index) => {
+				return tabs[index].name
 			};
-			onMounted(() => {});
-			return {
-				tabs,
-				tab_scroll,
-				selected,
-				popupShow
-			}
-		},
-		data() {
-			return {
-				select: [],
-			}
-		},
-		methods: {
-			tabSelect(event) {
-				const id = event.currentTarget.dataset.id;
-				this.selected = this.indexOf(id, this.tabs);
-				//css tab中 (margin:10+padding:20)*2=60
-				this.tab_scroll = (this.selected - 2) * 60; //左移时预先显示2个项目
-				if (this.popupShow && !this.tabs[this.selected].sub) this.popupShow = false
-			},
-			triangledown(event) {
-				this.tabSelect(event);
-				this.popupShow = !this.popupShow;
-			},
-			children() {
-				let first_select = this.select[this.selected]; //第一次点击tab_select
-				if (typeof(first_select) === "undefined") {
-					if (this.tabs[this.selected].sub[0].sub) {
-						return this.tabs[this.selected].sub[0].sub;
-					}
-					return this.tabs[this.selected].sub[0];
-				}
-				let sub = this.tabs[this.selected].sub;
-				let index = this.indexOf(this.select[this.selected].level2_id, sub);
-				return sub[index].sub;
-			},
-			second_menu_selected(id) {
-				let second = this.select[this.selected];
-				if (typeof(second) !== "undefined" && !second.level2_cancel && second.level2_id && second.level2_id ===
-					id) {
-					this.$set(this.select, this.selected, {
-						level2_id: id,
-						level2_cancel: true
-					});
-				} else {
-					this.$set(this.select, this.selected, {
-						level2_id: id,
-					});
-				}
-			},
-			three_menu_selected(id) {
-				let three = this.select[this.selected];
-				if (typeof(three) !== "undefined" && three.level3_id && three.level3_id === id) {
-					this.$set(this.select, this.selected, {
-						level2_id: three.level2_id
-					});
-				} else {
-					let sub = this.tabs[this.selected].sub;
-					this.$set(this.select, this.selected, {
-						level2_id: this.findParent(sub, id),
-						level3_id: id
-					});
-				}
-			},
-			four_menu_selected(id) {
-				let four = this.select[this.selected];
-				if (typeof(four) !== "undefined" && four.level4_id && four.level4_id === id) {
-					this.$set(this.select, this.selected, {
-						level2_id: this.select[this.selected].level2_id,
-						level3_id: this.select[this.selected].level3_id
-					});
-				} else {
-					let level2_id = (typeof(four) !== "undefined" && four.level2_id !== undefined) ? four.level2_id : this
-						.tabs[this.selected].sub[0].id;
-					let sub1 = this.tabs[this.selected].sub;
-					let index = this.indexOf(level2_id, sub1);
-					let sub2 = sub1[index].sub;
-					let level3_id = this.findParent(sub2, id);
-					level2_id = this.findParent(sub1, level3_id);
-					let four_object = {
-						level2_id: level2_id,
-						level3_id: level3_id,
-						level4_id: id
-					}
-					this.$set(this.select, this.selected, four_object);
-				}
-			},
-			three_three_menu_selected(id) {
-				this.$emit('selected', {
-					index: 0,
-					value: 0
-				});
-			},
-			rest_multi() {
-				this.$set(this.select, this.selected, {});
-			},
-			findParent(sub, id) {
-				for (const v of sub) {
-					if (v.sub) {
-						for (const v1 of v.sub) {
-							if (v1.id === id) return v.id
-						}
-					}
-				}
-			},
-			indexOf(id, menus = []) {
+			const triangledown = (event) => {
+				let index = event.currentTarget.dataset.id;
+				if (index != primary.value && popupShow.value) popupShow.value = true;
+				else popupShow.value = !popupShow.value;
+			};
+			const indexOf = (id, menus = []) => {
 				if (!id || !menus || !Array.isArray(menus) || menus.length === 0) return 0;
 				let index = 0;
 				for (const menu of menus) {
@@ -300,42 +144,209 @@
 					index++;
 				}
 				return index;
+			};
+			watch(primary, (n, o) => {
+				console.log("primary: " + n);
+			});
+			watch(() => props.menus, () => {
+				init()
+			}, {
+				deep: true //非常重要，没有它menus数组不会被watch到,针对是http请求
+			});
+			const _translate = (parent) => {
+				let result = {
+					id: getPropertyFromData(parent, props.props, 'id'),
+					name: getPropertyFromData(parent, props.props, 'name'),
+				}
+				const selector = getPropertyFromData(parent, props.props, 'selector');
+				if (selector) {
+					result.selector = selector;
+				}
+				const children = getPropertyFromData(parent, props.props, 'children');
+				if (children && Array.isArray(children) && children.length > 0) {
+					let items = [];
+					for (const child of children) {
+						items.push(_translate(child))
+					}
+					result.children = items;
+				}
+				return result;
+			};
+			const depth = (treeData) => {
+				let floor = 0
+				let max = 0
+				const _each = (data, floor) => {
+					if (data && Array.isArray(data) && data.length > 0) {
+						data.forEach(e => {
+							max = floor > max ? floor : max;
+							let children = getPropertyFromData(e, props.props, 'children');
+							//if (children && Array.isArray(children) && children.length > 0) {
+							_each(children, floor + 1)
+							//}
+						})
+					}
+				}
+				_each(treeData, 1)
+				return max + 1;
+			};
+			const init = () => {
+				let i = 0;
+				for (const menu of props.menus) {
+					if (menu.expand) {
+						for (const child of getPropertyFromData(menu, props.props, 'children')) {
+							tabs[i] = {
+								..._translate(child),
+								depth: depth(getPropertyFromData(child, props.props, 'children')),
+							}
+							i += 1;
+						}
+						continue;
+					}
+					//console.log(menu)
+					tabs[i] = {
+						..._translate(menu),
+						depth: depth(getPropertyFromData(menu, props.props, 'children')),
+					}
+					i += 1;
+				}
+				console.log(tabs);
+			};
+			onBeforeMount(init);
+			return {
+				tabs,
+				tab_scroll,
+				primary,
+				popupShow,
+				tabSelect,
+				showTitle,
+				triangledown,
+				indexOf
+			}
+		},
+		data() {
+			return {
+				select: [],
+			}
+		},
+		methods: {
+			children() {
+				let first_select = this.select[this.primary]; //第一次点击tab_select
+				if (typeof(first_select) === "undefined") {
+					if (this.tabs[this.primary].children[0].children) {
+						return this.tabs[this.primary].children[0].children;
+					}
+					return this.tabs[this.primary].children[0];
+				}
+				let children = this.tabs[this.primary].children;
+				let index = this.indexOf(this.select[this.primary].level2_id, children);
+				return children[index].children;
+			},
+			second_menu_selected(id) {
+				let second = this.select[this.primary];
+				if (typeof(second) !== "undefined" && !second.level2_cancel && second.level2_id && second.level2_id ===
+					id) {
+					this.$set(this.select, this.primary, {
+						level2_id: id,
+						level2_cancel: true
+					});
+				} else {
+					this.$set(this.select, this.primary, {
+						level2_id: id,
+					});
+				}
+			},
+			three_menu_selected(id) {
+				let three = this.select[this.primary];
+				if (typeof(three) !== "undefined" && three.level3_id && three.level3_id === id) {
+					this.$set(this.select, this.primary, {
+						level2_id: three.level2_id
+					});
+				} else {
+					let children = this.tabs[this.primary].children;
+					this.$set(this.select, this.primary, {
+						level2_id: this.findParent(children, id),
+						level3_id: id
+					});
+				}
+			},
+			four_menu_selected(id) {
+				let four = this.select[this.primary];
+				if (typeof(four) !== "undefined" && four.level4_id && four.level4_id === id) {
+					this.$set(this.select, this.primary, {
+						level2_id: this.select[this.primary].level2_id,
+						level3_id: this.select[this.primary].level3_id
+					});
+				} else {
+					let level2_id = (typeof(four) !== "undefined" && four.level2_id !== undefined) ? four.level2_id : this
+						.tabs[this.primary].children[0].id;
+					let sub1 = this.tabs[this.primary].children;
+					let index = this.indexOf(level2_id, sub1);
+					let sub2 = sub1[index].children;
+					let level3_id = this.findParent(sub2, id);
+					level2_id = this.findParent(sub1, level3_id);
+					let four_object = {
+						level2_id: level2_id,
+						level3_id: level3_id,
+						level4_id: id
+					}
+					this.$set(this.select, this.primary, four_object);
+				}
+			},
+			three_three_menu_selected(id) {
+				this.$emit('selected', {
+					index: 0,
+					value: 0
+				});
+			},
+			rest_multi() {
+				this.$set(this.select, this.primary, {});
+			},
+			findParent(children, id) {
+				for (const v of children) {
+					if (v.children) {
+						for (const v1 of v.children) {
+							if (v1.id === id) return v.id
+						}
+					}
+				}
 			},
 		}
 	}
 </script>
 
 <style lang='scss'>
-	$select-padding:108rpx;
+	$select-padding:54px;
 
 	.navigation {
 		position: relative;
 		z-index: 7;
 		white-space: nowrap; //使用横向滚动时，需要给<scroll-view>添加white-space: nowrap;样式
 		text-align: center;
-		border-bottom: solid 1rpx #eee;
-	}
+		border-bottom: solid 1px #eee;
 
-	.tab {
-		display: inline-block;
-		height: 84rpx;
-		line-height: 84rpx;
-		margin: 0 10rpx;
-		padding: 0 20rpx;
+		.tab {
+			display: inline-block;
+			height: 42px;
+			line-height: 42px;
+			margin: 0 4px;
+			padding: 0 8px;
 
-		&.cur {
-			border-bottom: 4upx solid;
-		}
+			&.cur {
+				border-bottom: 3px solid;
+				color: #e54d42;
+				font-weight: bold;
+			}
 
-		.subIcon {
-			font-size: 120%;
-			position: absolute;
-			top: 6rpx;
-			vertical-align: bottom;
-			transition: transform .5s ease-in-out, -webkit-transform .5s ease-in-out;
+			.subIcon {
+				font-size: 140%;
+				position: absolute;
+				top: 3px;
+				vertical-align: bottom;
+				transition: transform .5s ease-in-out, -webkit-transform .5s ease-in-out;
 
-			&.selected {
-				transform: rotate(180deg)
+				&.selected {
+					transform: rotate(180deg)
+				}
 			}
 		}
 	}
@@ -349,15 +360,12 @@
 		right: 0;
 		bottom: 0;
 		opacity: 0;
-		outline: 0;
 		background: rgba(0, 0, 0, 0.6);
 		transition: all 0.3s ease-in-out 0s;
-		pointer-events: none;
 
 		&.show {
 			opacity: 1;
 			transition-duration: 0.3s;
-			pointer-events: auto;
 		}
 	}
 
@@ -365,36 +373,41 @@
 		display: flex;
 		position: absolute;
 		width: 100%;
-		height: 52vh;
+		max-height: 40vh;
+		max-height: 55vh;
 		background-color: #fff;
 		z-index: 7;
-		box-shadow: 0 5px 5px rgba(0, 0, 0, .1);
+		box-shadow: 0 5px 5px rgba(0, 0, 0, .5);
 		opacity: 1;
-		transition: opacity .5s;
+		transition: 0.5s;
+		border-bottom-left-radius: 4px;
+		border-bottom-right-radius:  4px;
 
 		&.hide {
 			opacity: 0;
 			display: none;
-			transition: opacity .5s;
+			transition: 0.5s;
 		}
 
 		.left {
 			display: flex;
+			flex-direction: column;
 			width: 28vw;
 			background-color: #f0f0f0;
+			border-bottom-left-radius: 4px;
 
 			.left_menu {
-				padding-left: 20rpx;
+				padding-left: 10px;
 				white-space: nowrap;
-				/*overflow: hidden;*/
-				/*text-overflow: ellipsis;*/
+				overflow: hidden;
+				text-overflow: ellipsis;
 
-				>text {
+				.text {
 					/*以下垂直居中，仅对一列有效*/
 					display: inline-block;
 					vertical-align: middle;
-					height: 96rpx;
-					line-height: 96rpx;
+					height: 48px;
+					line-height: 48px;
 				}
 			}
 		}
@@ -408,7 +421,7 @@
 				padding-right: 24rpx;
 				padding-left: 8rpx;
 
-				>text {
+				.text {
 					height: 82rpx;
 					line-height: 82rpx;
 				}
@@ -426,7 +439,7 @@
 				justify-content: space-between;
 				padding: 0 26rpx;
 
-				>text {
+				.text {
 					height: 78rpx;
 					line-height: 78rpx;
 				}
@@ -469,7 +482,7 @@
 				}
 
 				/*重要设置上下左右居中*/
-				>text {
+				.text {
 					margin: auto;
 				}
 			}

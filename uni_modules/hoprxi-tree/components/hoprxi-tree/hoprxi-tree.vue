@@ -73,7 +73,7 @@
 				type: Object,
 				default: {
 					id: 'id', // 指定id为节点对象的某个属性值
-					sub: 'sub', // 指定子树为节点对象的某个属性值
+					sub: 'children', // 指定子树为节点对象的某个属性值
 					label: 'name', // 指定标签为节点对象的某个属性值
 					icon: 'icon', // 指定图标为节点对象的某个属性值
 				}
