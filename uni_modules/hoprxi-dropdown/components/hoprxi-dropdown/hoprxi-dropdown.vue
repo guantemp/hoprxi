@@ -87,7 +87,8 @@
 		reactive,
 		ref,
 		onBeforeMount,
-		watch
+		watch,
+		computed
 	} from 'vue';
 	import {
 		getPropertyFromData,
@@ -120,20 +121,23 @@
 			const tabSelect = (event) => {
 				primary.value = event.currentTarget.dataset.id;
 				//css tab中 (margin:8+padding:16)*2=48
+				// 尽量左右滑动显示平滑的处理
 				if (primary.value <= 2) tab_scroll.value = (primary.value - 1) * 48;
-				else if (primary.value > 2 && primary.value <= 5) tab_scroll.value = (primary.value - 0.6) *
-				48; //左移时预先显示2个项目
+				else if (primary.value > 2 && primary.value <= 5) tab_scroll.value = (primary.value - 0.6) * 48;
 				else tab_scroll.value = (primary.value + 0.6) * 48;
 				if (popupShow.value && !tabs[primary.value].children) popupShow.value = false
 			};
-			const showTitle = (index) => {
-				return tabs[index].name
-			};
+			const showTitle = computed(() => {
+				return (index) => {
+					return tabs[index].name
+				}
+			});
 			const triangledown = (event) => {
 				let index = event.currentTarget.dataset.id;
 				if (index != primary.value && popupShow.value) popupShow.value = true;
 				else popupShow.value = !popupShow.value;
 			};
+			const secondary_menu = (id) => {};
 			const indexOf = (id, menus = []) => {
 				if (!id || !menus || !Array.isArray(menus) || menus.length === 0) return 0;
 				let index = 0;
@@ -148,48 +152,43 @@
 			watch(primary, (n, o) => {
 				console.log("primary: " + n);
 			});
-			watch(() => props.menus, () => {
-				init()
-			}, {
-				deep: true //非常重要，没有它menus数组不会被watch到,针对是http请求
-			});
-			const _translate = (parent) => {
-				let result = {
-					id: getPropertyFromData(parent, props.props, 'id'),
-					name: getPropertyFromData(parent, props.props, 'name'),
-				}
-				const selector = getPropertyFromData(parent, props.props, 'selector');
-				if (selector) {
-					result.selector = selector;
-				}
-				const children = getPropertyFromData(parent, props.props, 'children');
-				if (children && Array.isArray(children) && children.length > 0) {
-					let items = [];
-					for (const child of children) {
-						items.push(_translate(child))
-					}
-					result.children = items;
-				}
-				return result;
-			};
-			const depth = (treeData) => {
-				let floor = 0
-				let max = 0
-				const _each = (data, floor) => {
-					if (data && Array.isArray(data) && data.length > 0) {
-						data.forEach(e => {
-							max = floor > max ? floor : max;
-							let children = getPropertyFromData(e, props.props, 'children');
-							//if (children && Array.isArray(children) && children.length > 0) {
-							_each(children, floor + 1)
-							//}
-						})
-					}
-				}
-				_each(treeData, 1)
-				return max + 1;
-			};
 			const init = () => {
+				const _translate = (parent) => {
+					let result = {
+						id: getPropertyFromData(parent, props.props, 'id'),
+						name: getPropertyFromData(parent, props.props, 'name'),
+					}
+					const selector = getPropertyFromData(parent, props.props, 'selector');
+					if (selector) {
+						result.selector = selector;
+					}
+					const children = getPropertyFromData(parent, props.props, 'children');
+					if (children && Array.isArray(children) && children.length > 0) {
+						let items = [];
+						for (const child of children) {
+							items.push(_translate(child))
+						}
+						result.children = items;
+					}
+					return result;
+				};
+				const depth = (treeData) => {
+					let floor = 0
+					let max = 0
+					const _each = (data, floor) => {
+						if (data && Array.isArray(data) && data.length > 0) {
+							data.forEach(e => {
+								max = floor > max ? floor : max;
+								let children = getPropertyFromData(e, props.props, 'children');
+								//if (children && Array.isArray(children) && children.length > 0) {
+								_each(children, floor + 1)
+								//}
+							})
+						}
+					}
+					_each(treeData, 1)
+					return max + 1;
+				};
 				let i = 0;
 				for (const menu of props.menus) {
 					if (menu.expand) {
@@ -211,6 +210,11 @@
 				}
 				console.log(tabs);
 			};
+			watch(() => props.menus, () => {
+				init()
+			}, {
+				deep: true //非常重要，没有它menus数组不会被watch到,针对是http请求
+			});
 			onBeforeMount(init);
 			return {
 				tabs,
@@ -373,7 +377,7 @@
 		display: flex;
 		position: absolute;
 		width: 100%;
-		max-height: 40vh;
+		max-height: 38vh;
 		max-height: 55vh;
 		background-color: #fff;
 		z-index: 7;
@@ -381,7 +385,7 @@
 		opacity: 1;
 		transition: 0.5s;
 		border-bottom-left-radius: 4px;
-		border-bottom-right-radius:  4px;
+		border-bottom-right-radius: 4px;
 
 		&.hide {
 			opacity: 0;

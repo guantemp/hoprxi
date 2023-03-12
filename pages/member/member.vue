@@ -32,9 +32,7 @@
 			<input :placeholder="item&&item.shelfLife||'0 天'" value="等下过来大厦" type="number" class="text-right">
 		</hoprxi-badge>
 	</view>
-	<view class="flex margin-top-xl justify-end flex-sub">
-		<input :placeholder="item&&item.shelfLife||'0 天'" value="等下过来大厦" type="number" class="text-right">
-	</view>
+	<view class="coupon">444</view>
 	<!--
 	<hoprxi-tree :trees="categories" checkType="checkbox" :disabledIds="disabledIds" :expandedIds="expandedIds"
 		:expendAll="false" :checkedIds="checkedIds" class="margin-left-sm" @check="check">
@@ -126,7 +124,8 @@
 					console.log($3)
 					console.log($4)
 				})
-				console.log("¥ 25.000/盒".replace(/\/([\u4e00-\u9fa5]{1,2}|500g|kg|pcs)?$/,'').replace(/^(¥|￥|¥ |￥ )(\d+.\d{2,}$)/,'$2'));
+				console.log("¥ 25.000/盒".replace(/\/([\u4e00-\u9fa5]{1,2}|500g|kg|pcs)?$/, '').replace(
+					/^(¥|￥|¥ |￥ )(\d+.\d{2,}$)/, '$2'));
 				console.log("021".replace(/(0)?(\d+)(.)?/, "$2.00"));
 				console.log("021.".replace(/(0)?(\d+)(.)?/, "$2.00"));
 				console.log("0".replace(/(0)(.)?/, "$1.00"));
@@ -166,5 +165,21 @@
 
 			white-space: nowrap;
 		}
+	}
+
+	.coupon {
+		width: 240px;
+		height: 100px;
+		background: linear-gradient(to right, #fd6868, #fd5252 60px) no-repeat left / 60px 100%,
+			radial-gradient(circle at 8px 8px, transparent 8px, #fd5252 8px) repeat-y 60px -8px / 16px 100%,
+			linear-gradient(to right, #fd5252 76px, #fe0000) no-repeat 76px 0 / 100% 100%;
+		position: relative;
+		border-radius: 10px;
+		/*纯色
+		background-image: radial-gradient(circle at 9px 8px ,transparent 0%, transparent 8px,#e15852 8px, #e15852 100%);
+		    background-position: 66px -8px;
+		    background-size: 100% 100%;
+			*/
+		filter: drop-shadow(2px 4px 6px black);
 	}
 </style>
