@@ -20,8 +20,8 @@
 		<view class="cu-item text-gray">
 			<view class="bg-gray light content">
 				<view class="cu-capsule radius">
-					<view class="cu-tag bg-green">version 0.1.2</view>
-					<view class="cu-tag line-green">2023-01-13</view>
+					<view class="cu-tag bg-cyan">version 0.1.2</view>
+					<view class="cu-tag line-cyan">2023-01-13</view>
 				</view>
 				<view class="margin-top flex flex-direction">
 					<text>1、根据hoprxi.tooo.top网站数据更新</text>

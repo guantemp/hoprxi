@@ -98,6 +98,11 @@
 				new: 9
 			}];
 			const purchase = [{
+				iconFont: 'icon-supplier',
+				color: "text-cyan",
+				url: '/pages/workflow/purchase/order',
+				title: '供应商',
+			},{
 				iconFont: 'icon-contract',
 				color: "text-cyan",
 				url: '/pages/workflow/purchase/order',

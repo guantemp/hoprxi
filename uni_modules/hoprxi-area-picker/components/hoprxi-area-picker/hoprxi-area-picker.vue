@@ -59,53 +59,53 @@
 				});
 			};
 			const _second = (index) => {
-				initialIndex.splice(1, 1, index);
-				oldSelectedIndex.splice(1, 1, index);
-				selected.splice(1, 1, {
+				initialIndex[1] = index;
+				oldSelectedIndex[1] = index;
+				selected[1] = {
 					code: cities[index].code,
 					name: cities[index].name,
 					parentName: cities[index].parentName,
-				});
+				};
 				if (props.showCounty) {
 					query(cities[index].code).then((areas) => {
 						counties.length = 0;
 						for (const county of areas) counties.push(county);
-						initialIndex.splice(2, 1, 0);
-						oldSelectedIndex.splice(2, 1, 0);
-						selected.splice(2, 1, {
+						initialIndex[2] = 0;
+						oldSelectedIndex[2] = 0;
+						selected[2] = {
 							code: counties[0].code,
 							name: counties[0].name,
 							parentName: counties[0].parentName,
-						});
+						};
 					});
 				}
 			};
 			const change = (e) => {
 				let index = [...e.detail.value]
-				if (index[0] != oldSelectedIndex[0]) {
-					initialIndex.splice(0, 1, index[0]);
-					oldSelectedIndex.splice(0, 1, index[0]);
-					selected.splice(0, 1, {
+				if (index[0] != oldSelectedIndex[0]) { //省变化
+					initialIndex[0] = index[0];
+					oldSelectedIndex[0] = index[0];
+					selected[0] = {
 						code: provinces[index[0]].code,
 						name: provinces[index[0]].name,
 						parentName: provinces[index[0]].parentName,
-					});
-					query(provinces[index[0]].code).then((areas) => {
+					};
+					query(provinces[index[0]].code).then((areas) => { //查询下级市
 						cities.length = 0;
 						for (const city of areas) cities.push(city);
-						_second(0);
+						_second(0); //定位到查询出来的第一个市
 					});
 				}
-				if (index[1] != oldSelectedIndex[1]) {
-					_second(index[1]);
+				if (index[1] != oldSelectedIndex[1]) { //省没变，市变了，查询下级区县
+					_second(index[1]); //省没变，用新选中的市
 				}
-				if (index[2] != oldSelectedIndex[2]) {
-					selected.splice(2, 1, {
+				if (index[2] != oldSelectedIndex[2]) { //省、市没变，选区县
+					selected[2] = {
 						code: counties[index[2]].code,
 						name: counties[index[2]].name,
 						parentName: counties[index[2]].parentName,
-					});
-					oldSelectedIndex.splice(2, 1, index[2]);
+					};
+					oldSelectedIndex[2] = index[2];
 				}
 				content.emit('selected', selected);
 			};
@@ -122,14 +122,14 @@
 						});
 						if (countyIndex === -1) countyIndex = 0;
 						setTimeout(() => { //奇怪的写法，必须要延迟，picker-view中的value才起作用
-							initialIndex.splice(2, 1, countyIndex);
+							initialIndex[2] = countyIndex;
 						}, 0);
-						oldSelectedIndex.splice(2, 1, countyIndex);
-						selected.splice(2, 1, {
+						oldSelectedIndex[2] = countyIndex;
+						selected[2] = {
 							code: counties[countyIndex].code,
 							name: counties[countyIndex].name,
 							parentName: counties[countyIndex].parentName,
-						});
+						};
 					})
 				} else {
 					_first();
@@ -144,14 +144,16 @@
 							return p.name === props.initialArea[0];
 						})
 						if (provinceIndex === -1) provinceIndex = 0;
-						initialIndex.splice(0, 1, provinceIndex);
-						oldSelectedIndex.splice(0, 1, provinceIndex)
+						initialIndex[0] = provinceIndex;
+						oldSelectedIndex[0] = provinceIndex;
 						selected.splice(0, 1, {
 							code: provinces[provinceIndex].code,
 							name: provinces[provinceIndex].name,
 							parentName: provinces[provinceIndex].parentName,
-						});
-						return query(provinces[provinceIndex]['code']) //[]取属性		
+						}); //注意使用splice改[3]值，如果[0]没有值，此值会付给[0]位，再一次付给[1]位，直到[0-2]填充完
+						return query(provinces[provinceIndex][
+							'code'
+						]) //[]取属性，等同于	provinces[provinceIndex].code	
 					}).then((areas) => {
 						cities.length = 0;
 						for (const city of areas) cities.push(city);
@@ -160,14 +162,14 @@
 						});
 						if (cityIndex === -1) cityIndex = 0;
 						setTimeout(() => { //奇怪的写法，initialIndex必须要延迟，在没有promise保证下picker-view中的value才起作用
-							initialIndex.splice(1, 1, cityIndex);
+							initialIndex[1] = cityIndex;
 						}, 0);
-						oldSelectedIndex.splice(1, 1, cityIndex)
-						selected.splice(1, 1, {
+						oldSelectedIndex[1] = cityIndex;
+						selected[1] = {
 							code: cities[cityIndex].code,
 							name: cities[cityIndex].name,
 							parentName: cities[cityIndex].parentName,
-						});
+						};
 						if (props.showCounty) return resolve(query(cities[cityIndex]['code'])) //[]取属性
 					});
 				});

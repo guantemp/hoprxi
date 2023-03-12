@@ -13,26 +13,28 @@
 	<!--4个层级-->
 	<view :class="['popup',{'hide':!popupShow}]" v-if="tabs[primary].depth >= 4">
 		<scroll-view class="left" :scroll-y="true" enable-flex="true"
-			scroll-into-view="{{select[primary]&&'label_'+ select[primary].level2_id}}">
-			<block v-for="(one,index) in tabs[primary].children" :key="one.id">
-				<view class="left_menu" :id="'label_'+one.id"
-					:class="{'bg-white text-red':select[primary]&&select[primary].level2_id === one.id&&!select[primary].level2_cancel}"
-					@tap.stop="second_menu_selected(one.id)">
-					<text class="text">{{one.name}}</text>
+			scroll-into-view="{{selected[primary]&&'secondary_'+ selected[primary].secondary_id}}">
+			<block v-for="(secondary,index) in tabs[primary].children" :key="secondary.id">
+				<view class="left_menu" :id="'secondary_'+secondary.id"
+					:class="{'bg-white text-red':selected[primary]&&selected[primary].secondary_id === secondary.id&&!select[primary].secondary_cancel}"
+					@tap.stop="second_menu_selected(secondary.id),secondary_menu(secondary.id)">
+					<text class="text">{{secondary.name}}</text>
 				</view>
 			</block>
 		</scroll-view>
 		<scroll-view class="right" :scroll-y="true"
-			:scroll-into-view="select[primary]&&'label_'+ (select[primary].level4_id||select[primary].level3_id)">
-			<block v-for="(two,index) in children()" :key="two.id">
-				<view class="label" :class="{'text-orange':select[primary]&&select[primary].level3_id === two.id}"
-					:id="'label_'+two.id" @tap.top="three_menu_selected(two.id)">
-					<text class="text">{{two.name}}</text>
+			:scroll-into-view="select[primary]&&'three_level_'+ (select[primary].level4_id||select[primary].level3_id)">
+			<block v-for="(three_level,index) in children()" :key="three_level.id">
+				<view class="label"
+					:class="{'text-orange':select[primary]&&select[primary].level3_id === three_level.id}"
+					:id="'three_level_'+three_level.id"
+					@tap.top="three_menu_selected(three_level.id),three_level_menu(three_level.id)">
+					<text class="text">{{three_level.name}}{{selected[primary]}}</text>
 					<text class="cuIcon-check text-lg text-bold"
-						v-if="select[primary]&&select[primary].level3_id === two.id"></text>
+						v-if="select[primary]&&select[primary].level3_id === three_level.id"></text>
 				</view>
-				<view class="items" v-if="two.children">
-					<block v-for="(three,three_index) in two.children" :key="three.id">
+				<view class="items" v-if="three_level.children">
+					<block v-for="(three,three_index) in three_level.children" :key="three.id">
 						<view class="item" @tap.top="four_menu_selected(three.id)"
 							:class="{'selected':select[primary]&&select[primary].level4_id === three.id}"
 							:id="'label_'+three.id">
@@ -118,12 +120,14 @@
 			let tab_scroll = ref(0);
 			let primary = ref(0);
 			let popupShow = ref(false);
+			const selected = reactive([]);
 			const tabSelect = (event) => {
 				primary.value = event.currentTarget.dataset.id;
 				//css tab中 (margin:8+padding:16)*2=48
 				// 尽量左右滑动显示平滑的处理
 				if (primary.value <= 2) tab_scroll.value = (primary.value - 1) * 48;
 				else if (primary.value > 2 && primary.value <= 5) tab_scroll.value = (primary.value - 0.6) * 48;
+				else if (primary.value > 5 && primary.value <= 8) tab_scroll.value = primary.value * 48;
 				else tab_scroll.value = (primary.value + 0.6) * 48;
 				if (popupShow.value && !tabs[primary.value].children) popupShow.value = false
 			};
@@ -137,7 +141,23 @@
 				if (index != primary.value && popupShow.value) popupShow.value = true;
 				else popupShow.value = !popupShow.value;
 			};
-			const secondary_menu = (id) => {};
+
+			const secondary_menu = (id) => {
+				let second = selected[primary.value];
+				if (typeof(second) !== "undefined" && !second.secondary_cancel && second.secondary_id && second
+					.secondary_id === id) {
+					selectedselected[primary.value] = {
+						secondary_id: id,
+						secondary_cancel: true
+					}
+				} else {
+					selected[primary.value] = {
+						secondary_id: id
+					};
+				}
+				console.log(selected)
+			};
+			const three_level_menu = (id) => {};
 			const indexOf = (id, menus = []) => {
 				if (!id || !menus || !Array.isArray(menus) || menus.length === 0) return 0;
 				let index = 0;
@@ -208,7 +228,7 @@
 					}
 					i += 1;
 				}
-				console.log(tabs);
+				//console.log(tabs);
 			};
 			watch(() => props.menus, () => {
 				init()
@@ -219,11 +239,13 @@
 			return {
 				tabs,
 				tab_scroll,
+				tabSelect,
 				primary,
 				popupShow,
-				tabSelect,
+				selected,
 				showTitle,
 				triangledown,
+				secondary_menu,
 				indexOf
 			}
 		},
