@@ -4,8 +4,8 @@
 		<view class="tab" :class="{'cur':index === primary}" v-for="(tab,index) in tabs" :key="index" :data-id="index"
 			@tap.stop="tabSelect" :style="[tab.children?'padding: 0 18px 0 7px':'']">
 			<text>{{showTitle(index)}}</text>
-			<text v-if="tab.children" class="cuIcon-triangledownfill subIcon" :data-id="index"
-				:class="{'selected':index === primary && popupShow}" @tap="triangledown"></text>
+			<text v-if="tab.children" class="cuIcon-triangledownfill subIcon"
+				:class="{'selected':index === primary && popupShow}" @tap="triangledown(index)"></text>
 		</view>
 	</scroll-view>
 	<!-- 遮罩层-->
@@ -17,7 +17,7 @@
 			<block v-for="(secondary,index) in tabs[primary].children" :key="secondary.id">
 				<view class="left_menu" :id="'secondary_'+secondary.id"
 					:class="{'bg-white text-red':selected[primary]&&selected[primary].secondary_id === secondary.id&&!select[primary].secondary_cancel}"
-					@tap.stop="second_menu_selected(secondary.id),secondary_menu(secondary.id)">
+					@tap.stop="second_menu_selected(secondary.id),secondary_menu_select(secondary.id,index)">
 					<text class="text">{{secondary.name}}</text>
 				</view>
 			</block>
@@ -28,8 +28,8 @@
 				<view class="label"
 					:class="{'text-orange':select[primary]&&select[primary].level3_id === three_level.id}"
 					:id="'three_level_'+three_level.id"
-					@tap.top="three_menu_selected(three_level.id),three_level_menu(three_level.id)">
-					<text class="text">{{three_level.name}}{{selected[primary]}}</text>
+					@tap.top="three_menu_selected(three_level.id),three_level_menu_select(three_level.id)">
+					<text class="text">{{three_level.name}}</text>
 					<text class="cuIcon-check text-lg text-bold"
 						v-if="select[primary]&&select[primary].level3_id === three_level.id"></text>
 				</view>
@@ -126,9 +126,9 @@
 				//css tab中 (margin:8+padding:16)*2=48
 				// 尽量左右滑动显示平滑的处理
 				if (primary.value <= 2) tab_scroll.value = (primary.value - 1) * 48;
-				else if (primary.value > 2 && primary.value <= 5) tab_scroll.value = (primary.value - 0.6) * 48;
+				else if (primary.value > 2 && primary.value <= 5) tab_scroll.value = (primary.value - 0.5) * 48;
 				else if (primary.value > 5 && primary.value <= 8) tab_scroll.value = primary.value * 48;
-				else tab_scroll.value = (primary.value + 0.6) * 48;
+				else tab_scroll.value = (primary.value + 0.5) * 48;
 				if (popupShow.value && !tabs[primary.value].children) popupShow.value = false
 			};
 			const showTitle = computed(() => {
@@ -136,28 +136,37 @@
 					return tabs[index].name
 				}
 			});
-			const triangledown = (event) => {
-				let index = event.currentTarget.dataset.id;
+			const triangledown = (index) => {
 				if (index != primary.value && popupShow.value) popupShow.value = true;
 				else popupShow.value = !popupShow.value;
 			};
 
-			const secondary_menu = (id) => {
+			const secondary_menu_select = (id, index) => {
 				let second = selected[primary.value];
 				if (typeof(second) !== "undefined" && !second.secondary_cancel && second.secondary_id && second
 					.secondary_id === id) {
-					selectedselected[primary.value] = {
+					selected[primary.value] = {
 						secondary_id: id,
-						secondary_cancel: true
+						secondary_cancel: true,
+						secondary_index: index
 					}
 				} else {
 					selected[primary.value] = {
-						secondary_id: id
+						secondary_id: id,
+						secondary_index: index
 					};
 				}
 				console.log(selected)
 			};
-			const three_level_menu = (id) => {};
+			const three_level_menus = computed(() => {
+				let first_select = selected[primary.value]; 
+				if (typeof(first_select) === "undefined") {//点击一级菜单，即tabs,此时secondary未被赋值
+					return tabs[primary.value].children[0].children;
+				}
+				let secondary = tabs[primary.value].children;
+				return secondary[selected[primary.value].secondary_index].children;
+			});
+			const three_level_menu_select = (id) => {};
 			const indexOf = (id, menus = []) => {
 				if (!id || !menus || !Array.isArray(menus) || menus.length === 0) return 0;
 				let index = 0;
@@ -245,7 +254,9 @@
 				selected,
 				showTitle,
 				triangledown,
-				secondary_menu,
+				secondary_menu_select,
+				three_level_menus,
+				three_level_menu_select,
 				indexOf
 			}
 		},
