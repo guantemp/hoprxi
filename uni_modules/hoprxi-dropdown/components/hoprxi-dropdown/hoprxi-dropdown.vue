@@ -1,7 +1,7 @@
 <template>
 	<scroll-view scroll-x class="navigation bg-white" scroll-with-animation :scroll-left="tab_scroll"
 		enable-flex="true">
-		<view class="tab" :class="{'cur':index === primary}" v-for="(tab,index) in tabs" :key="index" :data-id="index"
+		<view class="tab" :class="{'cur':index === primary}" v-for="(tab,index) in tabs" :key="tab.id" :data-id="index"
 			@tap.stop="tabSelect" :style="[tab.children?'padding: 0 18px 0 7px':'']">
 			<text>{{showTitle(index)}}</text>
 			<text v-if="tab.children" class="cuIcon-triangledownfill subIcon"
@@ -16,19 +16,18 @@
 			scroll-into-view="{{selected[primary]&&'secondary_'+ selected[primary].secondary_id}}">
 			<block v-for="(secondary,index) in tabs[primary].children" :key="secondary.id">
 				<view class="left_menu" :id="'secondary_'+secondary.id"
-					:class="{'bg-white text-red':selected[primary]&&selected[primary].secondary_id === secondary.id&&!select[primary].secondary_cancel}"
-					@tap.stop="second_menu_selected(secondary.id),secondary_menu_select(secondary.id,index)">
+					:class="{'bg-white text-red':selected[primary]&&selected[primary]['secondary_id']&&selected[primary].secondary_id === secondary.id}"
+					@tap.stop="second_menu_selected(secondary.id),secondary_menu_select(index,secondary.id,secondary.name)">
 					<text class="text">{{secondary.name}}</text>
 				</view>
 			</block>
 		</scroll-view>
 		<scroll-view class="right" :scroll-y="true"
 			:scroll-into-view="select[primary]&&'three_level_'+ (select[primary].level4_id||select[primary].level3_id)">
-			<block v-for="(three_level,index) in children()" :key="three_level.id">
-				<view class="label"
-					:class="{'text-orange':select[primary]&&select[primary].level3_id === three_level.id}"
+			<block v-for="(three_level,index) in three_level_menus" :key="three_level.id">
+				<view class="label" :class="{'text-red':select[primary]&&select[primary].level3_id === three_level.id}"
 					:id="'three_level_'+three_level.id"
-					@tap.top="three_menu_selected(three_level.id),three_level_menu_select(three_level.id)">
+					@tap.top="three_menu_selected(three_level.id),three_level_menu_select(index,three_level.id,three_level.name)">
 					<text class="text">{{three_level.name}}</text>
 					<text class="cuIcon-check text-lg text-bold"
 						v-if="select[primary]&&select[primary].level3_id === three_level.id"></text>
@@ -80,11 +79,13 @@
 </template>
 
 <script>
-	/*
+	/**
 	 * @description 一个下拉的菜单
 	 * @property {Array} menus 层级数组，id项目的列不能有重复的值
 	 * @value [{id:'xxx,name:'xxx',children:[{id:'xxx,name:'xxx'}]},{id:'xxx,name:'xxx',children:[{id:'xxx,name:'xxx'}]]
-	 */
+	 * @property {Bboolean} single 全局单选
+	 * @property {Function() <array> {}} confirm 返回所有选中的对象
+	 **/
 	import {
 		reactive,
 		ref,
@@ -117,9 +118,9 @@
 			const tabs = reactive([{
 				depth: 1
 			}]);
-			let tab_scroll = ref(0);
-			let primary = ref(0);
-			let popupShow = ref(false);
+			const tab_scroll = ref(0);
+			const primary = ref(0);
+			const popupShow = ref(false);
 			const selected = reactive([]);
 			const tabSelect = (event) => {
 				primary.value = event.currentTarget.dataset.id;
@@ -141,32 +142,62 @@
 				else popupShow.value = !popupShow.value;
 			};
 
-			const secondary_menu_select = (id, index) => {
+			const secondary_menu_select = (index, id, name) => {
 				let second = selected[primary.value];
-				if (typeof(second) !== "undefined" && !second.secondary_cancel && second.secondary_id && second
-					.secondary_id === id) {
-					selected[primary.value] = {
-						secondary_id: id,
-						secondary_cancel: true,
-						secondary_index: index
-					}
+				if (typeof(second) !== "undefined" && second.secondary_id && second.secondary_id === id) {
+					selected[primary.value] = null;
 				} else {
 					selected[primary.value] = {
 						secondary_id: id,
+						secondary_name: name,
 						secondary_index: index
 					};
 				}
-				console.log(selected)
+				content.emit('changed');
+				//console.log(selected)
 			};
 			const three_level_menus = computed(() => {
-				let first_select = selected[primary.value]; 
-				if (typeof(first_select) === "undefined") {//点击一级菜单，即tabs,此时secondary未被赋值
+				let first_select = selected[primary.value];
+				if (typeof(first_select) === "undefined" || first_select === null) { //点击一级菜单，即tabs,此时secondary未被赋值
 					return tabs[primary.value].children[0].children;
 				}
 				let secondary = tabs[primary.value].children;
-				return secondary[selected[primary.value].secondary_index].children;
+				return secondary[selected[primary.value].secondary_index].children
 			});
-			const three_level_menu_select = (id) => {};
+			const three_level_menu_select = (index, id, name) => {
+				let three = selected[primary.value];
+				if (typeof(three) !== "undefined" && three.three_level_id && three.three_level_id === id) {
+					selected[primary.value] = {
+						secondary_id: three.secondary_id,
+						secondary_index: three.secondary_index
+					}
+				} else {
+
+					selected[primary.value] = {
+						...selected[primary.value],
+						three_level: {
+							index: index,
+							id: id,
+							name: name
+						}
+					}
+					console.log(selected)
+				}
+				
+			};
+			const findParent = (children, id) => {
+				for (const v of children) {
+					if (v.children) {
+						for (const v1 of v.children) {
+							if (v1.id === id)
+								return {
+									id: v.id,
+									name: v.name
+								}
+						}
+					}
+				}
+			};
 			const indexOf = (id, menus = []) => {
 				if (!id || !menus || !Array.isArray(menus) || menus.length === 0) return 0;
 				let index = 0;
@@ -242,7 +273,7 @@
 			watch(() => props.menus, () => {
 				init()
 			}, {
-				deep: true //非常重要，没有它menus数组不会被watch到,针对是http请求
+				deep: true //非常重要，没有它menus数组不会被watch到,针对http请求
 			});
 			onBeforeMount(init);
 			return {
@@ -266,18 +297,6 @@
 			}
 		},
 		methods: {
-			children() {
-				let first_select = this.select[this.primary]; //第一次点击tab_select
-				if (typeof(first_select) === "undefined") {
-					if (this.tabs[this.primary].children[0].children) {
-						return this.tabs[this.primary].children[0].children;
-					}
-					return this.tabs[this.primary].children[0];
-				}
-				let children = this.tabs[this.primary].children;
-				let index = this.indexOf(this.select[this.primary].level2_id, children);
-				return children[index].children;
-			},
 			second_menu_selected(id) {
 				let second = this.select[this.primary];
 				if (typeof(second) !== "undefined" && !second.level2_cancel && second.level2_id && second.level2_id ===
@@ -455,6 +474,7 @@
 			.label {
 				display: flex;
 				justify-content: space-between;
+				align-items: center;
 				padding-right: 24rpx;
 				padding-left: 8rpx;
 
@@ -513,7 +533,7 @@
 				padding: 4rpx 8rpx;
 
 				&.selected {
-					border-color: #ec652b;
+					border-color: #e54d42;
 					background-color: #ec652b;
 					color: #fff;
 				}
