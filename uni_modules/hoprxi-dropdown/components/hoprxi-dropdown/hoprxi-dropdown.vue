@@ -134,6 +134,11 @@
 			};
 			const showTitle = computed(() => {
 				return (index) => {
+					if (selected[index]) {
+						let temp = selected[index];
+						return (temp.four_level && temp.four_level.name) || (temp.three_level && temp
+							.three_level.name) || (temp.secondary && temp.secondary.name)
+					}
 					return tabs[index].name
 				}
 			});
@@ -169,6 +174,7 @@
 				let three = selected[primary.value];
 				if (three && three.three_level && three.three_level.id === id) {
 					delete selected[primary.value].three_level //true
+					delete selected[primary.value].four_level //true
 				} else {
 					//直接点三级菜单没有点二级菜单
 					if (!selected[primary.value] || !selected[primary.value].secondary)
@@ -179,15 +185,12 @@
 								name: tabs[primary.value].children[0].name
 							}
 						};
-					selected[primary.value] = {
-						secondary: selected[primary.value].secondary,
-						three_level: {
-							id: id,
-							name: name
-						}
+					selected[primary.value].three_level = {
+						id: id,
+						name: name
 					}
 				}
-				console.log(selected)
+				//console.log(selected)
 			};
 			const four_level_menu_select = (id, name) => {
 				let four = selected[primary.value];
@@ -206,7 +209,6 @@
 					//console.log(tabs[primary.value].children[selected[primary.value].secondary.index]);
 					let three = findParent(tabs[primary.value].children[selected[primary.value].secondary.index]
 						.children, id);
-					console.log(three);
 					selected[primary.value].three_level = {
 						id: three.id,
 						name: three.name
@@ -215,7 +217,6 @@
 						id: id,
 						name: name
 					}
-					//console.log(selected)
 				}
 			};
 			const findParent = (data, id) => {
