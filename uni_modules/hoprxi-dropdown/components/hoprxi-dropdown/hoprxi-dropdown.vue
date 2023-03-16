@@ -16,28 +16,28 @@
 			scroll-into-view="{{selected[primary]&&'secondary_'+ selected[primary].secondary_id}}">
 			<block v-for="(secondary,index) in tabs[primary].children" :key="secondary.id">
 				<view class="left_menu" :id="'secondary_'+secondary.id"
-					:class="{'bg-white text-red':selected[primary]&&selected[primary]['secondary_id']&&selected[primary].secondary_id === secondary.id}"
-					@tap.stop="second_menu_selected(secondary.id),secondary_menu_select(index,secondary.id,secondary.name)">
+					:class="{'bg-white text-red':selected[primary]&&selected[primary]['secondary']&&selected[primary].secondary.id === secondary.id}"
+					@tap.stop="secondary_menu_select(index,secondary.id,secondary.name)">
 					<text class="text">{{secondary.name}}</text>
 				</view>
 			</block>
 		</scroll-view>
 		<scroll-view class="right" :scroll-y="true"
-			:scroll-into-view="select[primary]&&'three_level_'+ (select[primary].level4_id||select[primary].level3_id)">
+			:scroll-into-view="'three_level_'+ (selected[primary]&&selected[primary].three_level&&selected[primary].three_level.id)">
 			<block v-for="(three_level,index) in three_level_menus" :key="three_level.id">
-				<view class="label" :class="{'text-red':select[primary]&&select[primary].level3_id === three_level.id}"
+				<view class="label"
+					:class="{'text-red':selected[primary]&&selected[primary].three_level&&selected[primary].three_level.id === three_level.id}"
 					:id="'three_level_'+three_level.id"
-					@tap.top="three_menu_selected(three_level.id),three_level_menu_select(index,three_level.id,three_level.name)">
+					@tap.top="three_level_menu_select(three_level.id,three_level.name)">
 					<text class="text">{{three_level.name}}</text>
 					<text class="cuIcon-check text-lg text-bold"
-						v-if="select[primary]&&select[primary].level3_id === three_level.id"></text>
+						v-if="selected[primary]&&selected[primary].three_level&&selected[primary].three_level.id === three_level.id"></text>
 				</view>
 				<view class="items" v-if="three_level.children">
-					<block v-for="(three,three_index) in three_level.children" :key="three.id">
-						<view class="item" @tap.top="four_menu_selected(three.id)"
-							:class="{'selected':select[primary]&&select[primary].level4_id === three.id}"
-							:id="'label_'+three.id">
-							<text class="text">{{three.name}}</text>
+					<block v-for="(four_level,index) in three_level.children" :key="four_level.id">
+						<view class="item" @tap.top="four_level_menu_select(four_level.id,four_level.name)"
+							:class="{'selected':selected[primary]&&selected[primary].four_level&&selected[primary].four_level.id === four_level.id}">
+							<text class="text">{{four_level.name}}</text>
 						</view>
 					</block>
 				</view>
@@ -141,59 +141,93 @@
 				if (index != primary.value && popupShow.value) popupShow.value = true;
 				else popupShow.value = !popupShow.value;
 			};
-
 			const secondary_menu_select = (index, id, name) => {
 				let second = selected[primary.value];
-				if (typeof(second) !== "undefined" && second.secondary_id && second.secondary_id === id) {
+				if (second && second.secondary && second.secondary.id === id) { //second!=null
 					selected[primary.value] = null;
 				} else {
 					selected[primary.value] = {
-						secondary_id: id,
-						secondary_name: name,
-						secondary_index: index
+						secondary: {
+							index: index,
+							id: id,
+							name: name,
+						}
 					};
 				}
 				content.emit('changed');
-				//console.log(selected)
+				//console.log(selected[primary.value]);
 			};
 			const three_level_menus = computed(() => {
 				let first_select = selected[primary.value];
-				if (typeof(first_select) === "undefined" || first_select === null) { //点击一级菜单，即tabs,此时secondary未被赋值
+				if (first_select == null) { //点击一级菜单，即tabs,此时secondary未被赋值
 					return tabs[primary.value].children[0].children;
 				}
 				let secondary = tabs[primary.value].children;
-				return secondary[selected[primary.value].secondary_index].children
+				return secondary[selected[primary.value].secondary.index].children
 			});
-			const three_level_menu_select = (index, id, name) => {
+			const three_level_menu_select = (id, name) => {
 				let three = selected[primary.value];
-				if (typeof(three) !== "undefined" && three.three_level_id && three.three_level_id === id) {
-					selected[primary.value] = {
-						secondary_id: three.secondary_id,
-						secondary_index: three.secondary_index
-					}
+				if (three && three.three_level && three.three_level.id === id) {
+					delete selected[primary.value].three_level //true
 				} else {
-
+					//直接点三级菜单没有点二级菜单
+					if (!selected[primary.value] || !selected[primary.value].secondary)
+						selected[primary.value] = {
+							secondary: {
+								index: 0,
+								id: tabs[primary.value].children[0].id,
+								name: tabs[primary.value].children[0].name
+							}
+						};
 					selected[primary.value] = {
-						...selected[primary.value],
+						secondary: selected[primary.value].secondary,
 						three_level: {
-							index: index,
 							id: id,
 							name: name
 						}
 					}
-					console.log(selected)
 				}
-				
+				console.log(selected)
 			};
-			const findParent = (children, id) => {
-				for (const v of children) {
-					if (v.children) {
-						for (const v1 of v.children) {
-							if (v1.id === id)
+			const four_level_menu_select = (id, name) => {
+				let four = selected[primary.value];
+				if (!four) { //要确定二级
+					selected[primary.value] = {
+						secondary: {
+							index: 0,
+							id: tabs[primary.value].children[0].id,
+							name: tabs[primary.value].children[0].name
+						}
+					};
+				}
+				if (four && four.four_level && four.four_level.id === id) {
+					delete selected[primary.value].four_level //true
+				} else {
+					//console.log(tabs[primary.value].children[selected[primary.value].secondary.index]);
+					let three = findParent(tabs[primary.value].children[selected[primary.value].secondary.index]
+						.children, id);
+					console.log(three);
+					selected[primary.value].three_level = {
+						id: three.id,
+						name: three.name
+					};
+					selected[primary.value].four_level = {
+						id: id,
+						name: name
+					}
+					//console.log(selected)
+				}
+			};
+			const findParent = (data, id) => {
+				for (const d of data) {
+					if (d.children) {
+						for (const v of d.children) {
+							if (v.id === id) {
 								return {
-									id: v.id,
-									name: v.name
+									id: d.id,
+									name: d.name
 								}
+							}
 						}
 					}
 				}
@@ -210,7 +244,7 @@
 				return index;
 			};
 			watch(primary, (n, o) => {
-				console.log("primary: " + n);
+				//console.log("primary: " + n);
 			});
 			const init = () => {
 				const _translate = (parent) => {
@@ -288,6 +322,7 @@
 				secondary_menu_select,
 				three_level_menus,
 				three_level_menu_select,
+				four_level_menu_select,
 				indexOf
 			}
 		},
