@@ -139,7 +139,11 @@
 		ref,
 		toRef,
 		onBeforeMount,
+		onMounted
 	} from 'vue';
+	import {
+		toast
+	} from '@/uni_modules/hoprxi-common/js_sdk/util.js';
 	import ajax from '@/uni_modules/u-ajax'
 	import catalog_test from '@/data/catalog_test_data.js'; //用例
 	export default {
@@ -173,12 +177,32 @@
 				fontColor: '#fff',
 				event: 'del'
 			}];
+			const share = (data) => {
+				toast('分享：' + (data.id || data.plu));
+			};
+			const history = (data) => {
+				toast('历史：' + (data.id || data.plu));
+				console.log(data);
+			};
+			const favor = (data) => {
+				toast('收藏：' + (data.id || data.plu));
+			};
+			const navigationToDetail = (data) => {
+				if (data.id)
+					uni.navigateTo({
+						url: '/pages/workflow/catalog/good?id=' + data.id + '&sign=good'
+					})
+				else if (data.plu)
+					uni.navigateTo({
+						url: '/pages/workflow/catalog/good?plu=' + data.plu + '&sign=scale'
+					})
+			};
 			const menus = [{
 				iconFont: 'cuIcon-goods',
 				text: '新增商品',
 				event: 'appendGood'
 			}, {
-				iconPath: '/static/workflow_icon/new_kg.png',
+				iconFont: 'icon-scale',
 				text: '新增散秤',
 				event: 'appendScale'
 			}, {
@@ -227,6 +251,40 @@
 			const categories = reactive([]);
 			const catalog = reactive([]);
 			const brands = reactive([]);
+			const filterWindows = ref(false);
+			const sorts = ['待审', '新品', '条码', '品名', '零售价', '毛利率', '规格', '会员价', 'VIP价', '异常'];
+			const selectedFilter = reactive([sorts[0],
+				[],
+				[]
+			]);
+
+			let sortExchange = ref('asc');
+			let showPrice = ref(false);
+			const restFilter = () => {
+				selectedFilter[0] = sorts[0];
+				selectedFilter[1] = [];
+				selectedFilter[2] = [];
+			};
+			const sortChecked = (sort) => {
+				selectedFilter[0] = sort
+			};
+			const brandChecked = (brand) => {
+				let brands = selectedFilter[2];
+				let has = false;
+				for (let i = 0, j = brands.length; i < j; i++) {
+					if (brands[i] === brand) {
+						selectedFilter[2].splice(i, 1);
+						has = true;
+						break;
+					}
+				}
+				if (!has) selectedFilter[2].push(brand)
+			};
+			const isCheckedBrand = (brand) => {
+				for (const b of selectedFilter[2])
+					if (b === brand) return true;
+				return false;
+			};
 			onBeforeMount(() => {
 				ajax({ //categoryies
 					url: 'https://hoprxi.tooo.top/catalog/core/v1/categories',
@@ -273,25 +331,25 @@
 					}
 				});
 			});
-			const filterWindows = ref(false);
-			const sorts = ['待审', '新品', '条码', '品名', '零售价', '毛利率', '规格', '会员价', 'VIP价', '异常'];
-			const selectedFilter = reactive([sorts[0],
-				[],
-				[]
-			]);
-			let sortExchange = ref('asc');
-			let showPrice = ref(false);
-			const restFilter = () => {
-				selectedFilter[0] = sorts[0];
-				selectedFilter[1] = [];
-				selectedFilter[2] = [];
-			};
+			onMounted(() => {
+				uni.createSelectorQuery().select('#navBar').boundingClientRect(res => {
+					navigatorHeight.value = res.height;
+				}).exec();
+				uni.createSelectorQuery().select('#dropdown').boundingClientRect(res => {
+					dropdownHeight.value += res.height;
+				}).exec();
+				uni.hideLoading();
+			});
 			return {
 				navigatorHeight,
 				dropdownHeight,
 				scan,
 				scanResult,
 				buttons,
+				share,
+				history,
+				favor,
+				navigationToDetail,
 				menus,
 				categories,
 				catalog,
@@ -305,7 +363,10 @@
 				del,
 				remove,
 				delGoodModalDialog,
-				restFilter
+				restFilter,
+				sortChecked,
+				brandChecked,
+				isCheckedBrand
 			}
 		},
 		onLoad() {
@@ -314,58 +375,11 @@
 				mask: true
 			});
 		},
-		mounted() {
-			this.$nextTick(() => {
-				let query = uni.createSelectorQuery().in(this);
-				//query复用得到单位是rpx,似乎不太准确,需要uni.createSelectorQuery().in(this)重新赋值
-				query.select('#navBar').boundingClientRect().exec(rect => {
-					this.navigatorHeight = rect[0].height;
-				});
-				uni.createSelectorQuery().select('#dropdown').boundingClientRect(res => {
-					this.dropdownHeight += res.height;
-				}).exec();
-			})
-			uni.hideLoading();
-		},
 		methods: {
-			navigationToDetail(data) {
-				if (data.id) this.$util.navTo('/pages/workflow/catalog/good?id=' + data.id + '&sign=good&action=edit');
-				if (data.plu) this.$util.navTo('/pages/workflow/catalog/good?plu=' + data.plu + '&sign=scale&action=edit');
-			},
 			onLongPress(e) {
 				console.log(e.currentTarget);
 				console.log(e.target);
 			},
-			share(data) {
-				this.$util.toast('分享：' + (data.id || data.plu));
-			},
-			history(data) {
-				this.$util.toast('历史：' + (data.id || data.plu));
-				console.log(data);
-			},
-			favor(data) {
-				this.$util.toast('收藏：' + (data.id || data.plu));
-			},
-			sortChecked(sort) {
-				this.selectedFilter[0] = sort
-			},
-			brandChecked(brand) {
-				let brands = this.selectedFilter[2];
-				let has = false;
-				for (let i = 0, j = brands.length; i < j; i++) {
-					if (brands[i] === brand) {
-						this.selectedFilter[2].splice(i, 1);
-						has = true;
-						break;
-					}
-				}
-				if (!has) this.selectedFilter[2].push(brand)
-			},
-			isCheckedBrand(brand) {
-				for (const b of this.selectedFilter[2])
-					if (b === brand) return true;
-				return false;
-			}
 		}
 	}
 </script>

@@ -10,7 +10,7 @@
 	</scroll-view>
 	<!-- 遮罩层-->
 	<view :class="['mask',{'show':popupShow}]" @tap="popupShow = false"></view>
-	<!--4个层级-->
+	<!--最多的4个层级-->
 	<view :class="['popup',{'hide':!popupShow}]" v-if="tabs[primary].depth >= 4">
 		<scroll-view class="left" :scroll-y="true" enable-flex="true"
 			scroll-into-view="{{selected[primary]&&'secondary_'+ selected[primary].secondary_id}}">
@@ -45,24 +45,25 @@
 			</block>
 		</scroll-view>
 	</view>
-	<!--2,3个层级-->
+	<!--2、3个层级-->
 	<view :class="['popup',{'hide':!popupShow}]" v-else-if="tabs[primary].depth <= 3">
 		<scroll-view class="filter" scroll-y :scroll-with-animation="true" :enable-back-to-top="true"
-			scroll-into-view="{{select[primary]&&'label_'+(select[primary].level3_id||select[primary].level2_id)}}"
+			scroll-into-view="{{selected[primary]&&'secondary_'+(selected[primary].secondary&&selected[primary].secondary.id)}}"
 			:style="{'height:calc(52vh - 108rpx);' : tabs[primary].selector === 'multi'}">
-			<block v-for="(one,index) in tabs[primary].children" :key="one.id">
+			<block v-for="(secondary,index) in tabs[primary].children" :key="secondary.id">
 				<view class="label"
-					:class="{'text-red text-bold':select[primary]&&select[primary].level2_id === one.id&&!select[primary].level2_cancel}"
-					:id="'label_'+ one.id" @tap="second_menu_selected(one.id)">
-					<text class="text">{{one.name.name}}</text>
+					:class="{'text-red text-bold':selected[primary]&&selected[primary].secondary&&selected[primary].secondary.id === secondary.id}"
+					:id="'secondary_'+ secondary.id" @tap="secondary_menu_select(index,secondary.id,secondary.name)">
+					<text class="text">{{secondary.name}}</text>
 					<text class="cuIcon-check text-lg text-bold"
-						v-if="select[primary]&&select[primary].level2_id === one.id&&!select[primary].level2_cancel"></text>
+						v-if="selected[primary]&&selected[primary].secondary&&selected[primary].secondary.id === secondary.id"></text>
 				</view>
-				<view class="items items-extend" v-if="one.children">
-					<block v-for="(two,three_index) in one.children" :key="two.id">
-						<view class="item item-extend" @tap.top="three_menu_selected(two.id)" :id="'label_'+ two.id"
-							:class="{'selected':select[primary]&&select[primary].level3_id === two.id}">
-							<text class="text">{{two.name.name}}</text>
+				<view class="items items-extend" v-if="secondary.children">
+					<block v-for="(three_level,three_index) in secondary.children" :key="three_level.id">
+						<view class="item item-extend"
+							@tap.top="three_level_menu_select(three_level.id,three_level.name)"
+							:class="{'selected':selected[primary]&&selected[primary].three_level&&selected[primary].three_level.id === three_level.id}">
+							<text class="text">{{three_level.name}}</text>
 						</view>
 					</block>
 				</view>
@@ -173,10 +174,18 @@
 			const three_level_menu_select = (id, name) => {
 				let three = selected[primary.value];
 				if (three && three.three_level && three.three_level.id === id) {
-					delete selected[primary.value].three_level //true
-					delete selected[primary.value].four_level //true
+					delete selected[primary.value].three_level
 				} else {
-					//直接点三级菜单没有点二级菜单
+					if (tabs[primary.value].depth <= 3) {
+						let secondary = findParent(tabs[primary.value].children, id);
+						selected[primary.value] = {
+							secondary: {
+								id: secondary.id,
+								name: secondary.name
+							}
+						};
+					}
+					//深度>=4时，直接点三级菜单需要预设二级菜单
 					if (!selected[primary.value] || !selected[primary.value].secondary)
 						selected[primary.value] = {
 							secondary: {
@@ -190,7 +199,7 @@
 						name: name
 					}
 				}
-				//console.log(selected)
+				delete selected[primary.value].four_level
 			};
 			const four_level_menu_select = (id, name) => {
 				let four = selected[primary.value];
@@ -232,17 +241,6 @@
 						}
 					}
 				}
-			};
-			const indexOf = (id, menus = []) => {
-				if (!id || !menus || !Array.isArray(menus) || menus.length === 0) return 0;
-				let index = 0;
-				for (const menu of menus) {
-					if (id === menu.id) {
-						break;
-					}
-					index++;
-				}
-				return index;
 			};
 			watch(primary, (n, o) => {
 				//console.log("primary: " + n);
@@ -324,83 +322,11 @@
 				three_level_menus,
 				three_level_menu_select,
 				four_level_menu_select,
-				indexOf
-			}
-		},
-		data() {
-			return {
-				select: [],
 			}
 		},
 		methods: {
-			second_menu_selected(id) {
-				let second = this.select[this.primary];
-				if (typeof(second) !== "undefined" && !second.level2_cancel && second.level2_id && second.level2_id ===
-					id) {
-					this.$set(this.select, this.primary, {
-						level2_id: id,
-						level2_cancel: true
-					});
-				} else {
-					this.$set(this.select, this.primary, {
-						level2_id: id,
-					});
-				}
-			},
-			three_menu_selected(id) {
-				let three = this.select[this.primary];
-				if (typeof(three) !== "undefined" && three.level3_id && three.level3_id === id) {
-					this.$set(this.select, this.primary, {
-						level2_id: three.level2_id
-					});
-				} else {
-					let children = this.tabs[this.primary].children;
-					this.$set(this.select, this.primary, {
-						level2_id: this.findParent(children, id),
-						level3_id: id
-					});
-				}
-			},
-			four_menu_selected(id) {
-				let four = this.select[this.primary];
-				if (typeof(four) !== "undefined" && four.level4_id && four.level4_id === id) {
-					this.$set(this.select, this.primary, {
-						level2_id: this.select[this.primary].level2_id,
-						level3_id: this.select[this.primary].level3_id
-					});
-				} else {
-					let level2_id = (typeof(four) !== "undefined" && four.level2_id !== undefined) ? four.level2_id : this
-						.tabs[this.primary].children[0].id;
-					let sub1 = this.tabs[this.primary].children;
-					let index = this.indexOf(level2_id, sub1);
-					let sub2 = sub1[index].children;
-					let level3_id = this.findParent(sub2, id);
-					level2_id = this.findParent(sub1, level3_id);
-					let four_object = {
-						level2_id: level2_id,
-						level3_id: level3_id,
-						level4_id: id
-					}
-					this.$set(this.select, this.primary, four_object);
-				}
-			},
-			three_three_menu_selected(id) {
-				this.$emit('selected', {
-					index: 0,
-					value: 0
-				});
-			},
 			rest_multi() {
 				this.$set(this.select, this.primary, {});
-			},
-			findParent(children, id) {
-				for (const v of children) {
-					if (v.children) {
-						for (const v1 of v.children) {
-							if (v1.id === id) return v.id
-						}
-					}
-				}
 			},
 		}
 	}
@@ -505,24 +431,19 @@
 		}
 
 		.right {
-			padding: 0 6rpx 0 20rpx;
+			padding: 0 3px 0 10px;
 
 			.label {
 				display: flex;
 				justify-content: space-between;
 				align-items: center;
-				padding-right: 24rpx;
-				padding-left: 8rpx;
+				padding-right: 12px;
+				padding-left: 4px;
 
 				.text {
-					height: 82rpx;
-					line-height: 82rpx;
+					height: 41px;
+					line-height: 41px;
 				}
-			}
-
-			.bott {
-				border-bottom: dashed 1rpx #e5e5e5;
-				margin: 0rpx 6rpx 0 0;
 			}
 		}
 
@@ -530,21 +451,22 @@
 			.label {
 				display: flex;
 				justify-content: space-between;
-				padding: 0 26rpx;
+				align-items: center;
+				padding: 0 13px;
 
 				.text {
-					height: 78rpx;
-					line-height: 78rpx;
+					height: 39px;
+					line-height: 39px;
 				}
 			}
 
 			.items-extend {
-				padding: 0 2rpx 0 24rpx;
+				padding: 0 1px 0 12px;
 
 				.item-extend {
 					flex: 0 0 30%;
-					min-height: 74rpx;
-					margin-right: calc(16rpx*3 / 2);
+					min-height: 37px;
+					margin-right: calc(8px*3 / 2);
 				}
 			}
 		}
@@ -556,17 +478,17 @@
 			.item {
 				display: flex;
 				justify-content: center;
-				font-size: 28rpx;
+				font-size: 14px;
 				/*重要设置上下左右居中*/
 				text-align: center;
 				flex: 0 0 32%;
-				min-height: 68rpx;
-				margin-right: calc(5rpx*3 / 2);
+				min-height: 34px;
+				margin-right: calc(2px*3 / 2);
 				background-color: #f0f0f0;
-				border-radius: 6rpx;
-				margin-bottom: 16rpx;
-				border: solid #f5f5f5 1rpx;
-				padding: 4rpx 8rpx;
+				border-radius: 3px;
+				margin-bottom: 8px;
+				border: solid #f5f5f5 1px;
+				padding: 2px 4px;
 
 				&.selected {
 					border-color: #e54d42;
@@ -582,8 +504,8 @@
 		}
 
 		.division {
-			border-bottom: dashed 1rpx #e5e5e5;
-			margin: 0 12rpx;
+			border-bottom: dashed 1px #e5e5e5;
+			margin: 0 6px;
 		}
 
 		.filterBtn {

@@ -59,9 +59,9 @@
 				[{
 					label: '学习成本低',
 					style: {
-						paddingLeft: '24rpx',
+						paddingLeft: '12px',
 						marginTop: "10vh",
-						fontSize: "40rpx",
+						fontSize: "20px",
 						fontWeight: 500,
 						color: "#11B654",
 						willChange: 'transform',
@@ -69,14 +69,14 @@
 					},
 					animationStyle: {
 						opacity: 0,
-						transform: "translateX(-800rpx) translateY(-800rpx)"
+						transform: "translateX(-400px) translateY(-400px)"
 					}
 				}, {
 					label: '基于通用前端技术，无额外学习成本！',
 					style: {
-						marginTop: '16rpx',
-						paddingLeft: '48rpx',
-						fontSize: "26rpx",
+						marginTop: '8px',
+						paddingLeft: '24px',
+						fontSize: "13px",
 						fontWeight: 300,
 						color: "#11B654",
 						willChange: 'transform',
@@ -84,7 +84,7 @@
 					},
 					animationStyle: {
 						opacity: 0,
-						transform: "translateX(800rpx) translateY(-800rpx)"
+						transform: "translateX(400px) translateY(-400px)"
 					}
 				}, {
 					img: {
@@ -92,14 +92,14 @@
 						mode: 'aspectFit'
 					},
 					style: {
-						marginTop: '32rpx',
+						marginTop: '16px',
 						height: '45vh',
 						width: "100vw",
 						transition: 'transform .8s ease, opacity .8s ease'
 					},
 					animationStyle: {
 						opacity: 0,
-						transform: "translateY(-300rpx)"
+						transform: "translateY(-150px)"
 					}
 				}, {
 					label: '立即体验',
@@ -108,18 +108,18 @@
 						position: "absolute",
 						bottom: '19.5vh',
 						left: '28.5%',
-						padding: ' 22rpx 92rpx',
+						padding: ' 11px 46px',
 						background: '#FFFFFF',
-						borderRadius: '44rpx',
+						borderRadius: '22px',
 						border: '1px solid #11B654',
-						fontSize: '32rpx',
+						fontSize: '16px',
 						fontWeight: 500,
 						color: '#11B654',
 						transition: 'transform .8s ease, opacity .8s ease'
 					},
 					animationStyle: {
 						opacity: 0,
-						transform: "translateY(200rpx)"
+						transform: "translateY(100px)"
 					},
 				}]
 			];

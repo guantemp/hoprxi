@@ -24,7 +24,7 @@
 	</view>
 	<view class="flex margin-top-xl justify-end">
 		<hoprxi-badge count='22'>
-			<input :placeholder="item&&item.shelfLife||'0 天'" value="等下过来大厦" type="number" class="text-right">
+			<input :placeholder="item&&item.shelfLife||'0 天'"  type="number" class="text-right">
 		</hoprxi-badge>
 	</view>
 	<view class="flex margin-top-xl justify-end flex-sub">
