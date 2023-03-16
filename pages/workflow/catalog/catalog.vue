@@ -285,39 +285,46 @@
 					if (b === brand) return true;
 				return false;
 			};
+
 			onBeforeMount(() => {
+				const _translate = (data) => {
+					let result = {
+						id: data.id,
+						name: data.name.name
+					};
+					if (data.expand) result.expand = true;
+					if (data.children && Array.isArray(data.children)) {
+						let items = [];
+						for (const child of data.children) {
+							items.push(_translate(child))
+						}
+						result.children = items;
+					}
+					return result;
+				};
 				ajax({ //categoryies
 					url: 'https://hoprxi.tooo.top/catalog/core/v1/categories',
 				}).then(res => {
-					for (const category of res.data.categories) {
+					for (let category of res.data.categories) {
 						if (category.id === "-1") {
 							categories.splice(0, 0, {
 								id: category.id,
 								name: category.name.name
-							})
-						} else if (Array.isArray(category.children)) {
-							for (const child of category.children) {
-								let temp = {
-									id: child.id,
-									name: child.name.name
-								};
-								if (child.children) {
-									temp = {
-										...temp,
-										children: child.children
-									}
-								}
-								categories.push(temp);
-							}
+							});
+							continue;
 						}
+						category.expand = true;
+						categories.push(_translate(category));
 					}
 					categories.splice(0, 0, {
 						id: "-9999",
 						name: "全部"
 					});
+
 				}).catch(err => {
 					//$util.toast(err);
 				});
+				//console.log(categories);
 				//item
 				for (const item of catalog_test.catalog) {
 					catalog.push(item);

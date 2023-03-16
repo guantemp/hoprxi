@@ -203,7 +203,7 @@
 			};
 			const four_level_menu_select = (id, name) => {
 				let four = selected[primary.value];
-				if (!four) { //要确定二级
+				if (!four) { //直接点击四级菜单，二级菜单缺省为第一位
 					selected[primary.value] = {
 						secondary: {
 							index: 0,
@@ -215,7 +215,6 @@
 				if (four && four.four_level && four.four_level.id === id) {
 					delete selected[primary.value].four_level //true
 				} else {
-					//console.log(tabs[primary.value].children[selected[primary.value].secondary.index]);
 					let three = findParent(tabs[primary.value].children[selected[primary.value].secondary.index]
 						.children, id);
 					selected[primary.value].three_level = {
@@ -250,11 +249,11 @@
 					let result = {
 						id: getPropertyFromData(parent, props.props, 'id'),
 						name: getPropertyFromData(parent, props.props, 'name'),
-					}
+					};
 					const selector = getPropertyFromData(parent, props.props, 'selector');
 					if (selector) {
 						result.selector = selector;
-					}
+					};
 					const children = getPropertyFromData(parent, props.props, 'children');
 					if (children && Array.isArray(children) && children.length > 0) {
 						let items = [];
@@ -284,7 +283,7 @@
 				};
 				let i = 0;
 				for (const menu of props.menus) {
-					if (menu.expand) {
+					if (menu.expand && Array.isArray(getPropertyFromData(menu, props.props, 'children'))) {
 						for (const child of getPropertyFromData(menu, props.props, 'children')) {
 							tabs[i] = {
 								..._translate(child),
