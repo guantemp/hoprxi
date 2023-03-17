@@ -74,7 +74,7 @@
 </script>
 <style lang="scss">
 	.icon {
-		width: 51rpx;
-		height: 51rpx;
+		width: 25px;
+		height: 25px;
 	}
 </style>
