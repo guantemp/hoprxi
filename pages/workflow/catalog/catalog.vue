@@ -137,7 +137,6 @@
 	import {
 		reactive,
 		ref,
-		toRef,
 		onBeforeMount,
 		onMounted
 	} from 'vue';
@@ -233,8 +232,8 @@
 					},
 				});
 			};
-			let navigatorHeight = ref(0);
-			let dropdownHeight = ref(0);
+			const navigatorHeight = ref(0);
+			const dropdownHeight = ref(0);
 			let delGoodModalDialog = ref(false);
 			let selectedGood = reactive({});
 			const del = (data) => {

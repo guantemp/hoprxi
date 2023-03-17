@@ -271,10 +271,8 @@
 						if (data && Array.isArray(data) && data.length > 0) {
 							data.forEach(e => {
 								max = floor > max ? floor : max;
-								let children = getPropertyFromData(e, props.props, 'children');
-								//if (children && Array.isArray(children) && children.length > 0) {
+								let children = getPropertyFromData(e, props.props, 'children');				
 								_each(children, floor + 1)
-								//}
 							})
 						}
 					}
@@ -293,7 +291,6 @@
 						}
 						continue;
 					}
-					//console.log(menu)
 					tabs[i] = {
 						..._translate(menu),
 						depth: depth(getPropertyFromData(menu, props.props, 'children')),
