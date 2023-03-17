@@ -22,11 +22,6 @@
 		<text>至</text>
 		<text @click.stop="selectDate(false)">{{formattedEndDate}}</text>
 	</view>
-	<hoprxi-cell iconFont="cuIcon-comment"
-		:title="{name:'单据号: ' ,weight:500,size:15}"
-		:line="{pattern:'dashed',color:'#d4e7ed'}">
-		<!-- <template #slotName></template> -->
-	</hoprxi-cell>
 	<scroll-view scroll-y :scroll-with-animation="true" :enable-back-to-top="true" class="bg-grey"
 		:style="{height:dateShow?'calc(98.5vh - '+(fixedHeight+dateShowHeight)+'px - 5px)':'calc(98.5vh - '+ fixedHeight +'px - 5px)'}">
 		<view class="sheet" v-for="(sheet,index) in priceAdjustmentSheet" :key="index">
