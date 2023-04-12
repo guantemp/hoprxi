@@ -1,20 +1,17 @@
 {
-  "id": "hoprxi-date-time-picker",
-  "displayName": "hoprxi-date-time-picker",
+  "id": "hoprxi-dateTime-selector",
+  "displayName": "hoprxi-dateTime-selector",
   "version": "1.0.0",
-  "description": "hoprxi-date-time-picker",
+  "description": "hoprxi-dateTime-selector",
   "keywords": [
-    "hoprxi-date-time-picker"
+    "hoprxi-dateTime-selector"
 ],
   "repository": "",
   "engines": {
     "HBuilderX": "^3.1.0"
   },
   "dcloudext": {
-    "category": [
-        "前端组件",
-        "通用组件"
-    ],
+    "type": "component-vue",
     "sale": {
       "regular": {
         "price": "0.00"
@@ -72,8 +69,7 @@
           "钉钉": "u",
           "快手": "u",
           "飞书": "u",
-          "京东": "u",
-          "小红书": "u"
+          "京东": "u"
         },
         "快应用": {
           "华为": "u",

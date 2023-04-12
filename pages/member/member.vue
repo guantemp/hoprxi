@@ -32,8 +32,10 @@
 			<input :placeholder="item&&item.shelfLife||'0 天'" value="等下过来大厦" type="number" class="text-right">
 		</hoprxi-badge>
 	</view>
-	<view class="coupon">444</view>
+	<hoprxi-dateTime-selector></hoprxi-dateTime-selector>
 	<!--
+	<view class="coupon">444</view>
+	
 	<hoprxi-tree :trees="categories" checkType="checkbox" :disabledIds="disabledIds" :expandedIds="expandedIds"
 		:expendAll="false" :checkedIds="checkedIds" class="margin-left-sm" @check="check">
 	</hoprxi-tree>
