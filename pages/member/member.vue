@@ -22,6 +22,7 @@
 			<hoprxi-area-picker @change="change" :initialArea="['四川省','乐山市','井研县']"></hoprxi-area-picker>
 		</view>
 	</view>
+	<!--
 	<view class="flex margin-top-xl justify-end">
 		<hoprxi-badge count='22'>
 			<input :placeholder="item&&item.shelfLife||'0 天'"  type="number" class="text-right">
@@ -32,6 +33,7 @@
 			<input :placeholder="item&&item.shelfLife||'0 天'" value="等下过来大厦" type="number" class="text-right">
 		</hoprxi-badge>
 	</view>
+	-->
 	<hoprxi-dateTime-selector></hoprxi-dateTime-selector>
 	<!--
 	<view class="coupon">444</view>
