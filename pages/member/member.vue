@@ -2,16 +2,16 @@
 	<hoprxi-navigation title="会员管理" :backgroundColor="[1, ['#6B73FF', '#000DFF', 135]]" :titleFont="['#FFF','left',400]"
 		:surplusHeight=43>
 		<view slot="extendSlot" class="cu-bar search">
-			<view class="search-form radius">
-				<text class="cuIcon-search"></text>
-				<input v-model="scanResult" :adjust-position="false" type="text" placeholder="请输入会员编号、手机号、拼音助记码"
-					confirm-type="search">
-				<text class="cuIcon-scan text-blue text-bold" @tap="scan"></text>
+			<view class="search-form radius" style="height:38px">
+				<text class="cuIcon-search text-bold text-xl"></text>
+				<input v-model="scanResult" :adjust-position="false" type="text" placeholder="请输入会员编号、手机号、姓名拼音"
+					confirm-type="search" placeholder-class="text-df">
+				<text class="cuIcon-scan text-blue text-bold text-xxl" @tap="scan"></text>
 			</view>
 		</view>
 	</hoprxi-navigation>
-
 	<hoprxi-dropdown :menus="categories" id="dropdown"></hoprxi-dropdown>
+
 	<!-- 产地选择对话框 -->
 	<view class="cu-modal bottom-modal border-radius">
 		<view class="cu-dialog">
@@ -34,7 +34,7 @@
 		</hoprxi-badge>
 	</view>
 	-->
-	<hoprxi-dateTime-selector></hoprxi-dateTime-selector>
+	<hoprxi-dateTime-selector start="2023/05/15" end="2023/05/25" startPrompt="入住" endPrompt="离开"></hoprxi-dateTime-selector>
 	<!--
 	<view class="coupon">444</view>
 	

@@ -1,6 +1,6 @@
 <template>
 	<view class="navBar navBarContent"
-		:style="{width:barWidth,height:barHeight,'background-color': navBarBackgroudColor,'background-image':navBarBackgroudColor,navShadow:navShadow}">
+		:style="{height:barHeight,'background-color': navBarBackgroudColor,'background-image':navBarBackgroudColor,navShadow:navShadow}">
 		<!--全局背景 -->
 		<view class="background" v-if="navBarBackgroudImg">
 			<image :style="{height:barHeight,width:barWidth}" :src="navBarBackgroudImg" mode="scaleToFill"></image>
@@ -246,6 +246,7 @@
 	.navBar {
 		display: flex;
 		overflow: hidden;
+		width: 100vW;
 		//box-shadow: 0 0 6rpx 0 #ddd;
 	}
 
