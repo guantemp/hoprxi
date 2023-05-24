@@ -1,6 +1,6 @@
 <template>
 	<hoprxi-navigation title="会员管理" :backgroundColor="[1, ['#6B73FF', '#000DFF', 135]]" :titleFont="['#FFF','left',400]"
-		:surplusHeight=43>
+		:surplusHeight=46>
 		<view slot="extendSlot" class="cu-bar search">
 			<view class="search-form radius" style="height:38px">
 				<text class="cuIcon-search text-bold text-xl"></text>
@@ -10,7 +10,7 @@
 			</view>
 		</view>
 	</hoprxi-navigation>
-	<hoprxi-dropdown :menus="categories" id="dropdown"></hoprxi-dropdown>
+	<!-- <hoprxi-dropdown :menus="categories" id="dropdown"></hoprxi-dropdown> -->
 
 	<!-- 产地选择对话框 -->
 	<view class="cu-modal bottom-modal border-radius">
@@ -34,7 +34,7 @@
 		</hoprxi-badge>
 	</view>
 	-->
-	<hoprxi-dateTime-selector start="2023/05/15" end="2023/05/25" startPrompt="入住" endPrompt="离开"></hoprxi-dateTime-selector>
+	<hoprxi-dateTime-selector start="2023/05/24" end="2023/06/28" startPrompt="入住" endPrompt="离开"></hoprxi-dateTime-selector>
 	<!--
 	<view class="coupon">444</view>
 	

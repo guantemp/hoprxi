@@ -7,15 +7,15 @@
 	-moz-osx-font-smoothing: grayscale;
 }
 
-/* CDN 服务仅供平台体验和调试使用，平台不承诺服务的稳定性，企业客户需下载字体包自行发布使用并做好备份。 */
+/* 在线链接服务仅供平台体验和调试使用，平台不承诺服务的稳定性，企业客户需下载字体包自行发布使用并做好备份。 */
 @font-face {
   font-family: 'iconfont';  /* Project id 2371605 */
-  src: url('//at.alicdn.com/t/c/font_2371605_hj0gjkzoqwq.eot?t=1679219207439'); /* IE9 */
-  src: url('//at.alicdn.com/t/c/font_2371605_hj0gjkzoqwq.eot?t=1679219207439#iefix') format('embedded-opentype'), /* IE6-IE8 */
-       url('//at.alicdn.com/t/c/font_2371605_hj0gjkzoqwq.woff2?t=1679219207439') format('woff2'),
-       url('//at.alicdn.com/t/c/font_2371605_hj0gjkzoqwq.woff?t=1679219207439') format('woff'),
-       url('//at.alicdn.com/t/c/font_2371605_hj0gjkzoqwq.ttf?t=1679219207439') format('truetype'),
-       url('//at.alicdn.com/t/c/font_2371605_hj0gjkzoqwq.svg?t=1679219207439#iconfont') format('svg');
+  src: url('//at.alicdn.com/t/c/font_2371605_74xzjrgobri.eot?t=1684895521271'); /* IE9 */
+  src: url('//at.alicdn.com/t/c/font_2371605_74xzjrgobri.eot?t=1684895521271#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('//at.alicdn.com/t/c/font_2371605_74xzjrgobri.woff2?t=1684895521271') format('woff2'),
+       url('//at.alicdn.com/t/c/font_2371605_74xzjrgobri.woff?t=1684895521271') format('woff'),
+       url('//at.alicdn.com/t/c/font_2371605_74xzjrgobri.ttf?t=1684895521271') format('truetype'),
+       url('//at.alicdn.com/t/c/font_2371605_74xzjrgobri.svg?t=1684895521271#iconfont') format('svg');
 }
 
 .icon-invitation:before {
@@ -132,5 +132,9 @@
 
 .icon-today::before {
 	content: "\e62e";
+}
+
+.icon-double-arrow::before {
+	content: "\e62f";
 }
 

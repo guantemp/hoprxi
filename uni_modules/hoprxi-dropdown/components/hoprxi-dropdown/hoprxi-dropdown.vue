@@ -333,7 +333,7 @@
 
 	.navigation {
 		position: relative;
-		z-index: 7;
+		z-index: 3;
 		white-space: nowrap; //使用横向滚动时，需要给<scroll-view>添加white-space: nowrap;样式
 		text-align: center;
 		border-bottom: solid 1px #eee;
@@ -368,7 +368,7 @@
 	.mask {
 		display: flex;
 		position: fixed;
-		z-index: 6;
+		z-index: 2;
 		top: 0;
 		left: 0;
 		right: 0;
@@ -390,7 +390,7 @@
 		max-height: 38vh;
 		max-height: 55vh;
 		background-color: #fff;
-		z-index: 7;
+		z-index: 2;
 		box-shadow: 0 5px 5px rgba(0, 0, 0, .5);
 		opacity: 1;
 		transition: 0.5s;

@@ -2,15 +2,16 @@
 	<view class="date_time" @touchmove.prevent.stop="">
 		<view class="header">
 			<view class="flex flex-sub justify-center align-center">
-				<text class="cuIcon-back margin-right" @tap.stop="previousYear"><text class="cuIcon-back"></text></text>
+				<text class="icon-double-arrow margin-right-sm" style="font-size: 14px;" @tap="previousYear"></text>
 				<text class="cuIcon-back" @tap="previousMonth"></text>
-				<text class="margin-lr-sm">{{showTitle}}</text>
+				<text class="margin-lr">{{showTitle}}</text>
 				<text class="cuIcon-right" @tap="nextMonth"></text>
-				<text class="cuIcon-right margin-left" @tap="nextYear"> <text class="cuIcon-right"></text></text>
+				<text class="icon-double-arrow margin-left-sm" @tap="nextYear"
+					style="transform:rotate(180deg);font-size: 14px;"> </text>
 			</view>
 			<view>
 				<text class="padding-tb-xs padding-left-sm padding-right text-sm bg-orange radius"
-					@tap.stop="showTitle">今天</text>
+					@tap.stop="toDay">今天</text>
 			</view>
 		</view>
 		<view class="weeks text-sm padding-lr-xxl text-center">
@@ -19,7 +20,8 @@
 			</block>
 		</view>
 		<view class="calendars">
-			<view class="background-month">{{calendar.month < 10 ? "0"+calendar.month : calendar.month}}</view>
+			<view class="background-month">{{calendar.month+1 < 10 ? "0"+(calendar.month+1) : (calendar.month+1)}}
+			</view>
 			<block v-for="row in 6" :key="row">
 				<view class="flex text-bold padding-lr-xxl response" style="height:45px;font-size: 14px;">
 					<block v-for="(day,index) in rows(row)" :key="row + ':' + index">
@@ -27,27 +29,31 @@
 										'start':day.status === 'start',
 										'end':day.status === 'end',
 										'coincide':day.status === 'coincide',
-										'bg-olive radius':day.status ==='current' && day.status !== 'disable'
+										'bg-olive radius':day.status ==='current'
 										}" @tap.stop="clickDate">
-							<text :class="{'text-grey': day.status === 'disable'}" class="value">{{day.value}}</text>
+							<text :class="{'text-grey': day.status === 'prepose'||day.status === 'next'}"
+								class="value">{{day.day}}</text>
 							<text style="font-size: 10px;" :class="{'text-white': day.status === 'start'}"
 								v-if="day.status === 'start'" class="prompt">{{startPrompt}}</text>
 							<text style="font-size: 10px;" :class="{'text-white': day.status === 'end'}"
-								v-if="day.status === 'end'" class="prompt">{{endPrompt}}</text>
+								v-else-if="day.status === 'end'" class="prompt">{{endPrompt}}</text>
 							<text style="font-size: 10px;" :class="{'text-white': day.status === 'coincide'}"
-								v-if="day.status === 'coincide'" class="prompt">{{startPrompt + "/" + endPrompt}}</text>
+								v-else-if="day.status === 'coincide'"
+								class="prompt">{{startPrompt + "/" + endPrompt}}</text>
+							<text v-else style="font-size: 10px;"
+								:class="{'text-grey': day.status === 'prepose'||day.status === 'next','text-red':day.lunar.lunarFestival||day.lunar.festival||day.lunar.Term}"
+								class="prompt">{{day.lunar.lunarFestival||day.lunar.festival||day.lunar.Term||(day.lunar.IDayCn==='初一'?day.lunar.IMonthCn:day.lunar.IDayCn)}}</text>
 						</view>
 					</block>
 				</view>
 			</block>
 		</view>
 		<view class="response text-center flex padding solid-bottom" style="font-size: 14px;">
-			<text>2023-04-01 11:59:59</text><text class="flex-sub cuIcon-back_android"></text><text>2023-04-30
+			<text>2023-04-01 11:59:59</text><text class="flex-sub">——</text><text>2023-04-30
 				23:59:59</text>
 		</view>
 		<view class="flex justify-center margin-tb-sm">
-			<button class="cu-btn lg radius shadow bg-black basis-xl"
-				@tap.stop="$util.navTo('/pages/workflow/price/price_adjustment_add?sign=add')">
+			<button class="cu-btn lg radius shadow bg-black basis-xl" @tap.stop="confirm">
 				确认选择</button>
 		</view>
 	</view>
@@ -58,6 +64,7 @@
 		computed,
 		onBeforeMount
 	} from 'vue';
+	import lunar from '@/uni_modules/hoprxi-common/js_sdk/calendar.js';
 	export default {
 		name: 'hoprxi-dateTime-selector',
 		props: {
@@ -74,20 +81,42 @@
 		},
 		setup(props, content) {
 			const weeks = ['日', '一', '二', '三', '四', '五', '六'];
-			const start = props.start ? new Date(props.start) : null;
-			const end = props.end ? new Date(props.end) : null;
 			const current = new Date();
 			const calendar = reactive({
 				year: 1970,
-				month: 1,
+				month: 0,
 				days: []
 			});
 			const showTitle = computed(() => {
-				return calendar.year + '年' + calendar.month + "月";
+				return calendar.year + '年' + (calendar.month + 1) + "月";
 			});
+			const previousYear = () => {
+				if (calendar.year > 1970) calculate(new Date(calendar.year - 1, calendar.month, 1));
+			};
+			const previousMonth = () => {
+				if (calendar.year > 1970 && calendar.month >= 0) calculate(new Date(calendar.year, calendar.month - 1,
+					1));
+			};
+			const nextMonth = () => {
+				if (calendar.year < 2099)
+					if (calendar.month === 11) calculate(new Date(calendar.year + 1, 0, 1));
+					else calculate(new Date(calendar.year, calendar.month + 1, 1));
+			};
+			const nextYear = () => {
+				if (calendar.year < 2099) calculate(new Date(calendar.year + 1, calendar.month, 1));
+			};
+			const toDay = () => {
+				calculate(new Date(current.getFullYear(), current.getMonth(), current.getDate()));
+			};
 			const rows = computed(() => (row) => {
 				return calendar.days.slice((row - 1) * 7, row * 7);
 			});
+			const confirm = () => {
+				emits("confirm", {
+					start: props.start,
+					end: props.end
+				});
+			};
 			const calculate = (date) => {
 				const months = {
 					1: 31,
@@ -101,41 +130,51 @@
 					9: 30,
 					10: 31,
 					11: 30,
-					12: 30
+					12: 31
 				};
-				const now = date ? new Date(date) : current;
+				const now = date ? date : current;
 				const year = now.getFullYear();
-				const month = now.getMonth() + 1;
-				calendar.year = year;
-				calendar.month = month;
 				if (year % 4 === 0 && year % 100 !== 0 || year % 400 === 0) {
 					months[2] = 29;
 				}
-				let firstDay = new Date(`${year}/${month}/1 00:00:00`);
+				calendar.year = year;
+				const month = now.getMonth() + 1; //使用1-12月
+				calendar.month = now.getMonth(); //使用0-11月	
+				calendar.days = [];
+				//let firstDay = new Date(`${year}/${calendar.month}/1 00:00:00`);
+				let firstDay = new Date(year, now.getMonth(), 1);
 				const week = firstDay.getDay();
 				if (week != 0) {
 					for (let i = week - 1; i >= 0; i--) {
+						console.log("lunar")
+						console.log(year, month - 1, month - 1 == 0 ? months[12] - i : months[month - 1] - i)
 						calendar.days.push({
-							value: months[month - 1] - i,
+							day: month - 1 == 0 ? months[12] - i : months[month - 1] - i,
 							status: 'prepose',
+							lunar: lunar.solar2lunar(year, month - 1, month - 1 == 0 ? months[12] - i : months[
+								month - 1] - i) //使用1-12月
 						})
 					}
 				}
 				for (let i = 1; i <= months[month]; i++) {
 					calendar.days.push({
-						value: i,
-						status: setStatus(year, month - 1, i)
+						day: i,
+						status: setStatus(year, month - 1, i),
+						lunar: lunar.solar2lunar(year, month, i)
 					})
 				}
-				for (let i = 0, j = 42 - calendar.days.length; i < j; i++) {
+				for (let i = 1, j = 43 - calendar.days.length; i < j; i++) {
 					calendar.days.push({
-						value: i + 1,
+						day: i,
 						status: "next",
+						lunar: lunar.solar2lunar(year, month + 1, i)
 					})
 				}
 				console.log(calendar)
 			};
 			const setStatus = (year, month, day) => {
+				const start = props.start ? new Date(props.start) : null;
+				const end = props.end ? new Date(props.end) : null;
 				const value = new Date(year, month, day);
 				if (value.getFullYear() == current.getFullYear() && value.getMonth() == current.getMonth() && value
 					.getDate() == current.getDate()) return 'current';
@@ -147,36 +186,42 @@
 					.getTime()) return 'withinTheInterval';
 				return 'normal';
 			};
-			const clickDate = () => {};
+			const clickDate = () => {
+				console.log("clickdate");
+			};
 			onBeforeMount(() => {
 				calculate();
 			});
 			return {
 				weeks,
 				calendar,
-				current,
 				showTitle,
+				previousYear,
+				previousMonth,
+				nextMonth,
+				nextYear,
+				toDay,
 				rows,
-				clickDate
+				clickDate,
 			}
 		}
 	}
 </script>
 <style lang="scss">
 	.date_time {
-		display: flex;
 		width: 100vw;
+		z-index: 2;
+		display: flex;
 		flex-direction: column;
-		border-top-left-radius: 10px;
-		border-top-right-radius: 10px;
+		justify-content: center;
 		border-top: 1px solid #aaaaaa;
 		position: absolute;
-		bottom: 2px;
+		bottom: 1px;
 
 		.header {
 			display: flex;
 			line-height: 44px;
-			text-size: 16px
+			text-size: 16px;
 		}
 
 		.weeks {
