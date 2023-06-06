@@ -21,7 +21,7 @@
 	@import '@/common/iconfont/iconfont.css';
 	/*#endif*/
 	/*#ifndef MP*/
-	@import url('https://at.alicdn.com/t/c/font_2371605_hj0gjkzoqwq.css');
+	@import url('https://at.alicdn.com/t/c/font_2371605_sgm2zp8zfh9.css');
 	/*#endif*/
 </style>
 

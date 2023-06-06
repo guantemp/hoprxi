@@ -49,23 +49,34 @@
 			</block>
 		</view>
 		<view class="response text-center flex padding solid-bottom text-df">
-			<text>{{range.start.getFullYear()+'-'+formatNum(range.start.getMonth()+1)+'-'+formatNum(range.start.getDate())}}
-				{{formatNum(range.start.getHours())+':'+formatNum(range.start.getMinutes())+':'+formatNum(range.start.getSeconds())}}</text><text
-				class="flex-sub">——</text><text>{{range.end.getFullYear()+'-'+formatNum(range.end.getMonth()+1)+'-'+formatNum(range.end.getDate())}}
-				{{formatNum(range.end.getHours())+':'+formatNum(range.end.getMinutes())+':'+formatNum(range.end.getSeconds())}}</text>
+			<text>{{range.start.getFullYear()+'-'+formatNum(range.start.getMonth()+1)+'-'+formatNum(range.start.getDate())}}</text>
+			<text class="margin-left-xs"
+				@tap.stop="clickTime('start')">{{formatNum(range.start.getHours())+':'+formatNum(range.start.getMinutes())+':'+formatNum(range.start.getSeconds())}}</text>
+			<text
+				class="flex-sub cuIcon-move"></text><text>{{range.end.getFullYear()+'-'+formatNum(range.end.getMonth()+1)+'-'+formatNum(range.end.getDate())}}</text>
+			<text class="margin-left-xs"
+				@tap.stop="clickTime('end')">{{formatNum(range.end.getHours())+':'+formatNum(range.end.getMinutes())+':'+formatNum(range.end.getSeconds())}}</text>
 		</view>
-		<view class="time" v-if="false">
-			<picker-view class="d-picker-view" :indicator-style="itemHeight" :value="timeVal" @change="timeChange">
+		<view class="timeMask" v-if="timeShow" @tap="clickTime"></view>
+		<view class="time" v-if="timeShow">
+			<view class="text-center margin-bottom-xl">选择时间</view>
+			<picker-view class="time-picker-view" indicator-style="height:50px" :value="timeVal" @change="timeChange">
 				<picker-view-column>
-					<view class="dateItem" v-for="(item,index) in time.hours" :key="index">{{item}}时</view>
+					<view class="time-picker-Item" v-for="(item,index) in time.hours" :key="index">{{item}} 时</view>
 				</picker-view-column>
 				<picker-view-column>
-					<view class="dateItem" v-for="(item,index) in time.minutes " :key="index">{{item}}分</view>
+					<view class="time-picker-Item " v-for="(item,index) in time.minutes " :key="index">{{item}} 分
+					</view>
 				</picker-view-column>
 				<picker-view-column>
-					<view class="dateItem" v-for="(item,index) in time.seconds" :key="index">{{item}}秒</view>
+					<view class="time-picker-Item " v-for="(item,index) in time.seconds" :key="index">{{item}} 秒</view>
 				</picker-view-column>
 			</picker-view>
+			<view class="margin-top-xl flex justify-between text-blue">
+				<view><text class="cuIcon-top"></text><text class="icon-time-restore margin-left"></text><text
+						class="cuIcon-down margin-left"></text></view>
+				<view><text>取消</text><text class="margin-left">确定</text></view>
+			</view>
 		</view>
 		<view class="flex justify-center margin-tb-sm">
 			<button class="cu-btn lg radius shadow bg-black basis-xl" @tap.stop="confirm">
@@ -75,6 +86,7 @@
 </template>
 <script>
 	import {
+		ref,
 		reactive,
 		computed,
 		onBeforeMount
@@ -150,6 +162,7 @@
 			const rows = computed(() => (row) => {
 				return calendar.days.slice((row - 1) * 7, row * 7);
 			});
+			const timeShow = ref(false);
 			const timeVal = reactive([]);
 			const timeChange = (e) => {
 				let arr = [...e.detail.value];
@@ -243,6 +256,22 @@
 				else range.start = new Date(calendar.year + '-' + calendar.month + '-' + day.day)
 				console.log(range);
 			};
+			const clickTime = (flag) => {
+				timeShow.value = !timeShow.value;
+				switch (flag) {
+					case 'start':
+						timeVal[0] = range.start.getHours();
+						timeVal[1] = range.start.getMinutes();
+						timeVal[2] = range.start.getSeconds();
+						break;
+					case 'end':
+						timeVal[0] = range.end.getHours();
+						timeVal[1] = range.end.getMinutes();
+						timeVal[2] = range.end.getSeconds();
+						break
+				}
+				console.log(timeVal)
+			};
 			onBeforeMount(() => {
 				calculate();
 			});
@@ -261,7 +290,9 @@
 				rows,
 				clickDate,
 				timeVal,
+				timeShow,
 				timeChange,
+				clickTime,
 				confirm
 			}
 		}
@@ -275,7 +306,7 @@
 		flex-direction: column;
 		justify-content: center;
 		border-top: 1px solid #aaaaaa;
-		position: absolute;
+		position: fixed;
 		bottom: 1px;
 
 		.header {
@@ -343,27 +374,37 @@
 			}
 		}
 
+		.timeMask {
+			position: fixed;
+			bottom: 0px;
+			top: 0px;
+			left: 0px;
+			right: 0px;
+			background-color: rgba(0, 0, 0, 0.4);
+			transition-duration: 0.3s;
+			z-index: 2;
+		}
+
 		.time {
 			position: absolute;
-			display: inline-block;
-			vertical-align: middle;
-			margin-left: auto;
-			margin-right: auto;
-			width: 95%;
-			height: 238px;
-			overflow: hidden;
-			background-color: rgba(255, 255, 255, 1);
+			width: 85%;
+			border-radius: 8px;
+			padding: 15px 35px;
+			background-color: #fff;
+			left: 50%;
+			top: 50%;
+			transform: translate(-50%, -50%);
+			transition-duration: 0.3s;
 			z-index: 3;
 
-			.d-picker-view {
-				height: 100%;
+
+			.time-picker-view {
+				height: 130px;
 			}
 
-			.dateItem {
+			.time-picker-Item {
 				text-align: center;
-				width: 100%;
-				height: 44px;
-				line-height: 44px;
+				line-height: 50px;
 				text-overflow: ellipsis;
 				white-space: nowrap;
 				font-size: 15px;
