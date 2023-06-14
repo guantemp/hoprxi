@@ -73,9 +73,10 @@
 				</picker-view-column>
 			</picker-view>
 			<view class="margin-top-xl flex justify-between text-blue">
-				<view><text class="cuIcon-top"></text><text class="icon-time-restore margin-left"></text><text
-						class="cuIcon-down margin-left"></text></view>
-				<view><text>取消</text><text class="margin-left">确定</text></view>
+				<view><text class="cuIcon-top" @tap.stop="timeVal=[0,0,0]"></text><text
+						class="icon-time-restore margin-left" @tap=""></text><text class="cuIcon-down margin-left"
+						@tap.stop="timeVal=[23,59,59];"></text></view>
+				<view><text @tap="timeShow=false">取消</text><text class="margin-left" @tap="timeConfirm">确定</text></view>
 			</view>
 		</view>
 		<view class="flex justify-center margin-tb-sm">
@@ -89,7 +90,8 @@
 		ref,
 		reactive,
 		computed,
-		onBeforeMount
+		onBeforeMount,
+		watch
 	} from 'vue';
 	import lunar from '@/uni_modules/hoprxi-common/js_sdk/calendar.js';
 	export default {
@@ -112,12 +114,6 @@
 			const formatNum = (n) => {
 				return (Number(n) < 10 ? '0' + Number(n) : Number(n) + '');
 			};
-			const setLastTime = (date) => {
-				date.setHours(23);
-				date.setMinutes(59);
-				date.setSeconds(59);
-				return date;
-			}
 			const time = computed(() => {
 				let hours = [],
 					minutes = [],
@@ -157,26 +153,42 @@
 				if (calendar.year < 2099) calculate(new Date(calendar.year + 1, calendar.month, 1));
 			};
 			const toDay = () => {
-				calculate(new Date(current.getFullYear(), current.getMonth(), current.getDate()));
+				calculate(new Date());
 			};
 			const rows = computed(() => (row) => {
 				return calendar.days.slice((row - 1) * 7, row * 7);
 			});
 			const timeShow = ref(false);
-			const timeVal = reactive([]);
+			let timeFlag = 'start';
+			let timeTemp = [0, 0, 0];
+			const timeVal = ref([]);
 			const timeChange = (e) => {
-				let arr = [...e.detail.value];
-				console.log(arr);
+				timeTemp = [...e.detail.value];
+			}
+			const timeConfirm = () => {
+				timeShow.value = false;
+				switch (timeFlag) {
+					case 'start':
+						range.start = setTime(range.start, timeTemp[0], timeTemp[1], timeTemp[2])
+						break;
+					case 'end':
+						range.end = setTime(range.end, timeTemp[0], timeTemp[1], timeTemp[2])
+						break
+				}
+			};
+			const setTime = (d, hour, minute, second) => {
+				if (d instanceof Date) {
+					d.setHours(hour);
+					d.setMinutes(minute);
+					d.setSeconds(second);
+				}
+				return new Date(d.getTime());
 			}
 			const range = reactive({
-				start: props.start ? new Date(props.start) : current,
-				end: props.end ? setLastTime(new Date(props.end)) : setLastTime(current)
+				start: props.start ? new Date(props.start) : setTime(current, 0, 0, 0),
+				end: props.end ? setTime(new Date(props.end), 23, 59, 59) : setTime(current, 23, 59, 59)
 			});
 			const confirm = () => {
-				console.log({
-					start: range.start,
-					end: range.end
-				});
 				content.emit("confirm", {
 					start: range.start,
 					end: range.end
@@ -253,27 +265,27 @@
 			const clickDate = (day) => {
 				if (day.status === 'prepose') console.log(new Date(calendar.year, calendar.month - 1, day.day));
 				else if (day.status === 'next') console.log(new Date(calendar.year, calendar.month + 1, day.day));
-				else range.start = new Date(calendar.year + '-' + calendar.month + '-' + day.day)
+				else range.start = new Date(calendar.year, calendar.month, day.day)
 				console.log(range);
 			};
 			const clickTime = (flag) => {
 				timeShow.value = !timeShow.value;
-				switch (flag) {
+				timeFlag = flag;
+				switch (timeFlag) {
 					case 'start':
-						timeVal[0] = range.start.getHours();
-						timeVal[1] = range.start.getMinutes();
-						timeVal[2] = range.start.getSeconds();
+						timeVal.value = [range.start.getHours(), range.start.getMinutes(), range.start.getSeconds()];
 						break;
 					case 'end':
-						timeVal[0] = range.end.getHours();
-						timeVal[1] = range.end.getMinutes();
-						timeVal[2] = range.end.getSeconds();
+						timeVal.value = [range.end.getHours(), range.end.getMinutes(), range.end.getSeconds()];
 						break
 				}
-				console.log(timeVal)
 			};
 			onBeforeMount(() => {
 				calculate();
+				console.log(range)
+			});
+			watch(timeVal, () => {
+				timeTemp = timeVal.value;
 			});
 			return {
 				weeks,
@@ -293,6 +305,7 @@
 				timeShow,
 				timeChange,
 				clickTime,
+				timeConfirm,
 				confirm
 			}
 		}

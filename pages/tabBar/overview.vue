@@ -6,6 +6,17 @@
 		<view class="cu-item text-gray">
 			<view class="bg-gray light content">
 				<view class="cu-capsule radius">
+					<view class="cu-tag bg-green">version 0.1.4</view>
+					<view class="cu-tag line-green">2023-06-09</view>
+				</view>
+				<view class="margin-top flex flex-direction">
+					<text>1、实现日期选择组件</text>
+				</view>
+			</view>
+		</view>
+		<view class="cu-item text-gray">
+			<view class="bg-gray light content">
+				<view class="cu-capsule radius">
 					<view class="cu-tag bg-green">version 0.1.3</view>
 					<view class="cu-tag line-green">2023-03-10</view>
 				</view>

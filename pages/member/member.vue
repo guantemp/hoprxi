@@ -34,7 +34,7 @@
 		</hoprxi-badge>
 	</view>
 	-->
-	<hoprxi-dateTime-selector start="2023/05/12" end="2023/06/28" startPrompt="入住" endPrompt="离开"></hoprxi-dateTime-selector>
+	<hoprxi-dateTime-selector  startPrompt="入住" endPrompt="离开"></hoprxi-dateTime-selector>
 	<!--
 	<view class="coupon">444</view>
 	
