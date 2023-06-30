@@ -150,7 +150,7 @@
 							code: provinces[provinceIndex].code,
 							name: provinces[provinceIndex].name,
 							parentName: provinces[provinceIndex].parentName,
-						}); //注意使用splice改[3]值，如果[0]没有值，此值会付给[0]位，再一次付给[1]位，直到[0-2]填充完
+						}); //注意使用splice改[2]值，如果[0]没有值，此值会赋给[0]位，再一次赋给[1]位，直到[0-1]填充完有值后才会赋到[2]
 						return query(provinces[provinceIndex][
 							'code'
 						]) //[]取属性，等同于	provinces[provinceIndex].code	

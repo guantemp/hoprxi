@@ -34,14 +34,15 @@
 		</hoprxi-badge>
 	</view>
 	-->
-	<hoprxi-dateTime-selector  startPrompt="入住" endPrompt="离开"></hoprxi-dateTime-selector>
+	<hoprxi-dateTime-selector :prompt="{start:'入住',end:'离开'}" mode='single' :tempRange="[{start:'2023-6-6'}]"
+		@confirm="confirm"></hoprxi-dateTime-selector>
 	<!--
-	<view class="coupon">444</view>
-	
-	<hoprxi-tree :trees="categories" checkType="checkbox" :disabledIds="disabledIds" :expandedIds="expandedIds"
-		:expendAll="false" :checkedIds="checkedIds" class="margin-left-sm" @check="check">
-	</hoprxi-tree>
-	-->
+	<view class=" coupon">444</view>
+
+		<hoprxi-tree :trees="categories" checkType="checkbox" :disabledIds="disabledIds" :expandedIds="expandedIds"
+			:expendAll="false" :checkedIds="checkedIds" class="margin-left-sm" @check="check">
+		</hoprxi-tree>
+		-->
 </template>
 
 <script>
@@ -94,10 +95,14 @@
 				color: 'red',
 				txt: '萨尔图区而为'
 			});
+			const confirm = (e) => {
+				console.log(e)
+			}
 			return {
 				categories,
 				menus,
-				customTheme
+				customTheme,
+				confirm
 			}
 		},
 		data() {
