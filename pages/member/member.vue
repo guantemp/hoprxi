@@ -34,7 +34,7 @@
 		</hoprxi-badge>
 	</view>
 	-->
-	<hoprxi-dateTime-selector :prompt="{start:'入住',end:'离开'}" mode='single' :tempRange="[{start:'2023-6-6'}]"
+	<hoprxi-dateTime-selector :prompt="{start:'入住',end:'离开'}" mode='single' 
 		@confirm="confirm"></hoprxi-dateTime-selector>
 	<!--
 	<view class=" coupon">444</view>

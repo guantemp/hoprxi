@@ -38,10 +38,10 @@
 							<text :class="{'text-white text-xs': day.status === 'start'}" v-if="day.status === 'start'"
 								class="prompt">{{prompt.start}}</text>
 							<text :class="{'text-white text-xs': day.status === 'end'}" v-else-if="day.status === 'end'"
-								class="prompt">{{prompt.start}}</text>
+								class="prompt">{{prompt.end}}</text>
 							<text :class="{'text-white text-xs': day.status === 'coincide'}"
 								v-else-if="day.status === 'coincide'"
-								class="prompt">{{prompt.start + "/" + prompt.start}}</text>
+								class="prompt">{{prompt.start + "/" + prompt.end}}</text>
 							<text v-else
 								:class="{'text-grey': day.status === 'prepose'||day.status === 'next','text-red':day.lunar.lunarFestival||day.lunar.festival||day.lunar.Term}"
 								class="prompt text-xs">{{day.lunar.lunarFestival||day.lunar.festival||day.lunar.Term||(day.lunar.IDayCn==='初一'?day.lunar.IMonthCn:day.lunar.IDayCn)}}</text>
@@ -54,9 +54,9 @@
 			<view class="flex flex-sub text-center"
 				:class="{'padding-lr-lg':mode==='single','padding-lr':mode==='multiple'}">
 				<text>{{rangeDateShow('start')}}</text>
-				<text class="margin-left-xs" @tap.stop="clickTime('start')">{{rangeTimeShow('start')}}</text>
+				<text class="margin-left-xs text-grey" @tap.stop="clickTime('start')">{{rangeTimeShow('start')}}</text>
 				<text class="flex-sub cuIcon-move"></text><text>{{rangeDateShow('end')}}</text>
-				<text class="margin-left-xs" @tap.stop="clickTime('end')">{{rangeTimeShow('end')}}</text>
+				<text class="margin-left-xs text-grey" @tap.stop="clickTime('end')">{{rangeTimeShow('end')}}</text>
 			</view>
 			<text class="cuIcon-more padding-right-sm" style="transform:translateY(5px);"
 				v-if="mode === 'multiple'"></text>
@@ -100,7 +100,7 @@
 	import lunar from '@/uni_modules/hoprxi-common/js_sdk/calendar.js';
 	name: 'hoprxi-dateTime-selector';
 	const props = defineProps({
-		tempRange: {
+		range: {
 			type: Array[Object],
 			default: []
 		},
@@ -189,12 +189,12 @@
 		}
 	};
 	const setTime = (d, hour, minute, second) => {
-		if (d instanceof Date) {
-			d.setHours(hour);
-			d.setMinutes(minute);
-			d.setSeconds(second);
-		}
-		return new Date(d.getTime());
+		if (d == null || !(d instanceof Date)) return d;
+		let temp = new Date(d.getTime());
+		temp.setHours(hour);
+		temp.setMinutes(minute);
+		temp.setSeconds(second);
+		return temp;
 	}
 	const clickTime = (flag) => {
 		timeShow.value = !timeShow.value;
@@ -216,41 +216,41 @@
 	const rangeDateShow = computed(() => (flag) => {
 		switch (flag) {
 			case 'start':
-				if (internalRange.length != 0 && internalRange[0].start != null) return internalRange[0].start
-					.getFullYear() + '-' + formatNum(internalRange[0].start.getMonth() + 1) + '-' + formatNum(
-						internalRange[0].start.getDate());
-				else return props.prompt.start + '日期';
+				if (internalRange.length != 0 && internalRange[0].start != null) {
+					return internalRange[0].start.getFullYear() + '-' + formatNum(internalRange[0].start
+					.getMonth() + 1) + '-' + formatNum(internalRange[0].start.getDate());
+				} else {
+					return props.prompt.start + '日期';
+				}
 				break;
 			case 'end':
-				if (internalRange.length != 0 && internalRange[0].end != null) return internalRange[0].end
-					.getFullYear() + '-' + formatNum(internalRange[0].end.getMonth() + 1) + '-' + formatNum(
-						internalRange[0].end.getDate());
-				else return props.prompt.end + '日期';
+				if (internalRange.length != 0 && internalRange[0].end != null) {
+					return internalRange[0].end.getFullYear() + '-' + formatNum(internalRange[0].end.getMonth() +
+						1) + '-' + formatNum(internalRange[0].end.getDate());
+				} else {
+					return props.prompt.end + '日期';
+				}
 				break;
 		}
 	});
 	const rangeTimeShow = computed(() => (flag) => {
 		switch (flag) {
 			case 'start':
-				if (internalRange.length === 0) {
-					const temp = setTime(current, 0, 0, 0);
-					return formatNum(temp.getHours()) + ':' + formatNum(temp.getMinutes()) + ':' + formatNum(temp
-						.getSeconds());
-				} else {
+				if (internalRange.length != 0 && internalRange[0].start != null) {
 					return formatNum(internalRange[0].start.getHours()) + ':' + formatNum(internalRange[0].start
 						.getMinutes()) + ':' + formatNum(internalRange[0].start.getSeconds())
+				} else {
+					return props.prompt.start + '时间';
 				}
 				break;
 			case 'end':
-				if (internalRange.length === 0 || internalRange[0].end == null) {
-					const temp = setTime(current, 23, 59, 59);
-					return formatNum(temp.getHours()) + ':' + formatNum(temp.getMinutes()) + ':' + formatNum(temp
-						.getSeconds());
-				} else {
+				if (internalRange.length != 0 && internalRange[0].end != null) {
 					return formatNum(internalRange[0].end.getHours()) + ':' + formatNum(internalRange[0].end
 						.getMinutes()) + ':' + formatNum(internalRange[0].end.getSeconds())
-					break;
+				} else {
+					return props.prompt.end + '时间';
 				}
+				break;
 		}
 	});
 	const confirm = () => {
@@ -301,6 +301,7 @@
 				status: setStatus(year, month - 1, i),
 				lunar: lunar.solar2lunar(year, month, i)
 			})
+			//console.log(setStatus(year, month - 1, i));
 		}
 		for (let i = 1, j = 43 - calendar.days.length; i < j; i++) {
 			calendar.days.push({
@@ -310,26 +311,33 @@
 			})
 		}
 	};
+	const compareDate = (d1, d2) => {
+		return (d1.getFullYear() == d2.getFullYear() && d1.getMonth() == d2.getMonth() && d1.getDate() == d2
+		.getDate()) ? true : false;
+	}
 	const setStatus = (year, month, day) => {
 		const value = new Date(year, month, day);
 		const orientRange = orient(value)
+		//console.log(orientRange);
 		const start = orientRange.start ? new Date(orientRange.start) : null;
 		const end = orientRange.end ? new Date(orientRange.end) : null;
-		if (value.getFullYear() == current.getFullYear() && value.getMonth() == current.getMonth() && value
-		.getDate() == current.getDate()) return 'current';
-		if (start != null && end != null && value.getTime() == start.getTime() && value.getTime() == end.getTime())
-			return 'coincide';
-		if (start != null && start.getTime() == value.getTime()) return 'start';
-		if (end != null && end.getTime() == value.getTime()) return 'end';
+		if (start != null && end != null && compareDate(value, start) && compareDate(value, end)) return 'coincide';
+		if (start != null && compareDate(value, start)) return 'start';
+		if (end != null && compareDate(value, end)) return 'end';
 		if (start != null && end != null && value.getTime() > start.getTime() && value.getTime() < end.getTime())
 			return 'withinTheInterval';
+		if (compareDate(current, value)) return 'current';
 		return 'normal';
 	};
-	const orient = (d) => {
-		if (d instanceof Date) {
+	const orient = (d) => { //搜索合适的日期范围
+		if (d != null && d instanceof Date) {
 			for (const r of internalRange) {
+				//console.log(d + ':' + (r.start != null ? r.start : null) + ':' + (r.end != null ? r
+				//	.end : null));
 				if (r.start != null && d.getTime() >= r.start.getTime() && r.end != null && d.getTime() <= r.end
-					.getTime()) return r;
+					.getTime()) {
+					return r;
+				}
 			}
 		}
 		return {
@@ -339,45 +347,64 @@
 	};
 	const clickDate = (day) => {
 		const signle = (date) => {
-			if (internalRange.length == 0) {
+			if (internalRange[0].start == null && internalRange[0].end == null) {
 				internalRange[0] = {
 					start: date,
-					end: null
+					end: setTime(date, 23, 59, 59)
 				};
 			} else {
-				if (internalRange[0].start != null && internalRange[0].end == null) {}
+				if (compareDate(date, internalRange[0].start) && compareDate(date, internalRange[0].end)) {
+					internalRange[0] = {
+						start: null,
+						end: null
+					};
+				} else if (compareDate(date, internalRange[0].start) || date.getTime() > internalRange[0].end) {
+					internalRange[0].end = setTime(date, 23, 59, 59);
+				} else if (compareDate(date, internalRange[0].end) || date.getTime() < setTime(internalRange[0]
+						.start, 0, 0, 0)) {
+					internalRange[0].start = date;
+				} else if (date.getTime() > internalRange[0].start && date.getTime() < internalRange[0].end) {
+					if (date.getTime() - internalRange[0].start.getTime() <= internalRange[0].end.getTime() - date
+						.getTime()) internalRange[0].start = date;
+					else internalRange[0].end = setTime(date, 23, 59, 59)
+				}
 			}
+			//console.log(internalRange);
 		};
 		if (day.status === 'prepose') console.log(new Date(calendar.year, calendar.month - 1, day.day));
 		else if (day.status === 'next') console.log(new Date(calendar.year, calendar.month + 1, day.day));
 		else {
+			const date = new Date(calendar.year, calendar.month, day.day);
 			switch (props.mode) {
 				case 'single':
-					signle(new Date(calendar.year, calendar.month, day.day));
+					signle(date);
 					break;
 			}
+			calculate(date);
 		}
-		//calculate(new Date(calendar.year, calendar.month, day.day));
 		//console.log(internalRange);
 	};
 	const init = () => {
-		for (let i = 0; i < props.tempRange.length; i++) {
+		let i = 0;
+		let flag = props.range.length == 0 ? false : true;
+		do {
 			internalRange[i] = {
-				start: props.tempRange[i].start ? new Date(props.tempRange[i].start) : null,
-				end: props.tempRange[i].end ? setTime(new Date(props.tempRange[i].end), 23, 59, 59) : null
+				start: (flag && props.range[i].start) ? new Date(props.range[i].start) : null,
+				end: (flag && props.range[i].end) ? setTime(new Date(props.range[i].end), 23, 59, 59) : (flag &&
+					props.range[i].start) ? setTime(new Date(props.range[i].start), 23, 59, 59) : null,
 			}
-		}
+			i++;
+		} while (i < props.range.length)
 	};
 	onBeforeMount(() => {
 		init();
 		calculate();
-		//console.log(internalRange)
 	});
 	watch(timeVal, () => {
 		timeTemp = timeVal.value;
 	});
 	/*
-	watch(() => props.tempRange, () => {
+	watch(() => props.range, () => {
 		
 	}, {
 		deep: true //非常重要，没有它area数组不会被watch到
@@ -427,13 +454,13 @@
 			.value {
 				display: flex;
 				position: relative;
-				top: calc(50% - 13.5px);
+				top: calc(50% - 16.5px);
 			}
 
 			.prompt {
 				display: flex;
 				position: relative;
-				top: calc(50% - 14px);
+				top: calc(50% - 15px);
 			}
 
 			.start {
