@@ -3,9 +3,6 @@
 </template>
 
 <script>
-	import {
-		ref,
-	} from "vue";
 	export default {
 		setup(props, content) {
 			let isLaunched = false;
@@ -13,9 +10,9 @@
 				[{
 					label: 'HOPRXI协助工具，帮助改善应用',
 					style: {
-						paddingLeft: '24rpx',
+						paddingLeft: '12px',
 						marginTop: "10vh",
-						fontSize: "40rpx",
+						fontSize: "20px",
 						fontWeight: 500,
 						color: "#11B654",
 						willChange: 'transform',
@@ -23,14 +20,14 @@
 					},
 					animationStyle: {
 						opacity: 0,
-						transform: "translateX(-800rpx) translateY(-800rpx)"
+						transform: "translateX(-400px) translateY(-400px)"
 					}
 				}, {
 					label: '适配思迅、科脉、泰格、博优等多个管理软件',
 					style: {
-						marginTop: '16rpx',
-						paddingLeft: '48rpx',
-						fontSize: "26rpx",
+						marginTop: '8px',
+						paddingLeft: '24px',
+						fontSize: "13px",
 						fontWeight: 300,
 						color: "#11B654",
 						willChange: 'transform',
@@ -38,7 +35,7 @@
 					},
 					animationStyle: {
 						opacity: 0,
-						transform: "translateX(-800rpx) translateY(800rpx)"
+						transform: "translateX(-400px) translateY(400px)"
 					}
 				}, {
 					img: {
@@ -46,14 +43,14 @@
 						mode: 'aspectFit'
 					},
 					style: {
-						marginTop: '32rpx',
+						marginTop: '16px',
 						height: '45vh',
 						width: "100vw",
 						transition: 'transform .8s ease, opacity .8s ease'
 					},
 					animationStyle: {
 						opacity: 0,
-						transform: "translateY(-300rpx)"
+						transform: "translateY(-150px)"
 					}
 				}],
 				[{

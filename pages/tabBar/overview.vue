@@ -7,10 +7,10 @@
 			<view class="bg-gray light content">
 				<view class="cu-capsule radius">
 					<view class="cu-tag bg-green">version 0.1.4</view>
-					<view class="cu-tag line-green">2023-06-09</view>
+					<view class="cu-tag line-green">2023-07-03</view>
 				</view>
 				<view class="margin-top flex flex-direction">
-					<text>1、实现日期选择组件</text>
+					<text>1、实现日期时间的单选组件</text>
 				</view>
 			</view>
 		</view>

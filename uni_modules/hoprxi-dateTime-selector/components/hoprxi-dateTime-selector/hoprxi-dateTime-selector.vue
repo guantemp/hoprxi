@@ -1,20 +1,32 @@
 <template>
-	<view class="date_time" @touchmove.prevent.stop="">
-		<view class="cuIcon-close"></view>
+	<view class="editor" @tap.stop="select">
+		<view class="cuIcon-calendar text-xxl"></view>
+		<view class="flex flex-sub text-center text-df align-center padding-lr-xs">
+			<text>{{rangeDateShow('start')}}</text>
+			<text class="margin-left-xs text-grey">{{rangeTimeShow('start')}}</text>
+			<text class="flex-sub cuIcon-move"></text><text>{{rangeDateShow('end')}}</text>
+			<text class="margin-left-xs text-grey">{{rangeTimeShow('end')}}</text>
+		</view>
+		<view class="text-xl cuIcon-close round bg-grey" @tap.stop="internalRange[0]={start:null,end:null};calculate()">
+		</view>
+	</view>
+	<view class="mask" v-if="timeShow" @tap="clickTime"></view>
+	<view class="date_time">
+		<view class="flex padding-lr-sm padding-top-xs align-center">
+			<text class="flex-sub text-center">选择日期</text><text class="cuIcon-close text-bold"></text>
+		</view>
 		<view class="header">
-			<view>
-				<text class="padding-tb-xs padding-left-sm padding-right text-sm bg-orange radius"
-					@tap.stop="toDay">今天</text>
-			</view>
 			<view class="flex flex-sub justify-center align-center">
-				<text class="icon-double-arrow margin-right" style="font-size: 14px;" @tap="previousYear"></text>
+				<text class="icon-double-arrow margin-right" @tap="previousYear"></text>
 				<text class="cuIcon-back" @tap="previousMonth"></text>
 				<text class="margin-lr-xl">{{showTitle}}</text>
 				<text class="cuIcon-right" @tap="nextMonth"></text>
-				<text class="icon-double-arrow margin-left" @tap="nextYear"
-					style="transform:rotate(180deg);font-size: 14px;"> </text>
+				<text class="icon-double-arrow margin-left" @tap="nextYear" style="transform:rotate(180deg);"> </text>
 			</view>
-
+			<view>
+				<text class="padding-tb-xs padding-lr-sm text-sm bg-olive" @tap.stop="toDay" style="border-bottom-left-radius: 8px;
+		border-top-left-radius: 8px;">今日</text>
+			</view>
 		</view>
 		<view class="weeks text-sm padding-lr-xxl text-center">
 			<block v-for="(week,index) in weeks" :key="week">
@@ -61,7 +73,7 @@
 			<text class="cuIcon-more padding-right-sm" style="transform:translateY(5px);"
 				v-if="mode === 'multiple'"></text>
 		</view>
-		<view class="timeMask" v-if="timeShow" @tap="clickTime"></view>
+
 		<view class="time" v-if="timeShow">
 			<view class="text-center margin-bottom-xl">选择时间</view>
 			<picker-view class="time-picker-view" indicator-style="height:50px" :value="timeVal" @change="timeChange">
@@ -76,7 +88,7 @@
 					<view class="time-picker-Item " v-for="(item,index) in time.seconds" :key="index">{{item}} 秒</view>
 				</picker-view-column>
 			</picker-view>
-			<view class="margin-top-xl flex justify-between text-blue">
+			<view class="margin-top-xl flex justify-between text-blue text-df">
 				<view><text class="cuIcon-top" @tap.stop="timeVal=[0,0,0]"></text><text
 						class="icon-time-restore margin-left" @tap=""></text><text class="cuIcon-down margin-left"
 						@tap.stop="timeVal=[23,59,59];"></text></view>
@@ -174,19 +186,24 @@
 	let timeFlag = 'start';
 	let timeTemp = [0, 0, 0];
 	const timeVal = ref([]);
-	const timeChange = (e) => {
-		timeTemp = [...e.detail.value];
-	}
-	const timeConfirm = (index) => {
-		timeShow.value = false;
+	const clickTime = (flag) => {
+		timeShow.value = !timeShow.value;
+		timeFlag = flag;
 		switch (timeFlag) {
 			case 'start':
-				internalRange.start = setTime(internalRange.start, timeTemp[0], timeTemp[1], timeTemp[2])
+				timeVal.value = [internalRange[0].start.getHours(), internalRange[0].start.getMinutes(),
+					internalRange[0].start.getSeconds()
+				];
 				break;
 			case 'end':
-				internalRange.end = setTime(internalRange.end, timeTemp[0], timeTemp[1], timeTemp[2])
+				timeVal.value = [internalRange[0].end.getHours(), internalRange[0].end.getMinutes(), internalRange[0]
+					.end.getSeconds()
+				];
 				break
 		}
+	};
+	const timeChange = (e) => {
+		timeTemp = [...e.detail.value];
 	};
 	const setTime = (d, hour, minute, second) => {
 		if (d == null || !(d instanceof Date)) return d;
@@ -195,20 +212,15 @@
 		temp.setMinutes(minute);
 		temp.setSeconds(second);
 		return temp;
-	}
-	const clickTime = (flag) => {
-		timeShow.value = !timeShow.value;
-		timeFlag = flag;
+	};
+	const timeConfirm = (index) => {
+		timeShow.value = false;
 		switch (timeFlag) {
 			case 'start':
-				timeVal.value = [internalRange.start.getHours(), internalRange.start.getMinutes(),
-					internalRange.start.getSeconds()
-				];
+				internalRange[0].start = setTime(internalRange[0].start, timeTemp[0], timeTemp[1], timeTemp[2])
 				break;
 			case 'end':
-				timeVal.value = [internalRange.end.getHours(), internalRange.end.getMinutes(), internalRange.end
-					.getSeconds()
-				];
+				internalRange[0].end = setTime(internalRange[0].end, timeTemp[0], timeTemp[1], timeTemp[2])
 				break
 		}
 	};
@@ -312,30 +324,34 @@
 		}
 	};
 	const compareDate = (d1, d2) => {
+		if (d1.getFullYear() > d2.getFullYear()) return 1;
+		if (d1.getMonth() > d2.getMonth()) return 1;
+		if (d1.getDate() > d2.getDate()) return 1;
 		return (d1.getFullYear() == d2.getFullYear() && d1.getMonth() == d2.getMonth() && d1.getDate() == d2
-		.getDate()) ? true : false;
-	}
+		.getDate()) ? 0 : -1;
+	};
 	const setStatus = (year, month, day) => {
 		const value = new Date(year, month, day);
 		const orientRange = orient(value)
-		//console.log(orientRange);
 		const start = orientRange.start ? new Date(orientRange.start) : null;
 		const end = orientRange.end ? new Date(orientRange.end) : null;
-		if (start != null && end != null && compareDate(value, start) && compareDate(value, end)) return 'coincide';
-		if (start != null && compareDate(value, start)) return 'start';
-		if (end != null && compareDate(value, end)) return 'end';
+		//console.log(orientRange)
+		if (start != null && end != null && compareDate(value, start) == 0 && compareDate(value, end) == 0)
+		return 'coincide';
+		if (start != null && compareDate(value, start) == 0) return 'start';
+		if (end != null && compareDate(value, end) == 0) return 'end';
 		if (start != null && end != null && value.getTime() > start.getTime() && value.getTime() < end.getTime())
 			return 'withinTheInterval';
-		if (compareDate(current, value)) return 'current';
+		if (compareDate(current, value) == 0) return 'current';
 		return 'normal';
 	};
 	const orient = (d) => { //搜索合适的日期范围
 		if (d != null && d instanceof Date) {
 			for (const r of internalRange) {
-				//console.log(d + ':' + (r.start != null ? r.start : null) + ':' + (r.end != null ? r
-				//	.end : null));
-				if (r.start != null && d.getTime() >= r.start.getTime() && r.end != null && d.getTime() <= r.end
-					.getTime()) {
+				if (r.start != null && (d.getTime() >= r.start.getTime() || compareDate(d, r.start) == 0) && r.end !=
+					null && d.getTime() <= r.end.getTime()
+					) { //每次传入日期d缺省时间是零点，如果更改过start时间会导致d.getTime() >= r.start.getTime()为false需要加一个判断只比较start日期，
+					//end最小时间是零点不会为false
 					return r;
 				}
 			}
@@ -347,29 +363,54 @@
 	};
 	const clickDate = (day) => {
 		const signle = (date) => {
-			if (internalRange[0].start == null && internalRange[0].end == null) {
+			if (internalRange[0].start == null && internalRange[0].end == null) { //还没有选中范围
 				internalRange[0] = {
 					start: date,
 					end: setTime(date, 23, 59, 59)
 				};
 			} else {
-				if (compareDate(date, internalRange[0].start) && compareDate(date, internalRange[0].end)) {
+				if (compareDate(date, internalRange[0].start) == 0 && compareDate(date, internalRange[0].end) ==
+					0) { //start,end是同一天的清空
 					internalRange[0] = {
 						start: null,
 						end: null
 					};
-				} else if (compareDate(date, internalRange[0].start) || date.getTime() > internalRange[0].end) {
+				} else if (compareDate(date, internalRange[0].start) == 0) { //等于start
 					internalRange[0].end = setTime(date, 23, 59, 59);
-				} else if (compareDate(date, internalRange[0].end) || date.getTime() < setTime(internalRange[0]
-						.start, 0, 0, 0)) {
-					internalRange[0].start = date;
-				} else if (date.getTime() > internalRange[0].start && date.getTime() < internalRange[0].end) {
-					if (date.getTime() - internalRange[0].start.getTime() <= internalRange[0].end.getTime() - date
-						.getTime()) internalRange[0].start = date;
-					else internalRange[0].end = setTime(date, 23, 59, 59)
+				} else if (compareDate(date, internalRange[0].end) == 0) { //等于end
+					internalRange[0].start = setTime(date, 0, 0, 0);
+				} else if (compareDate(date, internalRange[0].start) == -1) { //小于start
+					let temp = internalRange[0].start;
+					internalRange[0].start = setTime(date, temp.getHours(), temp.getMinutes(), temp.getSeconds());
+				} else if (compareDate(date, internalRange[0].end) == 1) { //大于end
+					let temp = internalRange[0].end;
+					internalRange[0].end = setTime(date, temp.getHours(), temp.getMinutes(), temp.getSeconds());
+				} else {
+					if (internalRange[0].start.getMonth() - internalRange[0].end.getMonth() != 0 && (date
+							.getMonth() - internalRange[0].start.getMonth() == 0 || internalRange[0].end
+						.getMonth() - date.getMonth() == 0)) { //start,end任一一个不在当前月，排除都不在当前月的情况
+						if (date.getMonth() - internalRange[0].start.getMonth() == 0) { //start在当前月
+							let temp = internalRange[0].end;
+							internalRange[0].end = setTime(date, temp.getHours(), temp.getMinutes(), temp
+								.getSeconds());
+						} else { //end在当前月
+							let temp = internalRange[0].start;
+							internalRange[0].start = setTime(date, temp.getHours(), temp.getMinutes(), temp
+								.getSeconds());
+						}
+					} else if (date.getTime() - internalRange[0].start.getTime() <= internalRange[0].end
+					.getTime() - date.getTime()) {
+						let temp = internalRange[0].start;
+						internalRange[0].start = setTime(date, temp.getHours(), temp.getMinutes(), temp
+						.getSeconds());
+					} else {
+						let temp = internalRange[0].end;
+						internalRange[0].end = setTime(date, temp.getHours(), temp.getMinutes(), temp
+					.getSeconds());
+					}
+					console.log(internalRange)
 				}
 			}
-			//console.log(internalRange);
 		};
 		if (day.status === 'prepose') console.log(new Date(calendar.year, calendar.month - 1, day.day));
 		else if (day.status === 'next') console.log(new Date(calendar.year, calendar.month + 1, day.day));
@@ -412,20 +453,44 @@
 	*/
 </script>
 <style lang="scss">
+	.editor {
+		display: flex;
+		position: relative;
+		box-sizing: border-box;
+		border-radius: 6px;
+		border: 1px solid #e5e5e5;
+		min-height: 32px;
+		margin: 4px;
+		padding: 4px;
+	}
+
+	.mask {
+		position: fixed;
+		bottom: 0px;
+		top: 0px;
+		left: 0px;
+		right: 0px;
+		background-color: rgba(0, 0, 0, 0.4);
+		transition-duration: 0.3s;
+		z-index: 2;
+	}
+
 	.date_time {
 		width: 100vw;
 		z-index: 2;
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
-		border-top: 1px solid #aaaaaa;
+		border-top-right-radius: 8px;
+		border-top-left-radius: 8px;
+		border-top: 1px solid #e5e5e5;
 		position: fixed;
-		//bottom: 1px;
+		bottom: 1px;
 
 		.header {
 			display: flex;
-			line-height: 44px;
-			text-size: 16px;
+			line-height: 36px;
+
 		}
 
 		.weeks {
@@ -433,7 +498,7 @@
 			justify-content: center;
 			padding: 0 8px 8px 8px;
 			flex-wrap: nowrap;
-			border-bottom: 1px solid #aaaaaa;
+			border-bottom: 1px solid #e5e5e5;
 			margin-bottom: 2px;
 		}
 
@@ -441,7 +506,7 @@
 			display: flex;
 			flex-direction: column;
 			align-items: center;
-			border-bottom: 1px solid #aaaaaa;
+			border-bottom: 1px solid #e5e5e5;
 			padding: 0 6px;
 
 			.background-month {
@@ -487,20 +552,9 @@
 			}
 		}
 
-		.timeMask {
-			position: fixed;
-			bottom: 0px;
-			top: 0px;
-			left: 0px;
-			right: 0px;
-			background-color: rgba(0, 0, 0, 0.4);
-			transition-duration: 0.3s;
-			z-index: 2;
-		}
-
 		.time {
 			position: absolute;
-			width: 85%;
+			width: 87%;
 			border-radius: 8px;
 			padding: 15px 35px;
 			background-color: #fff;
@@ -512,7 +566,7 @@
 
 
 			.time-picker-view {
-				height: 130px;
+				height: 136px;
 			}
 
 			.time-picker-Item {
