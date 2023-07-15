@@ -410,6 +410,7 @@ export default {
 			alias: "营养快线"
 		},
 		barcode: 6902083898625,
+		type:'new',
 		spec: '550ml',
 		images: ['https://gd3.alicdn.com/imgextra/i3/2380078362/O1CN01m8D6Qi2BdqcFco9Eb_!!2380078362.jpg'],
 		madeIn: {
@@ -454,6 +455,7 @@ export default {
 			alias: "川骄卷纸"
 		},
 		barcode: 6970981171003,
+		type:'process',
 		spec: '1800g',
 		images: ['https://gd4.alicdn.com/imgextra/i4/3053115674/TB2LRXVisIrBKNjSZK9XXagoVXa_!!3053115674.jpg'],
 		category: {

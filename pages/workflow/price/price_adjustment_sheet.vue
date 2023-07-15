@@ -160,10 +160,6 @@
 				uni.createSelectorQuery().select('.flex.text-center.bg-white.nav').boundingClientRect(res => {
 					fixedHeight.value += res.height;
 				}).exec();
-
-				uni.createSelectorQuery().select('.bootom').boundingClientRect(res => {
-					fixedHeight.value += res.height;
-				}).exec();
 			});
 			return {
 				fixedHeight,

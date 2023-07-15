@@ -55,6 +55,10 @@
 					event: 'del'
 				}]
 			},
+			filterButtons:{
+				type:Array,
+				default:[]
+			}
 		},
 		setup(props, content) {
 			const calculationOffset = () => {

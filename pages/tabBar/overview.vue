@@ -6,11 +6,12 @@
 		<view class="cu-item text-gray">
 			<view class="bg-gray light content">
 				<view class="cu-capsule radius">
-					<view class="cu-tag bg-green">version 0.1.4</view>
-					<view class="cu-tag line-green">2023-07-03</view>
+					<view class="cu-tag bg-cyan">version 0.1.4</view>
+					<view class="cu-tag line-cyan">2023-07-14</view>
 				</view>
 				<view class="margin-top flex flex-direction">
-					<text>1、实现日期时间的单选组件</text>
+					<text>1、实现对日期时间的范围单选组件</text>
+					<text>2、实现一个长按遮罩并显示按钮的组建</text>
 				</view>
 			</view>
 		</view>

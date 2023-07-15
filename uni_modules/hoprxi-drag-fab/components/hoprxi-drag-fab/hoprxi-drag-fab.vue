@@ -263,7 +263,7 @@
 		z-index: 7;
 		justify-content: center;
 		align-items: center;
-		box-shadow: 0 0 5rpx 2rpx rgba(0, 0, 0, 0.2);
+		box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.2);
 		border-radius: 50%;
 
 		&.transition {
@@ -272,9 +272,9 @@
 
 		.ball-circle-v {
 			position: absolute;
-			width: 8rpx;
-			height: calc(75% - 4rpx);
-			left: calc(50% - 4rpx);
+			width: 4px;
+			height: calc(75% - 2px);
+			left: calc(50% - 2px);
 			top: 15%;
 			background-color: white;
 			transform: rotate(0deg);
@@ -283,10 +283,10 @@
 
 		.ball-circle-h {
 			position: absolute;
-			width: calc(75% - 4rpx);
-			height: 8rpx;
+			width: calc(75% - 2px);
+			height: 4px;
 			left: 15%;
-			top: calc(50% - 4rpx);
+			top: calc(50% - 2px);
 			background-color: white;
 			transform: rotate(0deg);
 			transition: transform .3s;
@@ -326,17 +326,17 @@
 
 			.badge {
 				position: absolute;
-				top: 4rpx;
-				right: 4rpx;
-				height: 28rpx;
-				line-height: 28rpx;
-				border-radius: 200rpx;
+				top: 2px;
+				right: 2px;
+				height: 14px;
+				line-height: 14px;
+				border-radius: 100px;
 				background: #dd524d;
 				color: #fff;
 				text-align: center;
-				padding: 0 10rpx;
-				font-size: 20rpx;
-				box-shadow: 0 0 0 2rpx #fff;
+				padding: 0 5px;
+				font-size: 10px;
+				box-shadow: 0 0 0 1px #fff;
 				box-sizing: border-box;
 			}
 
@@ -358,8 +358,8 @@
 			}
 
 			.text {
-				font-size: 24rpx;
-				text-shadow: 2rpx 0rpx 2rpx rgba(0, 0, 0, .3);
+				font-size: 12px;
+				text-shadow: 1px 0rpx 1px rgba(0, 0, 0, .3);
 			}
 
 			//>text {...}

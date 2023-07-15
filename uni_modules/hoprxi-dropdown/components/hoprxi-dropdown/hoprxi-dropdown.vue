@@ -1,7 +1,7 @@
 <template>
 	<scroll-view scroll-x class="navigation bg-white" scroll-with-animation :scroll-left="tab_scroll"
 		enable-flex="true">
-		<view class="tab" :class="{'cur':index === primary}" v-for="(tab,index) in tabs" :key="tab.id" :data-id="index"
+		<view :class="['tab',{'cur':index === primary}]" v-for="(tab,index) in tabs" :key="tab.id" :data-id="index"
 			@tap.stop="tabSelect" :style="[tab.children?'padding: 0 18px 0 7px':'']">
 			<text>{{showTitle(index)}}</text>
 			<text v-if="tab.children" class="cuIcon-triangledownfill subIcon"
@@ -10,10 +10,9 @@
 	</scroll-view>
 	<!-- 遮罩层-->
 	<view :class="['mask',{'show':popupShow}]" @tap="popupShow = false"></view>
-	<!--最多的4个层级-->
+	<!--最多4个层级-->
 	<view :class="['popup',{'hide':!popupShow}]" v-if="tabs[primary].depth >= 4">
-		<scroll-view class="left" :scroll-y="true" enable-flex="true"
-			scroll-into-view="{{selected[primary]&&'secondary_'+ selected[primary].secondary_id}}">
+		<scroll-view scroscroll-into-view="{{selected[primary]&&'secondary_'+ selected[primary].secondary_id}}">
 			<block v-for="(secondary,index) in tabs[primary].children" :key="secondary.id">
 				<view class="left_menu" :id="'secondary_'+secondary.id"
 					:class="{'bg-white text-red':selected[primary]&&selected[primary]['secondary']&&selected[primary].secondary.id === secondary.id}"
@@ -79,7 +78,7 @@
 	</view>
 </template>
 
-<script>
+<script setup>
 	/**
 	 * @description 一个下拉的菜单
 	 * @property {Array} menus 层级数组，id项目的列不能有重复的值
@@ -97,239 +96,218 @@
 	import {
 		getPropertyFromData,
 	} from '@/js_sdk/util.js';
-	export default {
-		name: 'hoprxi-dropdown',
-		props: {
-			single: Boolean,
-			menus: {
-				Type: Array,
-				default: []
-			},
-			props: { // 配置选项
-				type: Object,
-				default: {
-					id: 'id', // 指定id为节点对象的某个属性值
-					children: 'children', // 指定子树为节点对象的某个属性值
-					name: 'name', // 指定标签为节点对象的某个属性值
-					selector: 'selector' //选择类型：缺省单选single不标注,多选标注：multi
-				}
-			},
+	name: 'hoprxi-dropdown';
+	const props = defineProps({
+		single: Boolean,
+		menus: {
+			Type: Array,
+			default: []
 		},
-		setup(props, content) {
-			const tabs = reactive([{
-				depth: 1
-			}]);
-			const tab_scroll = ref(0);
-			const primary = ref(0);
-			const popupShow = ref(false);
-			const selected = reactive([]);
-			const tabSelect = (event) => {
-				primary.value = event.currentTarget.dataset.id;
-				//css tab中 (margin:8+padding:16)*2=48
-				// 尽量左右滑动显示平滑的处理
-				if (primary.value <= 2) tab_scroll.value = (primary.value - 1) * 48;
-				else if (primary.value > 2 && primary.value <= 5) tab_scroll.value = (primary.value - 0.5) * 48;
-				else if (primary.value > 5 && primary.value <= 8) tab_scroll.value = primary.value * 48;
-				else tab_scroll.value = (primary.value + 0.5) * 48;
-				if (popupShow.value && !tabs[primary.value].children) popupShow.value = false
-			};
-			const showTitle = computed(() => {
-				return (index) => {
-					if (selected[index]) {
-						let temp = selected[index];
-						return (temp.four_level && temp.four_level.name) || (temp.three_level && temp
-							.three_level.name) || (temp.secondary && temp.secondary.name)
-					}
-					return tabs[index].name
-				}
-			});
-			const triangledown = (index) => {
-				if (index != primary.value && popupShow.value) popupShow.value = true;
-				else popupShow.value = !popupShow.value;
-			};
-			const secondary_menu_select = (index, id, name) => {
-				let second = selected[primary.value];
-				if (second && second.secondary && second.secondary.id === id) { //second!=null
-					selected[primary.value] = null;
-				} else {
-					selected[primary.value] = {
-						secondary: {
-							index: index,
-							id: id,
-							name: name,
-						}
-					};
-				}
-				content.emit('changed');
-				//console.log(selected[primary.value]);
-			};
-			const three_level_menus = computed(() => {
-				let first_select = selected[primary.value];
-				if (first_select == null) { //点击一级菜单，即tabs,此时secondary未被赋值
-					return tabs[primary.value].children[0].children;
-				}
-				let secondary = tabs[primary.value].children;
-				return secondary[selected[primary.value].secondary.index].children
-			});
-			const three_level_menu_select = (id, name) => {
-				let three = selected[primary.value];
-				if (three && three.three_level && three.three_level.id === id) {
-					delete selected[primary.value].three_level
-				} else {
-					if (tabs[primary.value].depth <= 3) {
-						let secondary = findParent(tabs[primary.value].children, id);
-						selected[primary.value] = {
-							secondary: {
-								id: secondary.id,
-								name: secondary.name
-							}
-						};
-					}
-					//深度>=4时，直接点三级菜单需要预设二级菜单
-					if (!selected[primary.value] || !selected[primary.value].secondary)
-						selected[primary.value] = {
-							secondary: {
-								index: 0,
-								id: tabs[primary.value].children[0].id,
-								name: tabs[primary.value].children[0].name
-							}
-						};
-					selected[primary.value].three_level = {
-						id: id,
-						name: name
-					}
-				}
-				delete selected[primary.value].four_level
-			};
-			const four_level_menu_select = (id, name) => {
-				let four = selected[primary.value];
-				if (!four) { //直接点击四级菜单，二级菜单缺省为第一位
-					selected[primary.value] = {
-						secondary: {
-							index: 0,
-							id: tabs[primary.value].children[0].id,
-							name: tabs[primary.value].children[0].name
-						}
-					};
-				}
-				if (four && four.four_level && four.four_level.id === id) {
-					delete selected[primary.value].four_level //true
-				} else {
-					let three = findParent(tabs[primary.value].children[selected[primary.value].secondary.index]
-						.children, id);
-					selected[primary.value].three_level = {
-						id: three.id,
-						name: three.name
-					};
-					selected[primary.value].four_level = {
-						id: id,
-						name: name
-					}
+		props: { // 配置menus数据结构
+			type: Object,
+			default: {
+				id: 'id', // 指定id为节点对象的某个属性值
+				children: 'children', // 指定子树为节点对象的某个属性值
+				name: 'name', // 指定标签为节点对象的某个属性值
+				selector: 'selector' //选择类型：缺省单选single不标注,多选标注：multi
+			}
+		}
+	});
+	const emits = defineEmits(["changed"]);
+	const tabs = reactive([{
+		depth: 1
+	}]);
+	const tab_scroll = ref(0);
+	const primary = ref(0);
+	const popupShow = ref(false);
+	const selected = reactive([]);
+	const tabSelect = (event) => { //没有考虑每个选项占用空间，会有bug,还没找到办法
+		primary.value = event.currentTarget.dataset.id;
+		//css tab中 (margin:8+padding:16)*2=48
+		// 尽量左右滑动显示平滑的处理
+		if (primary.value <= 2) tab_scroll.value = (primary.value - 1) * 48;
+		else if (primary.value > 2 && primary.value <= 5) tab_scroll.value = (primary.value - 0.5) * 48;
+		else if (primary.value > 5 && primary.value <= 8) tab_scroll.value = primary.value * 48;
+		else tab_scroll.value = (primary.value + 0.5) * 48;
+		if (popupShow.value && !tabs[primary.value].children) popupShow.value = false
+	};
+	const showTitle = computed(() => {
+		return (index) => {
+			if (selected[index]) {
+				let temp = selected[index];
+				return (temp.four_level && temp.four_level.name) || (temp.three_level && temp
+					.three_level.name) || (temp.secondary && temp.secondary.name)
+			}
+			return tabs[index].name
+		}
+	});
+	const triangledown = (index) => {
+		if (index != primary.value && popupShow.value) popupShow.value = true;
+		else popupShow.value = !popupShow.value;
+	};
+	const secondary_menu_select = (index, id, name) => {
+		let second = selected[primary.value];
+		if (second && second.secondary && second.secondary.id === id) { //second!=null
+			selected[primary.value] = null;
+		} else {
+			selected[primary.value] = {
+				secondary: {
+					index: index,
+					id: id,
+					name: name,
 				}
 			};
-			const findParent = (data, id) => {
-				for (const d of data) {
-					if (d.children) {
-						for (const v of d.children) {
-							if (v.id === id) {
-								return {
-									id: d.id,
-									name: d.name
-								}
-							}
-						}
+		}
+		emits('changed');
+		//console.log(selected[primary.value]);
+	};
+	const three_level_menus = computed(() => {
+		let first_select = selected[primary.value];
+		if (first_select == null) { //点击一级菜单(即tabs)展开,此时secondary未赋值,缺省认为secondary是第一个
+			return tabs[primary.value].children[0].children;
+		}
+		let secondary = tabs[primary.value].children;
+		return secondary[selected[primary.value].secondary.index].children
+	});
+	const three_level_menu_select = (id, name) => {
+		let three = selected[primary.value];
+		if (three && three.three_level && three.three_level.id === id) {
+			delete selected[primary.value].three_level
+		} else {
+			if (tabs[primary.value].depth <= 3) {
+				let secondary = findParent(tabs[primary.value].children, id);
+				selected[primary.value] = {
+					secondary: {
+						id: secondary.id,
+						name: secondary.name
 					}
-				}
-			};
-			watch(primary, (n, o) => {
-				//console.log("primary: " + n);
-			});
-			const init = () => {
-				const _translate = (parent) => {
-					let result = {
-						id: getPropertyFromData(parent, props.props, 'id'),
-						name: getPropertyFromData(parent, props.props, 'name'),
-					};
-					const selector = getPropertyFromData(parent, props.props, 'selector');
-					if (selector) {
-						result.selector = selector;
-					};
-					const children = getPropertyFromData(parent, props.props, 'children');
-					if (children && Array.isArray(children) && children.length > 0) {
-						let items = [];
-						for (const child of children) {
-							items.push(_translate(child))
-						}
-						result.children = items;
-					}
-					return result;
 				};
-				const depth = (treeData) => {
-					let floor = 0
-					let max = 0
-					const _each = (data, floor) => {
-						if (data && Array.isArray(data) && data.length > 0) {
-							data.forEach(e => {
-								max = floor > max ? floor : max;
-								let children = getPropertyFromData(e, props.props, 'children');				
-								_each(children, floor + 1)
-							})
-						}
+			}
+			//深度>=4时，直接点三级菜单需要预设二级菜单
+			if (!selected[primary.value] || !selected[primary.value].secondary)
+				selected[primary.value] = {
+					secondary: {
+						index: 0,
+						id: tabs[primary.value].children[0].id,
+						name: tabs[primary.value].children[0].name
 					}
-					_each(treeData, 1)
-					return max + 1;
 				};
-				let i = 0;
-				for (const menu of props.menus) {
-					if (menu.expand && Array.isArray(getPropertyFromData(menu, props.props, 'children'))) {
-						for (const child of getPropertyFromData(menu, props.props, 'children')) {
-							tabs[i] = {
-								..._translate(child),
-								depth: depth(getPropertyFromData(child, props.props, 'children')),
-							}
-							i += 1;
+			selected[primary.value].three_level = {
+				id: id,
+				name: name
+			}
+		}
+		delete selected[primary.value].four_level //再次点击移除
+	};
+	const four_level_menu_select = (id, name) => {
+		let four = selected[primary.value];
+		if (!four) { //直接点击四级菜单，二级菜单缺省为第一位
+			selected[primary.value] = {
+				secondary: {
+					index: 0,
+					id: tabs[primary.value].children[0].id,
+					name: tabs[primary.value].children[0].name
+				}
+			};
+		}
+		if (four && four.four_level && four.four_level.id === id) {
+			delete selected[primary.value].four_level //true
+		} else {
+			let three = findParent(tabs[primary.value].children[selected[primary.value].secondary.index]
+				.children, id); //直接选4级要回溯此时父级(三级)是哪个
+			selected[primary.value].three_level = {
+				id: three.id,
+				name: three.name
+			};
+			selected[primary.value].four_level = {
+				id: id,
+				name: name
+			}
+		}
+	};
+	const findParent = (data, id) => {
+		for (const d of data) {
+			if (d.children) {
+				for (const v of d.children) {
+					if (v.id === id) {
+						return {
+							id: d.id,
+							name: d.name
 						}
-						continue;
 					}
+				}
+			}
+		}
+	};
+	const init = () => {
+		const _translate = (parent) => {
+			let result = {
+				id: getPropertyFromData(parent, props.props, 'id'),
+				name: getPropertyFromData(parent, props.props, 'name'),
+			};
+			const selector = getPropertyFromData(parent, props.props, 'selector');
+			if (selector) {
+				result.selector = selector;
+			};
+			const children = getPropertyFromData(parent, props.props, 'children');
+			if (children && Array.isArray(children) && children.length > 0) {
+				let items = [];
+				for (const child of children) {
+					items.push(_translate(child))
+				}
+				result.children = items;
+			}
+			return result;
+		};
+		const depth = (treeData) => {
+			let floor = 0
+			let max = 0
+			const _each = (data, floor) => {
+				if (data && Array.isArray(data) && data.length > 0) {
+					data.forEach(e => {
+						max = floor > max ? floor : max;
+						let children = getPropertyFromData(e, props.props, 'children');
+						_each(children, floor + 1)
+					})
+				}
+			}
+			_each(treeData, 1)
+			return max + 1;
+		};
+		let i = 0;
+		for (const menu of props.menus) {
+			if (menu.expand && Array.isArray(getPropertyFromData(menu, props.props, 'children'))) {
+				for (const child of getPropertyFromData(menu, props.props, 'children')) {
 					tabs[i] = {
-						..._translate(menu),
-						depth: depth(getPropertyFromData(menu, props.props, 'children')),
+						..._translate(child),
+						depth: depth(getPropertyFromData(child, props.props, 'children')),
 					}
 					i += 1;
 				}
-				//console.log(tabs);
-			};
-			watch(() => props.menus, () => {
-				init()
-			}, {
-				deep: true //非常重要，没有它menus数组不会被watch到,针对http请求
-			});
-			onBeforeMount(init);
-			return {
-				tabs,
-				tab_scroll,
-				tabSelect,
-				primary,
-				popupShow,
-				selected,
-				showTitle,
-				triangledown,
-				secondary_menu_select,
-				three_level_menus,
-				three_level_menu_select,
-				four_level_menu_select,
+				continue;
 			}
-		},
-		methods: {
-			rest_multi() {
-				this.$set(this.select, this.primary, {});
-			},
+			tabs[i] = {
+				..._translate(menu),
+				depth: depth(getPropertyFromData(menu, props.props, 'children')),
+			}
+			i += 1;
 		}
-	}
+		//console.log(tabs);
+	};
+	const rest_multi = () => {
+		selected[primary.value] = {};
+		//this.$set(this.select, this.primary, {});
+	};
+	watch(() => props.menus, () => {
+		init()
+	}, {
+		deep: true //非常重要，没有它menus数组不会被watch到,针对http请求开始为空，然后再有数据到来
+	});
+	onBeforeMount(init);
 </script>
 
 <style lang='scss'>
-	$select-padding:54px;
+	$select-padding: 54px;
 
 	.navigation {
 		position: relative;
@@ -390,7 +368,7 @@
 		max-height: 38vh;
 		max-height: 55vh;
 		background-color: #fff;
-		z-index: 2;
+		z-index: 3;
 		box-shadow: 0 5px 5px rgba(0, 0, 0, .5);
 		opacity: 1;
 		transition: 0.5s;
