@@ -173,17 +173,13 @@
 			uni.hideLoading();
 		}, 50)
 	}).catch(err => {
-		uni.showLoading({
-			title: '没有找到商品目录！',
-			mask: true
-		});
+		console.log(err)
 	});
 	const test = () => {
 		items.get("36157375959257686").name.name = "我是测试看看的"
 		console.log(items.get("36157375959257686"))
 	};
 	/*
-	a: "撒旦法",
 	disabledIds: ["-99"],
 	expandedIds: ["1", "3446", "a25423", "gj"],
 	checkedIds: ["-99", "43645", "754", "1234", "98874", "1532", "b25423", "24325", "24326", "24323465345"],
