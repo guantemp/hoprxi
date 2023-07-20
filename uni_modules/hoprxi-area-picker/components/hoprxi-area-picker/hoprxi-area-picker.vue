@@ -178,7 +178,7 @@
 			watch(() => props.initialArea, () => {
 				init()
 			}, {
-				deep: true //非常重要，没有它area数组不会被watch到
+				deep: true //非常重要，没有它initialArea数组不会被watch到
 			});
 			//watch(props.initialArea,init) 会起作用，但服务端会报props.initialArea不是一个该监听的对象警告
 			return {

@@ -25,43 +25,44 @@
 	<!--
 	<view class="flex margin-top-xl justify-end">
 		<hoprxi-badge count='22'>
-			<input :placeholder="item&&item.shelfLife||'0 天'"  type="number" class="text-right">
+			<input :placeholder="item&&item.shelfLife||'0 天'" type="number" class="text-right">
 		</hoprxi-badge>
 	</view>
-	<view class="flex margin-top-xl justify-end flex-sub">
+	
+	<view class="flex margin-top-xl justify-end flex-sub" @tap.stop="test">
 		<hoprxi-badge :count="'毛利率：20.23%'" left bg-color="red">
 			<input :placeholder="item&&item.shelfLife||'0 天'" value="等下过来大厦" type="number" class="text-right">
 		</hoprxi-badge>
 	</view>
-	-->
+-->
 	<hoprxi-dateTime-selector :prompt="{start:'入住',end:'离开'}" mode='single'
 		@confirm="confirm"></hoprxi-dateTime-selector>
-	<block v-for="(item,index) in catalog" :key="index">
-		<hoprxi-mask :item="item" :buttons="filterButton(item)">
-			<template v-slot="{item}">
-				<view class="flex padding-lr-sm padding-tb-xs align-center solid-top text-df"
-					:data-id="item.id||item.plu" :data-sign="item.id?'id':'plu'">
-					<view class="imageWrapper">
+	<block v-for="(item,index) in items.values()" :key="index">
+		<hoprxi-mask :buttons="filterButton(item)" :item="item">
+			<template v-slot>
+				<view class="flex flex-wrap padding-tb-xs align-center solid-top text-df" :data-id="item.id||item.plu"
+					:data-sign="item.id?'id':'plu'">
+					<view class="basis-xs text-center">
 						<image class="good-img"
 							:src="(item.images&&item.images[0])||(item.barcode?'/static/workflow_icon/archives.png':'/static/workflow_icon/plu.png')"
 							mode="aspectFill" />
 					</view>
-					<view class="flex flex-direction flex-sub">
+					<view class="flex flex-direction basis-xl padding-right-sm">
 						<view class="text-cut">{{item.name.name}}</view>
 						<view class="flex justify-between">
 							<text v-if="item.barcode">条码：{{item.barcode}}</text>
 							<text v-else>PLU：{{item.plu}}</text>
-							<text>规格：{{item.spec}}</text>
+							<text class="margin-left-xl">规格：{{item.spec=='NULL'?'未指定':item.spec}}</text>
 						</view>
 						<view>
-							产地：{{item.madeIn.name}}
+							产地：{{item.madeIn.madeIn=='UNKNOWN'?'未知':item.madeIn.madeIn}}
 						</view>
 						<view class="flex justify-between">
 							<view>零售价：<text
 									class="text-red">{{item.retailPrice.amount}}/{{item.retailPrice.unit}}</text>
 							</view>
 							<view>会员价:<text
-									class="text-red margin-left-sm">{{item.memberPrice.amount}}/{{item.memberPrice.unit}}</text>
+									class="text-red margin-left-xs">{{item.memberPrice.amount}}/{{item.memberPrice.unit}}</text>
 							</view>
 						</view>
 					</view>
@@ -69,6 +70,7 @@
 			</template>
 		</hoprxi-mask>
 	</block>
+
 	<!--
 	<view class=" coupon">444</view>
 
@@ -89,8 +91,10 @@
 	import {
 		formatMoney,
 	} from '@/uni_modules/hoprxi-common/js_sdk/util.js';
-	import catalog_test from '@/data/catalog_test_data.js'; //用例
-	const catalog = reactive([]);
+	import ajax from '@/uni_modules/u-ajax'
+	const https = ajax.create({
+		baseURL: 'https://hoprxi.tooo.top/catalog'
+	});
 	const menus = [{
 		iconFont: 'cuIcon-goods',
 		text: '新增商品',
@@ -145,9 +149,39 @@
 		fontColor: '#fff',
 		event: 'del'
 	}];
-	for (const item of catalog_test.catalog) {
-		catalog.push(item);
-	}
+	let scanResult = ref('');
+	https.interceptors.request.use(config => {
+		uni.showLoading({
+			title: config.ajax,
+			mask: true
+		});
+		return config
+	})
+	const items = reactive(new Map())
+	https({ //items
+		url: 'core/v1/items',
+		query: {
+			limit: 86,
+			offset: 2480
+		},
+		ajax: '载入商品数据...' // 传递给拦截器的值
+	}).then(res => {
+		for (const item of res.data.items) {
+			items.set(item.id, item)
+		}
+		setTimeout(() => {
+			uni.hideLoading();
+		}, 50)
+	}).catch(err => {
+		uni.showLoading({
+			title: '没有找到商品目录！',
+			mask: true
+		});
+	});
+	const test = () => {
+		items.get("36157375959257686").name.name = "我是测试看看的"
+		console.log(items.get("36157375959257686"))
+	};
 	/*
 	a: "撒旦法",
 	disabledIds: ["-99"],
@@ -162,7 +196,6 @@
 	*/
 	const categories = reactive([]);
 	onBeforeMount(() => {
-		for (const c of catalog_test.category) categories.push(c)
 		categories.splice(0, 0, {
 			id: "-9999",
 			name: "全部",
@@ -182,7 +215,6 @@
 							icon: 'cuIcon-time',
 							event: 'process',
 						});
-						console.log(temp)
 						return temp;
 						break;
 					case 'new':
@@ -197,12 +229,10 @@
 						return temp;
 						break;
 					default:
-
 				}
 			} catch (error) {}
 			return buttons;
-		}
-	);
+		});
 	const customTheme = ref({
 		color: 'red',
 		txt: '萨尔图区而为'
@@ -214,6 +244,9 @@
 		console.log("member");
 		console.log(object);
 	};
+	watch(items, (n, o) => {
+		console.log(n)
+	})
 	const forMoney = () => {
 		let patt = new RegExp(/^¥?[1-9][0-9]*\.[0-9]{1}$|^0\.[0-9]{1}$/);
 		"¥ 25.000/盒".replace(/^(¥|￥|¥ |￥ )(\d+.\d{2,})/, function(m, $1, $2, $3, $4) {
@@ -246,7 +279,6 @@
 	.imageWrapper {
 		width: 64px;
 		height: 64px;
-		display: flex;
 		align-items: center;
 	}
 

@@ -1,10 +1,10 @@
 <template>
-	<view @longpress="onLongPress" @longTap="onLongPress" class="flex" style="position: relative;">
-		<view @tap.stop="itemClick(item)">
-			<slot :item="item"></slot>
+	<view @longpress="onLongPress" @longTap="onLongPress"  style="position: relative;">
+		<view @tap.stop="itemClick(item)" >
+			<slot></slot>
 		</view>
 		<view v-if="popup" :class="{'mask_buttons':popup}" @tap="popup = false">
-			<view @tap.stop="$emit(button.event,item)" v-for="(button,num) in buttons" :key="num"
+			<view @tap.stop="buttonClick(button.event,item)" v-for="(button,num) in buttons" :key="num"
 				class="flex flex-direction margin-lr-lg">
 				<text :style="{color:button.fontColor}" :class="button.icon" class="margin-bottom-xs"
 					style="font-size: 28px;" v-if="button.icon"></text>
@@ -35,27 +35,28 @@
 			}]
 		},
 	});
-	const emits = defineEmits(['del','itemClick']);
+	const emits = defineEmits(['del', 'itemClick']);
 	let popup = ref(false);
 	const onLongPress = (e) => {
 		popup.value = true;
 	};
-	const init = () => {
-
-	};
 	//单击按钮
 	const buttonClick = (name, item) => {
-		console.log(popup.value)
+		console.log(item)
 		popup.value = false;
 		//emits(name, item)
 	};
 	const itemClick = (item) => {
-		emits('itemClick',item);
+		emits('itemClick', item);
 		console.log(item)
 	};
-	/*watch(popup, (n, o) => {
+	/*
+	watch(() => props.item, (n,o) => {
 		console.log(n)
-	})*/
+	}, {
+		deep: true //非常重要，没有它area数组不会被watch到
+	});
+	*/
 </script>
 <style lang="scss">
 	.mask_buttons {
@@ -70,5 +71,6 @@
 		justify-content: center;
 		align-items: center;
 		padding: 0 24px;
+		border-bottom: 1px solid #fff;
 	}
 </style>

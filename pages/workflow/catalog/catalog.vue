@@ -23,7 +23,7 @@
 		<hoprxi-slider :buttons="buttons" :items="catalog" @del="del" @history="history" @favor="favor" @share="share"
 			@click="navigationToDetail">
 			<template v-slot="{item}">
-				<view class="flex padding-lr-sm padding-tb-xs align-center solid-top" @longpress="onLongPress" 
+				<view class="flex padding-lr-sm padding-tb-xs align-center solid-top" @longpress="onLongPress"
 					:data-id="item.id||item.plu" :data-sign="item.id?'id':'plu'">
 					<view class="imageWrapper">
 						<image class="good-img"
@@ -79,7 +79,9 @@
 					</view>
 				</block>
 			</view>
-			<view class="flex justify-between margin-bottom-sm solid-top padding-top-xs padding-lr-xs text-df text-bold">价格
+			<view
+				class="flex justify-between margin-bottom-sm solid-top padding-top-xs padding-lr-xs text-df text-bold">
+				价格
 				<view class="text-sm text-center" @tap="showPrice=!showPrice">
 					{{showPrice?'收缩':'更多'}}<text
 						:class="['margin-left-xs',{'cuIcon-fold':showPrice,'cuIcon-unfold':!showPrice}]"></text>
@@ -152,7 +154,6 @@
 	} from '@/uni_modules/hoprxi-common/js_sdk/util.js';
 	import ajax from '@/uni_modules/u-ajax'
 	import catalog_test from '@/data/catalog_test_data.js'; //用例
-
 	const buttons = [{
 		name: '分享',
 		width: 100,
@@ -193,14 +194,12 @@
 		toast('收藏：' + (data.id || data.plu));
 	};
 	const navigationToDetail = (data) => {
-		if (data.id)
-			uni.navigateTo({
-				url: '/pages/workflow/catalog/good?id=' + data.id + '&sign=good'
-			})
-		else if (data.plu)
-			uni.navigateTo({
-				url: '/pages/workflow/catalog/good?plu=' + data.plu + '&sign=scale'
-			})
+		if (data.id) uni.navigateTo({
+			url: '/pages/workflow/catalog/good?id=' + data.id + '&sign=good'
+		})
+		else if (data.plu) uni.navigateTo({
+			url: '/pages/workflow/catalog/good?plu=' + data.plu + '&sign=scale'
+		})
 	};
 	const menus = [{
 		iconFont: 'cuIcon-goods',
@@ -254,9 +253,6 @@
 		toast('模拟删除：' + key); //还没找到方法
 		delGoodModalDialog.value = false;
 	};
-	const categories = reactive([]);
-	const catalog = reactive([]);
-	const brands = reactive([]);
 	const filterWindows = ref(false);
 	const sorts = ['待审', '新品', '异常', '条码', '品名', '零售价', '最近入库价', '毛利率', '规格', '会员价', 'VIP价'];
 	const selectedFilter = reactive([sorts[0],
@@ -294,6 +290,10 @@
 		console.log(e.currentTarget);
 		console.log(e.target);
 	};
+	const catalog = reactive([]);
+	const items = reactive([]);
+	const categories = reactive([]);
+	const brands = reactive([]);
 	onBeforeMount(() => {
 		const _translate = (data) => {
 			let result = {
@@ -329,15 +329,22 @@
 				categories.push(_translate(category));
 			}
 		}).catch(err => {
-			uni.showLoading({
-				title: '加载品类错误！',
-				mask: true
-			});
+			toast('无法加载商品类，请联系管理员');
 		});
 		categories.splice(0, 0, {
 			id: "-9999",
 			name: "全部"
 		});
+		ajax({ //items
+			url: 'https://hoprxi.tooo.top/catalog/core/v1/items',
+		}).then(res => {
+			for (const item of res.data.items) {
+				items.push(item)
+			}
+		}).catch(err => {
+			toast('加载商品目录错误，请联系管理员');
+		});
+		//
 		ajax({ //brand
 			url: 'https://hoprxi.tooo.top/catalog/core/v1/brands',
 		}).then(res => {
@@ -345,15 +352,13 @@
 				brands.push(brand.name.name)
 			}
 		}).catch(err => {
-			uni.showLoading({
-				title: '加载品牌错误！',
-				mask: true
-			});
+			toast('加载品牌错误！，请联系管理员');
 		});
 		//item
 		for (const item of catalog_test.catalog) {
 			catalog.push(item);
 		}
+		uni.hideLoading();
 	});
 	onMounted(() => {
 		uni.createSelectorQuery().select('#navBar').boundingClientRect(res => {
@@ -371,10 +376,11 @@
 		uni.hideLoading();
 	});
 	/*
-	watch(filterContentHeight, (n, o) => {
-		console.log(n)
-		console.log(o)
-	});*/
+		watch(items, (n, o) => {
+			console.log(n)
+			
+		});
+		*/
 </script>
 
 <style lang='scss'>
