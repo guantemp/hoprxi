@@ -2,7 +2,7 @@
 	<scroll-view scroll-x class="navigation bg-white" scroll-with-animation :scroll-left="tab_scroll"
 		enable-flex="true">
 		<view :class="['tab',{'cur':index === primary}]" v-for="(tab,index) in tabs" :key="tab.id" :data-id="index"
-			@tap.stop="tabSelect" :style="[tab.children?'padding: 0 18px 0 7px':'']">
+			:data-value="tab.name" @tap.stop="tabSelect" :style="[tab.children?'padding: 0 18px 0 7px':'']">
 			<text>{{showTitle(index)}}</text>
 			<text v-if="tab.children" class="cuIcon-triangledownfill subIcon"
 				:class="{'selected':index === primary && popupShow}" @tap="triangledown(index)"></text>
@@ -122,21 +122,23 @@
 	const popupShow = ref(false);
 	const selected = reactive([]);
 	const tabSelect = (event) => { //没有考虑每个选项占用空间，会有bug,还没找到办法
+		const offset = event.currentTarget.dataset.value.length * 4;
+		console.log(offset)
 		primary.value = event.currentTarget.dataset.id;
 		//css tab中 (margin:8+padding:16)*2=48
 		// 尽量左右滑动显示平滑的处理
-		if (primary.value <= 2) tab_scroll.value = (primary.value - 1) * 48;
-		else if (primary.value > 2 && primary.value <= 5) tab_scroll.value = (primary.value - 0.5) * 48;
-		else if (primary.value > 5 && primary.value <= 8) tab_scroll.value = primary.value * 48;
-		else tab_scroll.value = (primary.value + 0.5) * 48;
+		if (primary.value <= 2) tab_scroll.value = (primary.value - 1) * 64;
+		else if (primary.value > 2 && primary.value <= 5) tab_scroll.value = (primary.value - 0.5) * 64;
+		else if (primary.value > 5 && primary.value <= 8) tab_scroll.value = primary.value * 64;
+		else tab_scroll.value = (primary.value + 0.5) * 64;
 		if (popupShow.value && !tabs[primary.value].children) popupShow.value = false
 	};
 	const showTitle = computed(() => {
 		return (index) => {
 			if (selected[index]) {
 				let temp = selected[index];
-				return (temp.four_level && temp.four_level.name) || (temp.three_level && temp
-					.three_level.name) || (temp.secondary && temp.secondary.name)
+				return (temp.four_level && temp.four_level.name) || (temp.three_level && temp.three_level
+					.name) || (temp.secondary && temp.secondary.name)
 			}
 			return tabs[index].name
 		}
@@ -184,14 +186,13 @@
 				};
 			}
 			//深度>=4时，直接点三级菜单需要预设二级菜单
-			if (!selected[primary.value] || !selected[primary.value].secondary)
-				selected[primary.value] = {
-					secondary: {
-						index: 0,
-						id: tabs[primary.value].children[0].id,
-						name: tabs[primary.value].children[0].name
-					}
-				};
+			if (!selected[primary.value] || !selected[primary.value].secondary) selected[primary.value] = {
+				secondary: {
+					index: 0,
+					id: tabs[primary.value].children[0].id,
+					name: tabs[primary.value].children[0].name
+				}
+			};
 			selected[primary.value].three_level = {
 				id: id,
 				name: name
@@ -213,8 +214,8 @@
 		if (four && four.four_level && four.four_level.id === id) {
 			delete selected[primary.value].four_level //true
 		} else {
-			let three = findParent(tabs[primary.value].children[selected[primary.value].secondary.index]
-				.children, id); //直接选4级要回溯此时父级(三级)是哪个
+			let three = findParent(tabs[primary.value].children[selected[primary.value].secondary.index].children,
+			id); //直接选4级要回溯此时父级(三级)是哪个
 			selected[primary.value].three_level = {
 				id: three.id,
 				name: three.name

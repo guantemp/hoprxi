@@ -352,7 +352,17 @@
 				brands.push(brand.name.name)
 			}
 		}).catch(err => {
-			toast('加载品牌错误！，请联系管理员');
+			uni.showModal({
+				title: '错误',
+				content: '加载商品品牌超时！',
+				success: function(res) {
+					if (res.confirm) {
+						console.log('用户点击确定');
+					} else if (res.cancel) {
+						console.log('用户点击取消');
+					}
+				}
+			})
 		});
 		//item
 		for (const item of catalog_test.catalog) {

@@ -1,28 +1,33 @@
 <template>
-	<hoprxi-navigation title="会员管理" :backgroundColor="[1, ['#6B73FF', '#000DFF', 135]]" :titleFont="['#FFF','left',400]"
-		:surplusHeight=46>
-		<view slot="extendSlot" class="cu-bar search">
-			<view class="search-form radius" style="height:38px">
-				<text class="cuIcon-search text-bold text-xl"></text>
-				<input v-model="scanResult" :adjust-position="false" type="text" placeholder="请输入会员编号、手机号、姓名拼音"
-					confirm-type="search" placeholder-class="text-df">
-				<text class="cuIcon-scan text-blue text-bold text-xxl" @tap="scan"></text>
-			</view>
-		</view>
-	</hoprxi-navigation>
-	<!-- <hoprxi-dropdown :menus="categories" id="dropdown"></hoprxi-dropdown> -->
+	<z-paging ref="paging" v-model="dataList" @query="queryList" default-page-size="64"
+		loading-more-no-more-text="我也是有底线的！" :content-z-index="1">
+		<template #top>
+			<hoprxi-navigation title="会员管理" :backgroundColor="[1, ['#6B73FF', '#000DFF', 135]]"
+				:titleFont="['#FFF','left',400]" :surplusHeight=46>
+				<view slot="extendSlot" class="cu-bar search">
+					<view class="search-form radius" style="height:38px">
+						<text class="cuIcon-search text-bold text-xl"></text>
+						<input v-model="scanResult" :adjust-position="false" type="text" placeholder="请输入会员编号、手机号、姓名拼音"
+							confirm-type="search" placeholder-class="text-df">
+						<text class="cuIcon-scan text-blue text-bold text-xxl" @tap="scan"></text>
+					</view>
+				</view>
+			</hoprxi-navigation>
+			<!-- <hoprxi-dropdown :menus="categories" id="dropdown"></hoprxi-dropdown> -->
 
-	<!-- 产地选择对话框 -->
-	<view class="cu-modal bottom-modal border-radius">
-		<view class="cu-dialog">
-			<view class="flex align-center justify-between padding-lr-lg padding-tb-sm bg-white solid-bottom text-lg">
-				<text @tap.stop.prevent="hideOriginDialog">取消</text>
-				<text class="text-orange" @tap.stop.prevent="originDialogConfirm">确定</text>
+			<!-- 产地选择对话框 -->
+			<view class="cu-modal bottom-modal border-radius">
+				<view class="cu-dialog">
+					<view
+						class="flex align-center justify-between padding-lr-lg padding-tb-sm bg-white solid-bottom text-lg">
+						<text @tap.stop.prevent="hideOriginDialog">取消</text>
+						<text class="text-orange" @tap.stop.prevent="originDialogConfirm">确定</text>
+					</view>
+					<hoprxi-area-picker @change="change" :initialArea="['四川省','乐山市','井研县']"></hoprxi-area-picker>
+				</view>
 			</view>
-			<hoprxi-area-picker @change="change" :initialArea="['四川省','乐山市','井研县']"></hoprxi-area-picker>
-		</view>
-	</view>
-	<!--
+
+			<!--
 	<view class="flex margin-top-xl justify-end">
 		<hoprxi-badge count='22'>
 			<input :placeholder="item&&item.shelfLife||'0 天'" type="number" class="text-right">
@@ -35,13 +40,58 @@
 		</hoprxi-badge>
 	</view>
 -->
-	<hoprxi-dateTime-selector :prompt="{start:'入住',end:'离开'}" mode='single'
-		@confirm="confirm"></hoprxi-dateTime-selector>
-	<block v-for="(item,index) in items.values()" :key="index">
+			<hoprxi-dateTime-selector :prompt="{start:'入住',end:'离开'}" mode='single'
+				@confirm="confirm"></hoprxi-dateTime-selector>
+			<hoprxi-drag-fab :menus="menus"
+				@appendGood="$util.navTo('/pages/workflow/catalog/good?sign=good&action=new')"
+				@appendScale="$util.navTo('/pages/workflow/catalog/good?sign=scale&action=new')"
+				@editCategories="$util.navTo('/pages/workflow/catalog/category')"
+				@recovery="$util.navTo('/pages/public/recovery')"
+				@editBrands="$util.navTo('/pages/workflow/catalog/brand')">
+			</hoprxi-drag-fab>
+		</template>
+
+		<block v-for="(item,index) in dataList" :key="index">
+			<hoprxi-mask :buttons="filterButton(item)" :item="item">
+				<template>
+					<view class="flex flex-wrap padding-tb-xs align-center solid-top text-df"
+						:data-id="item.id||item.plu" :data-sign="item.id?'id':'plu'">
+						<view class="basis-xs text-center">
+							<image class="good-img"
+								:src="(item.images&&item.images[0])||(item.barcode?'/static/workflow_icon/archives.png':'/static/workflow_icon/plu.png')"
+								mode="aspectFill" />
+						</view>
+						<view class="flex flex-direction basis-xl padding-right-sm">
+							<view class="text-cut">{{item.name.name}}</view>
+							<view class="flex justify-between">
+								<text v-if="item.barcode">条码：{{item.barcode}}</text>
+								<text v-else>PLU：{{item.plu}}</text>
+								<text class="margin-left-xl">规格：{{item.spec=='NULL'?'未指定':item.spec}}</text>
+							</view>
+							<view>
+								产地：{{item.madeIn.madeIn=='UNKNOWN'?'未知':item.madeIn.madeIn}}
+							</view>
+							<view class="flex justify-between">
+								<view>零售价：<text
+										class="text-red">{{item.retailPrice.amount}}/{{item.retailPrice.unit}}</text>
+								</view>
+								<view>会员价:<text
+										class="text-red margin-left-xs">{{item.memberPrice.amount}}/{{item.memberPrice.unit}}</text>
+								</view>
+							</view>
+						</view>
+					</view>
+				</template>
+			</hoprxi-mask>
+		</block>
+	</z-paging>
+
+	<!--
+	<block v-for="(item,index) in dataList" :key="index">
 		<hoprxi-mask :buttons="filterButton(item)" :item="item">
-			<template v-slot>
-				<view class="flex flex-wrap padding-tb-xs align-center solid-top text-df" :data-id="item.id||item.plu"
-					:data-sign="item.id?'id':'plu'">
+			<template>
+				<view class="flex flex-wrap padding-tb-xs align-center solid-top text-df"
+					:data-id="item.id||item.plu" :data-sign="item.id?'id':'plu'">
 					<view class="basis-xs text-center">
 						<image class="good-img"
 							:src="(item.images&&item.images[0])||(item.barcode?'/static/workflow_icon/archives.png':'/static/workflow_icon/plu.png')"
@@ -70,8 +120,6 @@
 			</template>
 		</hoprxi-mask>
 	</block>
-
-	<!--
 	<view class=" coupon">444</view>
 
 		<hoprxi-tree :trees="categories" checkType="checkbox" :disabledIds="disabledIds" :expandedIds="expandedIds"
@@ -86,7 +134,8 @@
 		ref,
 		onBeforeMount,
 		watch,
-		computed
+		computed,
+		getCurrentInstance,
 	} from 'vue';
 	import {
 		formatMoney,
@@ -100,8 +149,7 @@
 		text: '新增商品',
 		event: 'appendGood'
 	}, {
-		iconPath: '/static/workflow_icon/new_kg.png',
-		selectedIconPath: '/static/workflow_icon/new_kg.png',
+		iconFont: 'icon-scale',
 		text: '新增散秤',
 		event: 'appendScale'
 	}, {
@@ -109,11 +157,10 @@
 		text: '商品类目',
 		event: 'editCategories'
 	}, {
-		iconPath: '/static/workflow_icon/new_kg.png',
 		iconFont: 'cuIcon-comment',
 		badge: 10,
 		text: '商品品牌',
-		event: 'recovery'
+		event: 'editBrands'
 	}, {
 		iconFont: 'cuIcon-delete',
 		badge: 100,
@@ -150,6 +197,7 @@
 		event: 'del'
 	}];
 	let scanResult = ref('');
+	/*
 	https.interceptors.request.use(config => {
 		uni.showLoading({
 			title: config.ajax,
@@ -157,24 +205,28 @@
 		});
 		return config
 	})
-	const items = reactive(new Map())
-	https({ //items
-		url: 'core/v1/items',
-		query: {
-			limit: 86,
-			offset: 2480
-		},
-		ajax: '载入商品数据...' // 传递给拦截器的值
-	}).then(res => {
-		for (const item of res.data.items) {
-			items.set(item.id, item)
-		}
-		setTimeout(() => {
-			uni.hideLoading();
-		}, 50)
-	}).catch(err => {
-		console.log(err)
-	});
+	*/
+	const {
+		proxy
+	} = getCurrentInstance()
+	let dataList = ref([]);
+	//const items = reactive(new Map())
+	const queryList = (pageNo, pageSize) => {
+		https({ //items
+			url: 'core/v1/items',
+			//data:{},{ name: 'name', age: 18 } 转换后的结果是 name=name&age=18
+			params: { //params 属性作用是将数据转换为 query string 拼接在 URL 上，即上面的 query 一致。但 2.4.2 更新后做了兼容处理，
+				//当你传了 params 属性并且 url 上没有 /:xxx 参数字段声明时，则按照 query 处理,针对restful
+				limit: pageSize,
+				offset: (pageNo - 1) * pageSize
+			},
+			//value:"ajax config"
+		}).then(res => {
+			proxy.$refs.paging.complete(res.data.items);
+		}).catch(err => {
+			proxy.$refs.paging.complete(false);
+		});
+	}
 	const test = () => {
 		items.get("36157375959257686").name.name = "我是测试看看的"
 		console.log(items.get("36157375959257686"))
@@ -240,9 +292,11 @@
 		console.log("member");
 		console.log(object);
 	};
+	/*
 	watch(items, (n, o) => {
 		console.log(n)
 	})
+	*/
 	const forMoney = () => {
 		let patt = new RegExp(/^¥?[1-9][0-9]*\.[0-9]{1}$|^0\.[0-9]{1}$/);
 		"¥ 25.000/盒".replace(/^(¥|￥|¥ |￥ )(\d+.\d{2,})/, function(m, $1, $2, $3, $4) {
