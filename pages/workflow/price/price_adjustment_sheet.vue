@@ -25,7 +25,7 @@
 	<scroll-view scroll-y :scroll-with-animation="true" :enable-back-to-top="true" class="bg-grey"
 		:style="{height:dateShow?'calc(98.5vh - '+(fixedHeight+dateShowHeight)+'px - 5px)':'calc(98.5vh - '+ fixedHeight +'px - 5px)'}">
 		<view class="sheet" v-for="(sheet,index) in priceAdjustmentSheet" :key="index">
-			<hoprxi-cell iconFont="icon-supplier"
+			<hoprxi-cell iconFont='cuIcon-delete'
 				:title="{name:'单据号: ' + sheet.sheetNumber,weight:500,size:15,color:selectColor(sheet)}"
 				:line="{pattern:'dashed',color:'#d4e7ed'}">
 				<!-- <template #slotName></template> -->

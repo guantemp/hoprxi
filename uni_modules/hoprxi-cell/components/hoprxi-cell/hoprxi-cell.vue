@@ -1,9 +1,9 @@
 <template>
 	<view v-if="line_pattern === 'top'" :style="lineStyle"></view>
 	<view class="flex justify-between">
-		<view class="flex align-center" :style="{padding:line_pattern === 'top'?'6px 0 0 0':'0 0 6px 6px'}">
-			<text v-if="iconFont" :class="iconFont" :style="{fontSize:iconFont_size}"></text>
-			<image v-if="icon&&!iconFont" :src="icon" class="icon"></image>
+		<view class="flex align-center" :style="{padding:line_pattern === 'top'?'6px 0 0 0':'0 0 6px 3px'}">
+			<text v-if="iconFont" :class="iconFont" style="fontSize:30px,color: #000;"></text>
+			<image v-if="icon&&!iconFont" :src="icon" style="width: 25px;height: 25px;"></image>
 			<text :style="titleStyle" :class="{'margin-left-xs':icon||iconFont}">{{ title.name }}</text>
 		</view>
 		<slot>
@@ -62,8 +62,5 @@
 	};
 </script>
 <style lang="scss">
-	.icon {
-		width: 25px;
-		height: 25px;
-	}
+
 </style>
