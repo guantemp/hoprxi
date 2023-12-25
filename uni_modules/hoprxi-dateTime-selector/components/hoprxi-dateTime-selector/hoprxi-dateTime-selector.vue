@@ -314,19 +314,22 @@
 	let timeFlag = 'start';
 	const timeVal = ref([]);
 	const clickTime = (flag) => {
-		timeShow.value = !timeShow.value;
-		timeFlag = flag;
-		switch (timeFlag) {
-			case 'start':
-				timeVal.value = [internalRange[0].start.getHours(), internalRange[0].start.getMinutes(),
-					internalRange[0].start.getSeconds()
-				];
-				break;
-			case 'end':
-				timeVal.value = [internalRange[0].end.getHours(), internalRange[0].end.getMinutes(), internalRange[0]
-					.end.getSeconds()
-				];
-				break
+		if (internalRange[0].start && internalRange[0].end) {
+			timeShow.value = !timeShow.value;
+			timeFlag = flag;
+			switch (timeFlag) {
+				case 'start':
+					timeVal.value = [internalRange[0].start.getHours(), internalRange[0].start.getMinutes(),
+						internalRange[0].start.getSeconds()
+					];
+					break;
+				case 'end':
+					timeVal.value = [internalRange[0].end.getHours(), internalRange[0].end.getMinutes(), internalRange[
+							0]
+						.end.getSeconds()
+					];
+					break;
+			}
 		}
 	};
 	const timeChange = (e) => {
